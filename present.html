@@ -125,11 +125,11 @@
     { key: "title",  build: buildTitle },
     { key: "who",    build: buildWho }
   ];
-  cfg.prompts.forEach(p => SLIDES.push({ key: "prompt:" + p.id, prompt: p, build: buildPrompt }));
-  SLIDES.push({ key: "gather",   build: buildGather });
-  SLIDES.push({ key: "problems", build: buildProblems });
-  SLIDES.push({ key: "solve",    build: buildSolve });
-  SLIDES.push({ key: "closing",  build: buildClosing });
+  cfg.prompts.forEach(p => SLIDES.push({ key: "prompt:" + p.id, prompt: p, phase: "concerns", build: buildPrompt }));
+  SLIDES.push({ key: "gather",   phase: "gather",    build: buildGather });
+  SLIDES.push({ key: "problems", phase: "problems",  build: buildProblems });
+  SLIDES.push({ key: "solve",    phase: "solutions", build: buildSolve });
+  SLIDES.push({ key: "closing",  phase: "closing",   build: buildClosing });
   window.SLIDES = SLIDES;
 
   let current = -1, viewMode = "wall";
@@ -472,10 +472,64 @@
   });
 
   /* Arrow keys work too, so you can drive from a clicker if the control panel
-     is not to hand. */
+     is not to hand.
+
+     They drive the ROOM, not just this screen. If they only changed this
+     screen, the control panel would still highlight the old slide, the phones
+     would not follow, the board would not open, and the next poll would snap
+     the projector straight back. So the same rules the control panel uses
+     apply here: pick a slide, set the phase and question, open the board on a
+     question slide, close it everywhere else.
+
+     That needs the control password. We reuse the one the control panel
+     remembered in this browser, or ask once and remember it ourselves. */
+  const TOKEN_KEY = "missingpiece.token";
+  let driveToken = null;
+
+  function askForToken() {
+    let t = null;
+    try { t = localStorage.getItem(TOKEN_KEY); } catch {}
+    if (!t) {
+      t = prompt("To drive the slides from this screen, enter the control password.\n" +
+                 "(Or leave this blank and use the control panel instead.)");
+      if (t) t = t.trim();
+    }
+    return t || null;
+  }
+
+  async function driveTo(i) {
+    i = Math.max(0, Math.min(SLIDES.length - 1, i));
+    if (i === current) return;
+    if (!driveToken) driveToken = askForToken();
+    if (!driveToken) return;
+
+    const s = SLIDES[i];
+    const changes = { slide: i };
+    if (s.phase) changes.phase = s.phase;
+    if (s.prompt) changes.prompt = s.prompt.id;
+    else if (s.phase && s.phase !== "solutions") changes.prompt = null;
+    if (s.key !== "solve") changes.spotlight = null;
+    changes.open = !!s.prompt || s.key === "solve";
+
+    show(i);                                   // move now; the poll confirms it
+    try {
+      await Store.control(driveToken, changes);
+      try { localStorage.setItem(TOKEN_KEY, driveToken); } catch {}
+    } catch (e) {
+      if (/token/i.test(e.message || "")) {
+        driveToken = null;
+        try { localStorage.removeItem(TOKEN_KEY); } catch {}
+        alert("That password doesn't match the one in the database. Try again.");
+      } else {
+        alert("Couldn't move the room: " + (e.message || e));
+      }
+      if (Store.state.room) show(Store.state.room.current_slide | 0);   // snap back
+    }
+  }
+
   addEventListener("keydown", e => {
-    if (e.key === "ArrowRight" || e.key === "PageDown") show(current + 1);
-    if (e.key === "ArrowLeft"  || e.key === "PageUp")   show(current - 1);
+    if (e.key === "ArrowRight" || e.key === "PageDown") driveTo(current + 1);
+    if (e.key === "ArrowLeft"  || e.key === "PageUp")   driveTo(current - 1);
     if (e.key === "w") $("tView").click();
     if (e.key === "f") $("tFull").click();
   });

@@ -85,6 +85,9 @@ project and tells you whether a participant can actually submit. Then open
    question on everyone's phone, and opens or closes the board automatically.
 
 Arrow keys also work on the projector if you would rather use a clicker.
+They move the whole room — control panel, phones and board — not just the
+projector, so the first press asks for the control password (or reuses the one
+the control panel remembered, if both are open in the same browser).
 
 ### The AI step
 
