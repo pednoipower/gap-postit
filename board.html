@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609220844">
+<link rel="stylesheet" href="assets/theme.css?v=202609220855">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
 <style>
   .stat-line { font-size: 14px; color: #8C2E25; font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
@@ -22,6 +22,16 @@
   .field textarea.note { min-height: 84px; }
   .field textarea.note.blank { min-height: 58px; }
   .field .lbl.conn { font-size: 17px; font-weight: 700; }
+  /* the fixed start of the sentence: the gap, then "because" */
+  .opening { font-size: 16px; font-weight: 700; line-height: 1.5; margin: 0 0 12px; padding: 10px 12px;
+    background: var(--paper-2); border-radius: var(--r-sm); }
+  .opening .gap { color: var(--text-dim); font-weight: 600; }
+  /* the sentence assembling itself as they type */
+  .preview { border: 2px dashed var(--edge); border-radius: var(--r-md); padding: 11px 13px; margin-top: 4px; }
+  .preview .k { font-size: 12.5px; color: var(--text-dim); font-weight: 600; margin-bottom: 4px; }
+  .preview .v { font-size: 15.5px; line-height: 1.55; }
+  .preview .v .b { color: var(--text-dim); }
+  .preview .v .f { font-weight: 700; }
   .field .lbl { font-size: 15.5px; }
   .why-note { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; margin: 0 0 12px; }
   /* where am I in the session */
@@ -74,22 +84,24 @@
     </label>
     <div id="whyFields" class="hidden">
       <p class="why-note" id="whyLead"></p>
+      <p class="opening" id="opening"></p>
+      <label class="field">
+        <span class="lbl conn" id="situLbl"></span>
+        <textarea class="note blank" id="wWhen" maxlength="400" rows="2" autocomplete="off" autocorrect="on"></textarea>
+      </label>
       <label class="field">
         <span class="lbl" id="whoLbl"></span>
         <div class="choices wrap-auto" id="whoChoices"></div>
       </label>
       <label class="field">
-        <span class="lbl" id="whenLbl"></span>
-        <textarea class="note blank" id="wWhen" maxlength="400" rows="2" autocomplete="off" autocorrect="on"></textarea>
-      </label>
-      <label class="field">
-        <span class="lbl" id="doesLbl"></span>
+        <span class="lbl conn" id="doesLbl"></span>
         <textarea class="note blank" id="wBody" maxlength="400" rows="2" autocomplete="off" autocorrect="on"></textarea>
       </label>
-      <label class="field" style="margin-bottom:0">
-        <span class="lbl" id="becauseLbl"></span>
+      <label class="field">
+        <span class="lbl conn" id="becauseLbl"></span>
         <textarea class="note blank" id="wWhy" maxlength="400" rows="2" autocomplete="off" autocorrect="on"></textarea>
       </label>
+      <div class="preview" id="preview"><div class="k" id="previewK"></div><div class="v" id="previewV"></div></div>
       <p class="why-note" style="margin:10px 0 0" id="whyNote"></p>
     </div>
   </div>
@@ -132,12 +144,12 @@
   <p class="hint center" style="opacity:.5;font-size:11px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609220844"></script>
-<script src="assets/config.js?v=202609220844"></script>
-<script src="assets/strings.js?v=202609220844"></script>
-<script src="assets/store-supabase.js?v=202609220844"></script>
-<script src="assets/store-local.js?v=202609220844"></script>
-<script src="assets/store.js?v=202609220844"></script>
+<script src="assets/version.js?v=202609220855"></script>
+<script src="assets/config.js?v=202609220855"></script>
+<script src="assets/strings.js?v=202609220855"></script>
+<script src="assets/store-supabase.js?v=202609220855"></script>
+<script src="assets/store-local.js?v=202609220855"></script>
+<script src="assets/store.js?v=202609220855"></script>
 <script>
 (function () {
   "use strict";
@@ -177,21 +189,43 @@
   $("stHas").addEventListener("click", () => setSite("cause"));
   $("stHasnot").addEventListener("click", () => setSite("works"));
   $("whoLbl").textContent = t("who_lbl");
-  $("whenLbl").textContent = t("when_lbl");   $("whenLbl").classList.add("conn");
-  $("becauseLbl").textContent = t("because_lbl"); $("becauseLbl").classList.add("conn");
-  $("doesLbl").classList.add("conn");
-  $("wWhen").placeholder = t("when_hint");
+  $("situLbl").textContent = t("situ_lbl");
+  $("becauseLbl").textContent = t("because_lbl");
+  $("previewK").textContent = t("preview_lbl");
+  $("wWhen").placeholder = t("situ_hint");
+
+  /* The sentence, assembled from the blanks. Blank parts show as ___ so the
+     person can see the shape of what they are building. */
+  function renderPreview() {
+    const g = currentGap();
+    if (!g || !site) return;
+    const f = v => v ? `<span class="f">${escapeHtml(v)}</span>` : `<span class="b">______</span>`;
+    const who = actorLabel(actor);
+    $("previewV").innerHTML =
+      `<span class="b">${escapeHtml(g.label)} ${escapeHtml(t(site === "cause" ? "open_cause" : "open_works"))}</span> ` +
+      `ในสถานการณ์${f($("wWhen").value.trim())} ` +
+      `${f(who)} ${site === "cause" ? "มักจะ" : "จะ"}${f($("wBody").value.trim())} ` +
+      `เพราะ${f($("wWhy").value.trim())}`;
+  }
+  function escapeHtml(v) {
+    return String(v == null ? "" : v).replace(/[&<>"']/g,
+      c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
   function setSite(v) {
     site = v;
     $("stHas").setAttribute("aria-pressed", String(v === "cause"));
     $("stHasnot").setAttribute("aria-pressed", String(v === "works"));
     $("whyFields").classList.remove("hidden");
     $("whyLead").textContent = t(v === "cause" ? "why_lead" : "works_lead");
+    const g = currentGap();
+    $("opening").innerHTML = `<span class="gap">${escapeHtml(g ? g.label : "")}</span> ${escapeHtml(t(v === "cause" ? "open_cause" : "open_works"))}`;
     $("doesLbl").textContent = t(v === "cause" ? "does_lbl" : "does_works_lbl");
     $("wBody").placeholder = t(v === "cause" ? "does_hint" : "does_works_hint");
     $("wWhy").placeholder = t(v === "cause" ? "because_hint" : "because_works_hint");
-    chips($("whoChoices"), cfg.actors || [], id => { actor = id; }, actor);
+    chips($("whoChoices"), cfg.actors || [], id => { actor = id; renderPreview(); }, actor);
+    renderPreview();
     refreshSend();
+    $("wWhen").focus({ preventScroll: true });
   }
   /* ---- choice chips ---- */
   function chips(host, items, onPick, current) {
@@ -329,6 +363,7 @@
   }
   setInterval(refreshSend, 400);
   ["wWhen","wBody","wWhy","hWhat","hWhy"].forEach(id => $(id).addEventListener("input", refreshSend));
+  ["wWhen","wBody","wWhy"].forEach(id => $(id).addEventListener("input", renderPreview));
 
   /* ---- echo back what they have sent this round ---- */
   function renderMine() {
@@ -343,7 +378,7 @@
       const r = document.createElement("span"); r.className = "ref"; r.textContent = n.queued ? "…" : "✓";
       const tx = document.createElement("span");
       tx.textContent = n.context
-        ? `เมื่อ${n.context} · ${actorLabel(n.actor)} ${n.kind === "cause" ? "มักจะ" : "จะ"} ${n.body} — เพราะ ${n.reason}`
+        ? `ในสถานการณ์${n.context} ${actorLabel(n.actor)}${n.kind === "cause" ? "มักจะ" : "จะ"}${n.body} เพราะ${n.reason}`
         : (n.reason ? `${n.body} — ${n.reason}` : n.body);
       d.append(r, tx);
       $("mineList").appendChild(d);
@@ -433,7 +468,7 @@
       if (res.ok) {
         entry.queued = !!res.queued;
         mine.push(entry);
-        if (m === "why") { $("wWhen").value = ""; $("wBody").value = ""; $("wWhy").value = ""; }
+        if (m === "why") { $("wWhen").value = ""; $("wBody").value = ""; $("wWhy").value = ""; renderPreview(); }
         if (m === "how") { $("hWhat").value = ""; $("hWhy").value = ""; }
         lastSentAt = Date.now();
         status(res.queued ? "warn" : "ok", res.queued ? t("sent_queued") : t("sent_ok"));

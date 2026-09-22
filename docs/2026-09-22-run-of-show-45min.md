@@ -45,11 +45,16 @@ For each gap, two slides.
 *at your hospital: still the case / not the case — it works here*. Then a
 fill-in-the-blank, all four required:
 
-> **ใคร** (tap) · **เมื่อ**… · **มักจะ**… · **เพราะ**…
+> **[gap] เนื่องจาก ในสถานการณ์**… · **ใคร** (tap) **มักจะ**… · **เพราะ**…
 
-— who, in what situation, does or doesn't do what, because of what reason or
-missing resource. People from hospitals where it already works fill the
-mirror image (*เมื่อ… จะ… เพราะ…*): what makes it work there. Say out loud:
+— in what situation, who, does or doesn't do what, because of what reason or
+missing resource. The sentence assembles itself on the phone as they type.
+People from hospitals where it already works fill the mirror image
+(*[gap] ไม่เกิดที่ รพ. ของเรา เนื่องจาก ในสถานการณ์… ใคร จะ… เพราะ…*).
+
+Example, G1: *โรงพยาบาลยังไม่มีระบบคัดกรองผู้ป่วยที่เหมาะกับ CKM เนื่องจาก
+ในสถานการณ์ผู้ป่วย stage 5 มาตามนัดที่ CKD clinic แพทย์โรคไตมักจะไม่ได้ประเมินว่า
+เหมาะกับ CKM หรือไม่ เพราะไม่มีเกณฑ์ ไม่มีช่องในแบบบันทึก และคิวยาว* Say out loud:
 *one sentence that pins down where it breaks — talk about the system, not
 people.*
 
