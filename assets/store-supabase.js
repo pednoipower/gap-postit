@@ -74,14 +74,14 @@
     },
 
     async listConcerns(code, since) {
-      let url = rest() + "/concerns?select=id,ref,prompt_id,body,role,discipline,group_id,created_at"
+      let url = rest() + "/concerns?select=id,ref,prompt_id,body,situation,role,discipline,participant_id,group_id,created_at"
               + "&room_code=eq." + q(code) + "&order=created_at.asc&limit=5000";
       if (since) url += "&created_at=gte." + q(since);
       return (await req(url, { headers: headers() })) || [];
     },
 
     async listSolutions(code, since) {
-      let url = rest() + "/solutions?select=id,ref,group_id,body,role,discipline,created_at"
+      let url = rest() + "/solutions?select=id,ref,group_id,kind,body,reason,outcome,role,discipline,participant_id,created_at"
               + "&room_code=eq." + q(code) + "&order=created_at.asc&limit=5000";
       if (since) url += "&created_at=gte." + q(since);
       return (await req(url, { headers: headers() })) || [];
@@ -89,14 +89,14 @@
 
     async listGroups(code) {
       return (await req(
-        rest() + "/groups?select=id,label,problem_statement,rationale,color_index,sort_order"
+        rest() + "/groups?select=id,label,problem_statement,rationale,proposal,color_index,sort_order"
         + "&room_code=eq." + q(code) + "&order=sort_order.asc",
         { headers: headers() })) || [];
     },
 
     async listParticipants(code) {
       return (await req(
-        rest() + "/participants?select=id,role,discipline,joined_at&room_code=eq." + q(code) + "&limit=1000",
+        rest() + "/participants?select=id,role,discipline,setting,joined_at&room_code=eq." + q(code) + "&limit=1000",
         { headers: headers() })) || [];
     },
 

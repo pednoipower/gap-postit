@@ -77,12 +77,15 @@ body.participant {
 }
 
 .masthead { padding: 8px 0 18px; }
+/* Thai puts tone marks above the ascender line and vowels below the
+   baseline, so it needs more leading than Latin: tight line-height makes
+   marks from one line touch the next. Same reason for no negative tracking. */
 .masthead h1 {
   font-family: var(--font-display);
-  font-size: 26px; line-height: 1.15; margin: 0 0 4px;
-  letter-spacing: -0.02em; font-weight: 700;
+  font-size: 25px; line-height: 1.35; margin: 0 0 6px;
+  letter-spacing: 0; font-weight: 700;
 }
-.masthead p { margin: 0; color: var(--text-dim); font-size: 15px; line-height: 1.45; }
+.masthead p { margin: 0; color: var(--text-dim); font-size: 15px; line-height: 1.55; }
 
 .card {
   background: #fff;
@@ -117,12 +120,22 @@ label.field > span.lbl {
   text-align: left;
   min-height: 56px;                 /* comfortable thumb target */
   display: flex; align-items: center; gap: 10px;
+  line-height: 1.4;
+  touch-action: manipulation;       /* no 300ms tap delay on older phones */
   transition: border-color .12s, background .12s, transform .06s;
 }
+.choice:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
 .choice:active { transform: scale(.985); }
 .choice[aria-pressed="true"] {
   border-color: var(--pick, var(--text));
-  background: color-mix(in srgb, var(--pick, #000) 9%, #fff);
+  background: color-mix(in srgb, var(--pick, #000) 13%, #fff);
+  font-weight: 700;
+}
+/* a chosen option is marked by a tick as well as by colour, so it still
+   reads under a bright room light or to someone who does not see the tint */
+.choice[aria-pressed="true"]::after {
+  content: "✓"; margin-left: auto; padding-left: 8px;
+  color: var(--pick, var(--text)); font-weight: 800; font-size: 18px;
 }
 .choice .dot {
   width: 15px; height: 15px; border-radius: 50%;
@@ -143,7 +156,8 @@ textarea.note {
   background: var(--paper-2);
   color: var(--text);
 }
-textarea.note:focus { outline: none; border-color: var(--text-dim); background: #fff; }
+textarea.note:focus { outline: none; border-color: var(--text); background: #fff;
+  box-shadow: 0 0 0 3px rgba(19,23,34,.14); }
 textarea.note::placeholder { color: #A8A395; }
 
 .counter { text-align: right; font-size: 13px; color: var(--text-dim); margin-top: 7px; }
@@ -158,10 +172,14 @@ textarea.note::placeholder { color: #A8A395; }
   width: 100%;
   background: var(--text); color: #fff;
   min-height: 56px;
-  transition: opacity .12s, transform .06s;
+  touch-action: manipulation;
+  transition: opacity .12s, transform .06s, background .12s, color .12s;
 }
+.btn:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
 .btn:active:not(:disabled) { transform: scale(.99); }
-.btn:disabled { opacity: .38; cursor: not-allowed; }
+/* the disabled label carries the reason ("fill in both boxes"), so it has
+   to stay readable — a pale button with dark text rather than a faded one */
+.btn:disabled { background: #E6E2DA; color: #454B5A; cursor: not-allowed; }
 .btn.ghost { background: #fff; color: var(--text); border: 2px solid var(--edge); }
 .btn.small { font-size: 15px; padding: 12px 16px; min-height: 46px; width: auto; }
 
@@ -171,6 +189,11 @@ textarea.note::placeholder { color: #A8A395; }
   padding: 14px 0 max(16px, env(safe-area-inset-bottom));
   margin-top: auto;
 }
+/* feedback next to the button, where the thumb and the eyes already are */
+.foot-msg { font-size: 14px; line-height: 1.45; text-align: center; margin: 0 0 9px; min-height: 1.45em; }
+.foot-msg.ok   { color: #1D6B48; }
+.foot-msg.warn { color: #7A5C09; }
+.foot-msg.bad  { color: #8C2E25; font-weight: 600; }
 
 /* Status strip — connection, queued notes, confirmations */
 .status {
@@ -207,7 +230,7 @@ textarea.note::placeholder { color: #A8A395; }
 }
 .mine-item.pending { opacity: .62; font-style: italic; }
 
-.hint { font-size: 14px; color: var(--text-dim); line-height: 1.5; }
+.hint { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
 .center { text-align: center; }
 
 /* ============================================================================
@@ -231,19 +254,21 @@ body.present {
 .slide.live { display: flex; opacity: 1; }
 
 .slide-head { flex: none; margin-bottom: 2vh; }
+/* Thai needs more leading than Latin (tone marks above, vowels below);
+   tight headings make the marks of one line touch the next. */
 .slide h1 {
-  font-size: clamp(38px, 5.6vw, 96px);
-  line-height: 1.02; margin: 0;
-  letter-spacing: -0.03em; font-weight: 750;
+  font-size: clamp(36px, 5.2vw, 90px);
+  line-height: 1.25; margin: 0;
+  letter-spacing: 0; font-weight: 750;
 }
 .slide h2 {
-  font-size: clamp(26px, 3.4vw, 56px);
-  line-height: 1.1; margin: 0 0 1vh;
-  letter-spacing: -0.02em; font-weight: 700;
+  font-size: clamp(24px, 3.1vw, 52px);
+  line-height: 1.3; margin: 0 0 1vh;
+  letter-spacing: 0; font-weight: 700;
 }
 .slide .sub {
   font-size: clamp(16px, 1.65vw, 28px);
-  color: #9BA6BC; margin: 1vh 0 0; font-weight: 450; line-height: 1.35;
+  color: #9BA6BC; margin: 1vh 0 0; font-weight: 450; line-height: 1.5;
 }
 .slide-body { flex: 1; min-height: 0; position: relative; }
 
