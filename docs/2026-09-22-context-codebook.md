@@ -1,4 +1,4 @@
-# Context codebook — for coding the ในสถานการณ์ blank
+# Context codebook — for coding the เพราะเมื่อ [สถานการณ์/เงื่อนไข] blank
 
 Participants describe the situation in their own words (*where · when · what
 is going on*). Context is classified **afterwards**, by the analyst, with this
@@ -24,7 +24,7 @@ the response) and any number of secondary codes.
 1. Code what the **participant** described, not what you infer. If the text
    says only *วันพุธ*, code WORKLOAD/TIME; do not add PLACE because you know
    the Wednesday clinic is far away.
-2. The **เพราะ** blank often names a second context (e.g. *เพราะไม่มีช่องใน
+2. The **เนื่องจาก** blank often names a second context (e.g. *เนื่องจากไม่มีช่องใน
    HIS*). Code it there as the *mechanism's missing resource*, and also as a
    secondary context code if it is a standing condition rather than a
    momentary reason.

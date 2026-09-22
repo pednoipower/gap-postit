@@ -45,7 +45,7 @@ For each gap, two slides.
 *at your hospital: still the case / not the case — it works here*. Then a
 fill-in-the-blank, all four required:
 
-> **[gap] เนื่องจาก ในสถานการณ์**… · **ใคร** (tap) **มักจะ**… · **เพราะ**…
+> **[gap] เพราะเมื่อ** [สถานการณ์/เงื่อนไข] · **ใคร** (tap) **มักจะ** [การตอบสนอง] · **เนื่องจาก** [เหตุผล]
 
 — in what situation, who, does or doesn't do what, because of what reason or
 missing resource. The sentence assembles itself on the phone as they type.
@@ -53,16 +53,16 @@ missing resource. The sentence assembles itself on the phone as they type.
 what is going on* — so people describe rather than classify. Context is
 coded afterwards with `docs/2026-09-22-context-codebook.md`.
 People from hospitals where it already works fill the mirror image
-(*[gap] ไม่เกิดที่ รพ. ของเรา เนื่องจาก ในสถานการณ์… ใคร จะ… เพราะ…*).
+(*[gap] ไม่เกิดที่ รพ. ของเรา เพราะเมื่อ… ใคร จะ… เนื่องจาก…*).
 
 Examples:
-- G1, workload: *…เนื่องจาก ในสถานการณ์คลินิกไตวันพุธคนล้น 80 ราย แพทย์โรคไต
-  มักจะไม่ได้ประเมินว่าเหมาะกับ CKM หรือไม่ เพราะไม่มีเกณฑ์ และไม่มีช่องใน HIS*
-- G3, place and relationship: *…เนื่องจาก ในสถานการณ์ทีม PC อยู่คนละตึก
-  และไม่มีวันราวด์ร่วม ทีมประคับประคองมักจะเห็นผู้ป่วยต่อเมื่อถูกปรึกษา เพราะ
-  ไม่มีเวทีทบทวนผู้ป่วยร่วมกัน*
-- G4, incentive: *…เนื่องจาก ในสถานการณ์ตัวชี้วัดของหน่วยนับจำนวนผู้ป่วยที่ได้เริ่ม
-  ฟอก แพทย์โรคไตมักจะไม่เปิดเรื่อง ACP ก่อนเริ่ม HD เพราะเกรงว่าครอบครัวจะเข้าใจ
+- G1, workload: *…เพราะเมื่อคลินิกไตวันพุธคนล้น 80 ราย แพทย์โรคไตมักจะไม่ได้
+  ประเมินว่าเหมาะกับ CKM หรือไม่ เนื่องจากไม่มีเกณฑ์ และไม่มีช่องใน HIS*
+- G3, place and relationship: *…เพราะเมื่อทีม PC อยู่คนละตึกและไม่มีวันราวด์ร่วม
+  ทีมประคับประคองมักจะเห็นผู้ป่วยต่อเมื่อถูกปรึกษา เนื่องจากไม่มีเวทีทบทวนผู้ป่วย
+  ร่วมกัน*
+- G4, incentive: *…เพราะเมื่อตัวชี้วัดของหน่วยนับจำนวนผู้ป่วยที่ได้เริ่มฟอก
+  แพทย์โรคไตมักจะไม่เปิดเรื่อง ACP ก่อนเริ่ม HD เนื่องจากเกรงว่าครอบครัวจะเข้าใจ
   ว่า "ไม่รักษา"* Say out loud:
 *one sentence that pins down where it breaks — talk about the system, not
 people.*

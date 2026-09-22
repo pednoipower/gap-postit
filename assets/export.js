@@ -256,7 +256,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
 
     /* Sheet 1 — why: causes where the gap exists, and what makes it work where it doesn't */
     const causeRows = [[
-      H("Ref"), H("Gap"), H("Gap label"), H("Type"), H("ใคร (actor)"), H("ในสถานการณ์ (context)"), H("มักจะ/จะ (response)"), H("เพราะ (mechanism)"),
+      H("Ref"), H("Gap"), H("Gap label"), H("Type"), H("ใคร (actor)"), H("เมื่อ (situation/condition)"), H("มักจะ/จะ (response)"), H("เนื่องจาก (reason)"),
       H("Role"), H("Discipline"), H("Setting"), H("Phone id"), H("Time")
     ]];
     for (const r of snap.solutions.filter(x => x.kind === "cause" || x.kind === "works")) {
@@ -393,7 +393,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
     L.push("THE MISSING PIECE — why each gap happens, and what we would do");
     L.push("Exported: " + new Date(snap.exportedAt).toLocaleString());
     L.push("");
-    L.push("WHY lines: LABEL | team | role | ในสถานการณ์ (context) | ใคร (actor) | มักจะ/จะ (response) | เพราะ (mechanism)");
+    L.push("WHY lines: LABEL | team | role | เมื่อ (situation/condition) | ใคร (actor) | มักจะ/จะ (response) | เนื่องจาก (reason)");
     L.push("HOW lines: LABEL | team | role | what — why it would work here");
     L.push("");
     for (const g of (snap.groups || [])) {
@@ -406,7 +406,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
       if (g.proposal) L.push("PROPOSAL: " + clean(g.proposal));
       L.push("-".repeat(74));
       L.push("WHY IT HAPPENS — from hospitals where the gap exists (" + c.length + "):");
-      const sent = x => `ในสถานการณ์ ${clean(x.context)} | ใคร ${clean(x.actor)} | มักจะ/จะ ${clean(x.body)} | เพราะ ${clean(x.reason)}`;
+      const sent = x => `เมื่อ ${clean(x.context)} | ใคร ${clean(x.actor)} | มักจะ/จะ ${clean(x.body)} | เนื่องจาก ${clean(x.reason)}`;
       c.forEach(x => L.push(`  ${x.ref} | ${x.discipline} | ${x.role} | ${sent(x)}`));
       L.push("");
       L.push("WHAT MAKES IT WORK — from hospitals where it does not (" + w.length + "):");
