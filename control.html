@@ -102,6 +102,9 @@
       <p class="why">Paste what the AI gave you. Before anything is saved, every
         note it refers to is checked against what was actually said in this room.
         If it invented one, nothing is imported and you'll be told which.</p>
+      <p class="why"><b>If the AI can't do it, or you want to fix what it did:</b>
+        <a href="group.html" target="_blank">open the grouping board</a> and sort
+        the notes by hand. It saves through the same check.</p>
       <textarea class="text" id="importBox" placeholder='Paste the AI&apos;s JSON here…'></textarea>
       <div class="row" style="margin-top:11px">
         <button class="btn small" id="doImport">Check and import</button>
@@ -284,6 +287,14 @@
   });
 
   /* ---- the AI prompt ---- */
+  /* Themes the facilitator already expects, from the evidence. When present,
+     the AI is asked to sort into these first rather than invent its own. */
+  function seedRule() {
+    const seeds = cfg.seedThemes || [];
+    if (!seeds.length) return "";
+    return "\n   KNOWN THEMES: the evidence already points to these gaps. Use them as groups where concerns fit, keeping their names. Add a new group only for concerns that genuinely fit none of them.\n" +
+      seeds.map((t, i) => `     - ${t.label}: ${t.problem || ""}`).join("\n");
+  }
   const AI_PROMPT = `You are helping run a clinical workshop called "The Missing Piece", bringing together a nephrology team and a palliative care team.
 
 Below is a list of concerns written anonymously by workshop participants. Each line looks like:
@@ -296,7 +307,7 @@ Group these concerns into a small number of shared underlying problems, and writ
 RULES — these matter more than elegance:
 1. Use ONLY the labels (C-001 etc.) exactly as they appear. Never invent, renumber or alter a label. Every label you output must appear in the input.
 2. Every concern must appear in exactly one group. Do not silently drop any. If something genuinely fits nowhere, put it in a group called "Other".
-3. Aim for 4-8 groups. Fewer than 4 hides real differences; more than 8 is unusable in a room.
+3. Aim for 4-${cfg.maxGroups || 6} groups and never more than ${cfg.maxGroups || 6}. Fewer than 4 hides real differences; more than ${cfg.maxGroups || 6} is unusable in a room. If you have more, merge the smallest into a group called "Other".${seedRule()}
 4. A problem statement is ONE sentence, in the participants' own vocabulary, naming what is missing between the two teams. Not a solution. Not a slogan.
 5. Where a group contains concerns from BOTH disciplines, say so in the rationale — those are the most valuable groups in this workshop.
 6. Do not soften or sanitise. If people wrote that something is broken, the problem statement should say it is broken.
@@ -390,6 +401,33 @@ Return ONLY a JSON array, no commentary before or after, in exactly this shape:
     if (new Set(ids).size !== ids.length) problems.push("Two groups share the same id");
     if (problems.length)
       return msg("importMsg", "bad", "Not imported:<br>• " + problems.map(escapeHtml).join("<br>• "));
+
+    /* Too many groups is not an error, but it is unworkable in a room. Offer
+       to keep the biggest and fold the rest into "Other" — the facilitator
+       decides, nothing is silently changed. */
+    const cap = cfg.maxGroups || 6;
+    if (groups.length > cap && !$("doImport").dataset.capped) {
+      msg("importMsg", "warn",
+        `The AI returned <b>${groups.length}</b> groups; the room works best with at most <b>${cap}</b>.<br>` +
+        `<button class="btn small" id="capBtn" style="margin-top:9px">Keep the ${cap - 1} biggest, merge the rest into "Other"</button> ` +
+        `<button class="btn small ghost" id="capNo" style="margin-top:9px">Import all ${groups.length} anyway</button>`);
+      $("capBtn").addEventListener("click", () => {
+        const sorted = groups.slice().sort((a, b) => b.source_ids.length - a.source_ids.length);
+        const keep = sorted.slice(0, cap - 1), rest = sorted.slice(cap - 1);
+        const other = {
+          id: "G" + cap, label: "Other",
+          problem_statement: rest.map(g => g.problem_statement).join(" / "),
+          rationale: "Merged at import: " + rest.map(g => g.label || g.id).join(", "),
+          source_ids: rest.flatMap(g => g.source_ids)
+        };
+        $("importBox").value = JSON.stringify(keep.concat([other]), null, 2);
+        $("doImport").dataset.capped = "1";
+        $("doImport").click();
+      });
+      $("capNo").addEventListener("click", () => { $("doImport").dataset.capped = "1"; $("doImport").click(); });
+      return;
+    }
+    delete $("doImport").dataset.capped;
 
     msg("importMsg", "", "Checking every note against what was actually said…");
     try {

@@ -20,6 +20,7 @@ gather round it. Colour is discipline: nephrology against palliative care.
 | `present.html` | the projector |
 | `control.html` | you, on a laptop or phone |
 | `health.html` | you, the day before |
+| `group.html` | you, only if the AI grouping fails or needs fixing |
 
 Plus one file you edit: **`assets/config.js`**. Everything else can be left alone.
 
@@ -108,6 +109,24 @@ was actually said in this room.** If it invents a `C-999` that nobody wrote,
 the import is refused, nothing is written, and you are told which label was
 wrong. Ask it to try again. This is the guard that keeps the problem statements
 honest — every one stays traceable to the words that produced it.
+
+### If the AI grouping doesn't work
+
+Three things can go wrong, and each has a way out that keeps the session moving:
+
+- **It returns too many groups.** The prompt asks for at most `maxGroups`
+  (set in `config.js`, default 6). If the AI ignores that, the import offers
+  one click: keep the biggest, merge the rest into "Other".
+- **You can't reach an AI at all**, or **what it returned is wrong for the
+  room.** Open `group.html`. Every concern is a post-it in a tray; drag them
+  (or tap several, then "Send selected here") into groups, name each group,
+  write its one-sentence problem, and **Save to the room**. It goes through
+  the same check as the AI path. Your draft is kept in the browser until you
+  save, so a refresh loses nothing.
+- **You already know what the gaps are likely to be.** Put them in
+  `seedThemes` in `config.js`. The AI is told to sort into those first, and
+  the grouping board starts with those columns already there — so the manual
+  fallback becomes "drop notes into known buckets", which takes minutes.
 
 ### Spotlight
 

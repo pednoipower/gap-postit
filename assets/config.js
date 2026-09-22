@@ -132,5 +132,25 @@ window.CONFIG = {
      straight into the prompt you copy to the AI. Labels like C-001 and G1 stay
      as they are whatever you put here.
      ------------------------------------------------------------------------ */
-  aiOutputLanguage: "Thai"
+  aiOutputLanguage: "Thai",
+
+  /* --------------------------------------------------------------------------
+     11. HOW MANY PROBLEM GROUPS, AND WHICH ONES YOU ALREADY EXPECT
+     --------------------------------------------------------------------------
+     maxGroups   The most problem groups a room can work with. The AI is asked
+                 to stay within it; if it doesn't, the import offers to keep the
+                 biggest ones and merge the rest into "Other".
+
+     seedThemes  Gaps you already expect from the evidence. The AI is told to
+                 use these where they fit (and only add new ones if it must),
+                 and the manual grouping board (group.html) starts with these
+                 columns ready. Leave the list empty to start from nothing.
+                 `problem` is the one-sentence problem statement; `label` is the
+                 2-4 word name that shows on the pieces.
+     ------------------------------------------------------------------------ */
+  maxGroups: 6,
+  seedThemes: [
+    // { label: "Late referral",   problem: "Palliative care is brought in only in the final days." },
+    // { label: "After-hours gap", problem: "Nobody knows who to call after 5pm." }
+  ]
 };

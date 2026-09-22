@@ -370,6 +370,7 @@ input.text:focus, textarea.text:focus { outline: none; border-color: var(--text-
 }
 .note-line.bad { background: #FBECEA; border-color: #F2CFCA; color: #8C2E25; }
 .note-line.ok  { background: #EAF6F0; border-color: #C5E5D6; color: #1D6B48; }
+.note-line.warn { background: #FDF6E3; border-color: #F0E0B0; color: #7A5C09; }
 
 code.inline {
   background: var(--paper-2); padding: 2px 6px; border-radius: 4px;
