@@ -1,0 +1,4 @@
+# runtime data written by the fallback server during a workshop
+server/workshop-data.json
+
+.DS_Store

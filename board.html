@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBFAF7">
+<title>The Missing Piece</title>
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
+</head>
+<body class="participant">
+<div class="wrap">
+
+  <div class="masthead">
+    <h1 id="promptTitle">Waiting to start…</h1>
+    <p id="promptSub">Keep this page open. The question will appear here.</p>
+  </div>
+
+  <div id="statusBox"></div>
+
+  <!-- shown when the facilitator has the board closed -->
+  <div class="card center" id="waitCard">
+    <p class="hint" style="margin:6px 0 0" id="waitText">
+      Look up at the screen — we'll open this when it's time to write.
+    </p>
+  </div>
+
+  <!-- solution mode: which problem are you answering? -->
+  <div class="card hidden" id="groupCard">
+    <label class="field" style="margin-bottom:0">
+      <span class="lbl" id="groupLbl">Which gap do you want to help close?</span>
+      <div class="choices" id="groupChoices"></div>
+    </label>
+  </div>
+
+  <div class="card hidden" id="writeCard">
+    <textarea class="note" id="body" maxlength="400" rows="4"
+      placeholder="Type here…" autocomplete="off" autocorrect="on"></textarea>
+    <div class="counter" id="counter">0 / 200</div>
+  </div>
+
+  <div class="mine hidden" id="mineBox">
+    <h3 id="mineHead">What you've added</h3>
+    <div id="mineList"></div>
+  </div>
+
+  <div class="sticky-foot hidden" id="foot">
+    <button class="btn" id="send" disabled>Add to the board</button>
+  </div>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/store-supabase.js"></script>
+<script src="assets/store-local.js"></script>
+<script src="assets/store.js"></script>
+<script>
+(function () {
+  "use strict";
+  const cfg = window.CONFIG;
+  const $ = id => document.getElementById(id);
+
+  const me = (() => {
+    try { return JSON.parse(localStorage.getItem("missingpiece.me") || "null"); }
+    catch { return null; }
+  })();
+  if (!me || me.room !== cfg.roomCode) { location.replace("index.html"); return; }
+
+  const root = document.documentElement.style;
+  if (cfg.colors.nephro)     root.setProperty("--nephro", cfg.colors.nephro.base);
+  if (cfg.colors.palliative) root.setProperty("--pall",   cfg.colors.palliative.base);
+  const myColor = (cfg.colors[me.discipline] || cfg.colors.fallback).base;
+
+  let room = null, groups = [], chosenGroup = null;
+  let lastSentAt = 0, sending = false;
+  const mine = [];        // this person's own notes, echoed back to them
+
+  /* -- status strip -- */
+  function status(kind, text, hide) {
+    if (hide) { $("statusBox").replaceChildren(); return; }
+    $("statusBox").innerHTML =
+      `<div class="status ${kind}"><span class="pip"></span><span>${text}</span></div>`;
+  }
+
+  /* -- character counter -- */
+  const max = cfg.maxCharacters || 200;
+  function updateCount() {
+    const n = $("body").value.length;
+    const c = $("counter");
+    c.textContent = n + " / " + max;
+    c.className = "counter" + (n > max ? " over" : n > max * 0.85 ? " near" : "");
+    refreshSend();
+  }
+  $("body").addEventListener("input", updateCount);
+
+  function myNotesForNow() {
+    return mine.filter(m => room && (room.phase === "solutions"
+      ? m.kind === "solution" && m.groupId === chosenGroup
+      : m.kind === "concern" && m.promptId === room.active_prompt_id));
+  }
+
+  function refreshSend() {
+    const txt = $("body").value.trim();
+    const cooling = Date.now() - lastSentAt < (cfg.submitCooldownSeconds || 3) * 1000;
+    const atLimit = myNotesForNow().length >= (cfg.maxPerPersonPerPrompt || 5);
+    const needGroup = room && room.phase === "solutions" && !chosenGroup;
+    const ok = txt.length > 0 && txt.length <= max && !cooling && !sending
+               && !atLimit && !needGroup && room && room.board_open;
+    $("send").disabled = !ok;
+    $("send").textContent =
+      sending   ? "Adding…" :
+      atLimit   ? "That's all for this one — thank you" :
+      needGroup ? "Pick a gap above first" :
+      cooling   ? "Just a moment…" :
+                  (room && room.phase === "solutions" ? "Add this idea" : "Add to the board");
+  }
+  setInterval(refreshSend, 400);
+
+  /* -- render this person's own contributions -- */
+  function renderMine() {
+    const list = myNotesForNow();
+    $("mineBox").classList.toggle("hidden", list.length === 0);
+    $("mineHead").textContent = list.length === 1
+      ? "You've added 1 note" : `You've added ${list.length} notes`;
+    $("mineList").replaceChildren();
+    for (const m of list) {
+      const d = document.createElement("div");
+      d.className = "mine-item" + (m.queued ? " pending" : "");
+      d.style.setProperty("--pick", myColor);
+      const r = document.createElement("span");
+      r.className = "ref";
+      r.textContent = m.queued ? "…" : "✓";
+      const t = document.createElement("span");
+      t.textContent = m.body;
+      d.append(r, t);
+      $("mineList").appendChild(d);
+    }
+  }
+
+  /* -- solution mode: list the problems to choose between -- */
+  function renderGroups() {
+    const host = $("groupChoices");
+    host.replaceChildren();
+    for (const g of groups) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "choice";
+      b.style.display = "block";
+      b.dataset.gid = g.id;
+      b.setAttribute("aria-pressed", String(chosenGroup === g.id));
+      b.style.setProperty("--pick", myColor);
+      const strong = document.createElement("div");
+      strong.style.cssText = "font-weight:700;margin-bottom:3px";
+      strong.textContent = g.label;
+      const p = document.createElement("div");
+      p.style.cssText = "font-weight:450;font-size:14.5px;line-height:1.4;color:#5D6577";
+      p.textContent = g.problem_statement;
+      b.append(strong, p);
+      b.addEventListener("click", () => {
+        chosenGroup = g.id;
+        /* Update the buttons in place rather than rebuilding the list.
+           Rebuilding it here destroys the button that is mid-click, and the
+           browser then delivers a second click to whatever has taken its
+           place — which silently filed everyone's idea under the first
+           problem in the list no matter which one they actually tapped. */
+        markChosen();
+        renderMine(); refreshSend();
+        // preventScroll stops the page jumping to the text box under the tap
+        $("body").focus({ preventScroll: true });
+      });
+      host.appendChild(b);
+    }
+  }
+
+  function markChosen() {
+    const host = $("groupChoices");
+    [...host.children].forEach(c =>
+      c.setAttribute("aria-pressed", String(c.dataset.gid === chosenGroup)));
+  }
+
+  /* -- react to whatever the facilitator is doing -- */
+  function applyRoom(r) {
+    const prevPhase = room && room.phase;
+    const prevPrompt = room && room.active_prompt_id;
+    room = r;
+    if (!room) return;
+
+    const spotlightChanged = room.spotlight_group && room.spotlight_group !== chosenGroup;
+
+    if (room.phase === "solutions") {
+      $("groupCard").classList.remove("hidden");
+      // If the facilitator spotlights a problem, everyone's phone follows.
+      if (spotlightChanged) { chosenGroup = room.spotlight_group; }
+      $("promptTitle").textContent = "How do we close this gap?";
+      $("promptSub").textContent = room.spotlight_group
+        ? "Everyone is on the same problem right now."
+        : "Pick any gap below, then add your idea.";
+      $("body").placeholder = "e.g. A joint clinic once a fortnight";
+      renderGroups();
+    } else {
+      $("groupCard").classList.add("hidden");
+      const p = (cfg.prompts || []).find(p => p.id === room.active_prompt_id);
+      if (p) {
+        $("promptTitle").textContent = p.title;
+        $("promptSub").textContent = p.subtitle || "";
+        $("body").placeholder = p.hint || "Type here…";
+      } else {
+        $("promptTitle").textContent = "Waiting to start…";
+        $("promptSub").textContent = "Keep this page open. The question will appear here.";
+      }
+    }
+
+    // moving to a new question clears the box so nobody posts a stale answer
+    if (prevPhase !== room.phase || prevPrompt !== room.active_prompt_id) {
+      $("body").value = "";
+      updateCount();
+    }
+
+    const open = !!room.board_open;
+    $("writeCard").classList.toggle("hidden", !open);
+    $("foot").classList.toggle("hidden", !open);
+    $("waitCard").classList.toggle("hidden", open);
+    if (!open) {
+      $("waitText").textContent = room.phase === "lobby"
+        ? "You're in. Look up at the screen — we'll start shortly."
+        : "That round is closed. Look up at the screen.";
+    }
+    renderMine();
+    refreshSend();
+  }
+
+  /* -- sending -- */
+  $("send").addEventListener("click", async () => {
+    const body = $("body").value.trim();
+    if (!body) return;
+    sending = true; refreshSend();
+
+    const isSolution = room && room.phase === "solutions";
+    const entry = {
+      kind: isSolution ? "solution" : "concern",
+      body,
+      promptId: room ? room.active_prompt_id : null,
+      groupId: chosenGroup,
+      queued: false
+    };
+
+    try {
+      const res = isSolution
+        ? await Store.addSolution({ groupId: chosenGroup, body,
+            role: me.role, discipline: me.discipline, participantId: me.id })
+        : await Store.addConcern({ promptId: room.active_prompt_id, body,
+            role: me.role, discipline: me.discipline, participantId: me.id });
+
+      if (res.ok) {
+        entry.queued = !!res.queued;
+        mine.push(entry);
+        $("body").value = "";
+        updateCount();
+        lastSentAt = Date.now();
+        status(res.queued ? "warn" : "ok",
+          res.queued
+            ? "Saved on your phone — it'll send itself when the signal comes back"
+            : "Added. Look up at the screen.");
+        setTimeout(() => status(null, null, true), res.queued ? 6000 : 2600);
+      } else {
+        status("bad", res.error || "That didn't go through. Try again.");
+      }
+    } catch (e) {
+      status("bad", "That didn't go through. Try again.");
+    } finally {
+      sending = false;
+      renderMine();
+      refreshSend();
+    }
+  });
+
+  /* -- keep in step with the room --
+     Only the room's own row is fetched, and only while the phone is awake and
+     the page is in front of the participant. That keeps 150 phones costing
+     almost nothing. */
+  let timer = null;
+  async function poll() {
+    try {
+      applyRoom(await Store.getRoom());
+      const g = await Store.listGroups();
+      if (JSON.stringify(g) !== JSON.stringify(groups)) { groups = g; renderGroups(); }
+      status(null, null, true);
+    } catch (e) {
+      status("warn", "Lost connection — still trying. Anything you write is kept safe.");
+    }
+  }
+  function startPolling() {
+    if (timer) return;
+    poll();
+    timer = setInterval(poll, 4000);
+  }
+  function stopPolling() { clearInterval(timer); timer = null; }
+
+  document.addEventListener("visibilitychange", () => {
+    document.hidden ? stopPolling() : startPolling();
+  });
+
+  (async function () {
+    try {
+      await Store.init();
+      await Store.flushOutbox();
+      startPolling();
+    } catch (e) {
+      status("bad", "Can't reach the workshop. Check your wifi, then refresh.");
+    }
+  })();
+
+  updateCount();
+})();
+</script>
+</body>
+</html>

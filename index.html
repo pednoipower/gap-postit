@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBFAF7">
+<title>Join — The Missing Piece</title>
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
+</head>
+<body class="participant">
+<div class="wrap">
+
+  <div class="masthead">
+    <h1 id="title">The Missing Piece</h1>
+    <p id="subtitle">Finding the gaps between nephrology and palliative care</p>
+  </div>
+
+  <div id="statusBox"></div>
+
+  <div class="card">
+    <label class="field">
+      <span class="lbl">Which team are you part of?</span>
+      <div class="choices two" id="disciplines"></div>
+    </label>
+
+    <label class="field" style="margin-bottom:6px">
+      <span class="lbl">And your role?</span>
+      <div class="choices wrap-auto" id="roles"></div>
+    </label>
+  </div>
+
+  <p class="hint center" style="margin:0 0 6px">
+    Nothing you write is linked to your name.<br>
+    We only record your team and role.
+  </p>
+
+  <div class="sticky-foot">
+    <button class="btn" id="go" disabled>Choose both to continue</button>
+  </div>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/store-supabase.js"></script>
+<script src="assets/store-local.js"></script>
+<script src="assets/store.js"></script>
+<script>
+(function () {
+  "use strict";
+  const cfg = window.CONFIG;
+  const $ = id => document.getElementById(id);
+
+  document.title = "Join — " + cfg.workshopTitle;
+  $("title").textContent = cfg.workshopTitle;
+  $("subtitle").textContent = cfg.workshopSubtitle;
+
+  // Discipline colours come from config so there is one place to change them
+  const root = document.documentElement.style;
+  if (cfg.colors.nephro)     { root.setProperty("--nephro", cfg.colors.nephro.base); }
+  if (cfg.colors.palliative) { root.setProperty("--pall",   cfg.colors.palliative.base); }
+
+  const picked = { discipline: null, role: null };
+
+  function buildChoices(host, items, key, withDot) {
+    host.replaceChildren();
+    for (const item of items) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "choice";
+      b.setAttribute("aria-pressed", "false");
+      if (key === "discipline") b.dataset.discipline = item.id;
+      if (withDot) {
+        const d = document.createElement("span");
+        d.className = "dot";
+        b.appendChild(d);
+      }
+      b.appendChild(document.createTextNode(item.label));
+      b.addEventListener("click", () => {
+        picked[key] = item.id;
+        [...host.children].forEach(c => c.setAttribute("aria-pressed", "false"));
+        b.setAttribute("aria-pressed", "true");
+        refresh();
+      });
+      host.appendChild(b);
+    }
+  }
+
+  buildChoices($("disciplines"), cfg.disciplines, "discipline", true);
+  buildChoices($("roles"), cfg.roles, "role", false);
+
+  function refresh() {
+    const ready = picked.discipline && picked.role;
+    $("go").disabled = !ready || !window.__connected;
+    $("go").textContent = !window.__connected ? "Connecting…"
+      : ready ? "I'm in — let's go" : "Choose both to continue";
+  }
+
+  function status(kind, text) {
+    $("statusBox").innerHTML =
+      `<div class="status ${kind}"><span class="pip"></span><span>${text}</span></div>`;
+  }
+
+  // If they already joined on this phone, remember it and skip straight in.
+  const saved = (() => {
+    try { return JSON.parse(localStorage.getItem("missingpiece.me") || "null"); }
+    catch { return null; }
+  })();
+
+  (async function connect() {
+    status("warn", "Connecting…");
+    try {
+      const backend = await Store.init();
+      window.__connected = true;
+      if (saved && saved.room === cfg.roomCode) {
+        status("ok", "Welcome back — taking you to the board");
+        location.replace("board.html");
+        return;
+      }
+      status("ok", "Connected. Room " + cfg.roomCode +
+             (backend === "local" ? " (on the local network)" : ""));
+      refresh();
+    } catch (e) {
+      window.__connected = false;
+      status("bad", e.bothFailed
+        ? "Can't reach the workshop. Check you're on the right wifi, then pull down to refresh."
+        : "Can't connect: " + (e.message || e));
+      refresh();
+    }
+  })();
+
+  $("go").addEventListener("click", async () => {
+    $("go").disabled = true;
+    $("go").textContent = "Joining…";
+    try {
+      const id = await Store.join(picked.role, picked.discipline);
+      localStorage.setItem("missingpiece.me", JSON.stringify({
+        id, role: picked.role, discipline: picked.discipline, room: cfg.roomCode
+      }));
+      location.href = "board.html";
+    } catch (e) {
+      // Joining is only bookkeeping — never block someone from taking part
+      localStorage.setItem("missingpiece.me", JSON.stringify({
+        id: Store.uuid(), role: picked.role, discipline: picked.discipline,
+        room: cfg.roomCode, unregistered: true
+      }));
+      location.href = "board.html";
+    }
+  });
+})();
+</script>
+</body>
+</html>

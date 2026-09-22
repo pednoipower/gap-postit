@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pre-flight check — The Missing Piece</title>
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .check { display:flex; gap:13px; align-items:flex-start; padding:14px 0; border-bottom:1px solid var(--edge); }
+  .check:last-child { border-bottom:0; }
+  .mark { width:24px; height:24px; border-radius:50%; flex:none; display:grid; place-items:center;
+          font-size:14px; font-weight:800; color:#fff; background:var(--text-dim); }
+  .mark.ok { background:var(--ok); } .mark.bad { background:var(--bad); } .mark.warn { background:var(--warn); }
+  .check .t { font-weight:650; margin-bottom:3px; }
+  .check .d { font-size:13.5px; color:var(--text-dim); line-height:1.5; }
+</style>
+</head>
+<body class="control">
+<div class="control-wrap" style="max-width:760px">
+  <div class="panel">
+    <h2>Pre-flight check</h2>
+    <p class="why">Open this the day before, and again an hour before you start.
+      It wakes a sleeping Supabase project and tells you whether everything the
+      workshop depends on is actually working.</p>
+    <button class="btn small" id="run">Run the checks</button>
+    <div id="out" style="margin-top:14px"></div>
+  </div>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/qrcode.js"></script>
+<script src="assets/store-supabase.js"></script>
+<script src="assets/store-local.js"></script>
+<script src="assets/store.js"></script>
+<script>
+(function () {
+  "use strict";
+  const cfg = window.CONFIG, $ = id => document.getElementById(id);
+
+  function add(state, title, detail) {
+    const d = document.createElement("div");
+    d.className = "check";
+    d.innerHTML = `<div class="mark ${state}">${state==="ok"?"✓":state==="bad"?"!":"?"}</div>
+      <div><div class="t">${title}</div><div class="d">${detail}</div></div>`;
+    $("out").appendChild(d);
+  }
+
+  $("run").addEventListener("click", async () => {
+    $("out").replaceChildren();
+    $("run").disabled = true; $("run").textContent = "Checking…";
+
+    // 1. has the config actually been filled in?
+    if (cfg.supabaseUrl.includes("YOUR-PROJECT") || cfg.supabaseAnonKey.includes("PASTE")) {
+      add("warn", "Supabase keys not filled in",
+        "assets/config.js still has the placeholder text. Fine if you are deliberately running on the laptop server only.");
+    } else {
+      add("ok", "Supabase keys are filled in", cfg.supabaseUrl);
+    }
+
+    // 2. can we reach a backend at all?
+    let backend = null;
+    try {
+      backend = await Store.init();
+      add("ok", "Connected", backend === "supabase"
+        ? "Talking to Supabase. Your project is awake."
+        : "Running on the local laptop server.");
+    } catch (e) {
+      add("bad", "Cannot reach any backend", (e.message || String(e)).replace(/\n/g, "<br>") +
+        "<br><br>If your Supabase project is paused, open your Supabase dashboard and click Restore, then wait a couple of minutes and run this again.");
+      $("run").disabled = false; $("run").textContent = "Run the checks again";
+      return;
+    }
+
+    // 3. does the room exist?
+    try {
+      const room = await Store.getRoom();
+      if (room) add("ok", "Room " + cfg.roomCode + " exists",
+        `Currently on slide ${room.current_slide}, board ${room.board_open ? "OPEN" : "closed"}, phase "${room.phase}".`);
+      else add("bad", "Room " + cfg.roomCode + " does not exist",
+        "Run the last few lines of supabase/schema.sql to create it, or check roomCode in config.js matches.");
+    } catch (e) { add("bad", "Could not read the room", e.message); }
+
+    // 4. can a participant actually post? (writes a note, then tells you to clear it)
+    try {
+      const room = await Store.getRoom();
+      if (!room || !room.board_open) {
+        add("warn", "Could not test submitting",
+          "The board is closed, which is correct between rounds. To test end to end, open the board on the control page and run this again.");
+      } else {
+        const res = await Store.addConcern({
+          promptId: (cfg.prompts[0] || {}).id || "p1",
+          body: "PRE-FLIGHT TEST — safe to delete",
+          role: "other", discipline: (cfg.disciplines[0] || {}).id || "nephro",
+          participantId: null
+        });
+        if (res.ok && !res.queued)
+          add("ok", "A participant can submit",
+            "A test note was added. Clear the room on the control page before you start for real.");
+        else if (res.queued)
+          add("warn", "Submission was queued, not delivered", "The connection dropped mid-test. Check your wifi.");
+        else add("bad", "Submitting failed", res.error || "unknown");
+      }
+    } catch (e) { add("bad", "Submitting failed", e.message); }
+
+    // 5. does the QR code build?
+    try {
+      const qr = QRCode.generate(cfg.joinUrl, { level: "M" });
+      add("ok", "QR code builds", `Version ${qr.version}, ${qr.size}×${qr.size}. Point a phone at the title slide to be sure it scans.`);
+    } catch (e) { add("bad", "QR code failed", e.message + " — try a shorter joinUrl."); }
+
+    // 6. is the join link plausible?
+    if (/your-site\.example\.com|localhost|127\.0\.0\.1/.test(cfg.joinUrl))
+      add("warn", "joinUrl is still a placeholder",
+        `It reads "${cfg.joinUrl}". Participants will type what is under the QR code, so set this to the real address.`);
+    else add("ok", "Join link looks real", cfg.joinUrl);
+
+    // 7. storage, used for the offline queue
+    try {
+      localStorage.setItem("__t", "1"); localStorage.removeItem("__t");
+      add("ok", "Phone storage works", "Notes written while offline will be kept and sent later.");
+    } catch (e) {
+      add("warn", "Phone storage blocked", "Private browsing can block this. Offline notes may be lost.");
+    }
+
+    $("run").disabled = false; $("run").textContent = "Run the checks again";
+  });
+})();
+</script>
+</body>
+</html>

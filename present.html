@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Missing Piece — presenter</title>
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
+<style>
+  .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
+  .qr-card { background:#fff; border-radius:26px; padding:26px; box-shadow:var(--shadow-3); }
+  .qr-card svg { display:block; width:100%; height:auto; }
+  .join-line { margin-top:20px; text-align:center; }
+  .join-line .url { font-size:clamp(15px,1.5vw,25px); color:#C4CCDD; word-break:break-all; }
+  .join-line .code {
+    font-size:clamp(34px,4.6vw,76px); font-weight:800; letter-spacing:.2em;
+    margin-top:6px; color:#fff;
+  }
+  .joined {
+    display:flex; align-items:baseline; gap:16px; margin-top:4vh;
+    font-size:clamp(17px,1.9vw,32px); color:#9BA6BC;
+  }
+  .joined b { font-size:clamp(40px,5.4vw,92px); color:#fff; font-weight:800; letter-spacing:-.03em; }
+
+  .who-grid { display:flex; gap:4vw; height:100%; align-items:center; justify-content:center; flex-wrap:wrap; }
+  .who-col { text-align:center; }
+  .who-col .n { font-size:clamp(54px,8vw,150px); font-weight:800; line-height:1; letter-spacing:-.04em; }
+  .who-col .l { font-size:clamp(16px,1.7vw,29px); color:#9BA6BC; margin-top:10px; }
+  .who-roles { display:flex; gap:22px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
+  .who-roles span { font-size:clamp(13px,1.15vw,20px); color:#7D879C; }
+
+  .toolbar {
+    position:fixed; top:2vh; right:2vw; display:flex; gap:8px; z-index:20;
+    opacity:.12; transition:opacity .2s;
+  }
+  .toolbar:hover { opacity:1; }
+  .toolbar button {
+    background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2);
+    color:#fff; border-radius:9px; padding:8px 13px; font:inherit; font-size:13px; cursor:pointer;
+  }
+  .toolbar button[aria-pressed="true"] { background:#fff; color:var(--ink); }
+
+  .more-chip {
+    /* sits above the room-code chip in the corner rather than on top of it */
+    position:absolute; right:0; bottom:54px;
+    background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2);
+    border-radius:100px; padding:9px 18px; font-size:clamp(13px,1.2vw,21px); color:#C4CCDD;
+  }
+
+  /* The cards shrink as more problem groups arrive, so 8 groups still fit on
+     one projected screen. You cannot scroll a projector. */
+  .problems { display:grid; gap:1.6vh; height:100%; align-content:center; padding-bottom:6vh; }
+  .problems[data-n="6"] .stmt, .problems[data-n="7"] .stmt { font-size:clamp(15px,1.72vw,30px); }
+  .problems[data-n="8"] .stmt, .problems[data-n="9"] .stmt,
+  .problems[data-n="10"] .stmt { font-size:clamp(14px,1.5vw,26px); }
+  .problems[data-n="8"] .problem-card, .problems[data-n="9"] .problem-card,
+  .problems[data-n="10"] .problem-card { padding:1.4vh 2vw; }
+  .problem-card {
+    display:grid; grid-template-columns:auto 1fr auto; gap:2vw; align-items:center;
+    background:#161C2A; border:1px solid #2A3142; border-radius:20px;
+    padding:2.2vh 2.4vw;
+  }
+  .problem-card .tag {
+    font-size:clamp(12px,1vw,18px); font-weight:800; letter-spacing:.09em;
+    padding:7px 13px; border-radius:8px; color:#0E1118;
+  }
+  .problem-card .stmt { font-size:clamp(17px,2vw,36px); font-weight:700; line-height:1.22; }
+  .problem-card .from { font-size:clamp(12px,1.05vw,19px); color:#8A94A8; margin-top:8px; }
+  .problem-card .counts { text-align:right; font-size:clamp(12px,1.05vw,19px); color:#8A94A8; white-space:nowrap; }
+  .problem-card .counts b { display:block; font-size:clamp(24px,2.6vw,46px); color:#fff; letter-spacing:-.02em; }
+
+  .spotlight-wrap { display:grid; grid-template-columns: 1fr 1.15fr; gap:3vw; height:100%; align-items:center; }
+  .spot-problem { position:relative; height:70%; }
+  .spot-solutions { position:relative; height:100%; overflow:hidden; }
+
+  .closing { display:grid; place-items:center; height:100%; text-align:center; }
+  .closing .big { font-size:clamp(32px,5vw,90px); font-weight:800; letter-spacing:-.03em; line-height:1.08; }
+  .closing .sub { font-size:clamp(16px,1.8vw,31px); color:#9BA6BC; margin-top:2.4vh; }
+
+  .offline-flag {
+    position:fixed; top:2vh; left:2vw; z-index:30;
+    background:#C94A3F; color:#fff; border-radius:100px;
+    padding:9px 18px; font-size:15px; font-weight:650;
+  }
+</style>
+</head>
+<body class="present">
+
+<div class="toolbar">
+  <button id="tView" aria-pressed="false">Word cloud</button>
+  <button id="tFull">Full screen</button>
+</div>
+
+<div id="offline" class="offline-flag hidden">Lost connection — retrying</div>
+
+<!-- slides are created by script so the sequence follows your config -->
+<div id="slides"></div>
+
+<div class="corner-code" id="cornerCode"></div>
+<div class="livecount" id="liveCount"><span class="pip"></span><span>0 in the room</span></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/qrcode.js"></script>
+<script src="assets/jigsaw.js"></script>
+<script src="assets/wordcloud.js"></script>
+<script src="assets/store-supabase.js"></script>
+<script src="assets/store-local.js"></script>
+<script src="assets/store.js"></script>
+<script>
+(function () {
+  "use strict";
+  const cfg = window.CONFIG;
+  const $ = id => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+
+  const root = document.documentElement.style;
+  if (cfg.colors.nephro)     root.setProperty("--nephro", cfg.colors.nephro.base);
+  if (cfg.colors.palliative) root.setProperty("--pall",   cfg.colors.palliative.base);
+
+  /* ------------------------------------------------------------------------
+     THE SLIDE SEQUENCE
+     Built from config, so adding a question adds a slide automatically.
+     ---------------------------------------------------------------------- */
+  const SLIDES = [
+    { key: "title",  build: buildTitle },
+    { key: "who",    build: buildWho }
+  ];
+  cfg.prompts.forEach(p => SLIDES.push({ key: "prompt:" + p.id, prompt: p, build: buildPrompt }));
+  SLIDES.push({ key: "gather",   build: buildGather });
+  SLIDES.push({ key: "problems", build: buildProblems });
+  SLIDES.push({ key: "solve",    build: buildSolve });
+  SLIDES.push({ key: "closing",  build: buildClosing });
+  window.SLIDES = SLIDES;
+
+  let current = -1, viewMode = "wall";
+  const els = [];
+
+  SLIDES.forEach((s, i) => {
+    const d = document.createElement("div");
+    d.className = "slide";
+    d.dataset.key = s.key;
+    $("slides").appendChild(d);
+    els.push(d);
+  });
+
+  function show(i) {
+    i = Math.max(0, Math.min(SLIDES.length - 1, i));
+    if (i === current) { refreshSlide(); return; }
+    current = i;
+    els.forEach((e, n) => e.classList.toggle("live", n === i));
+    // the title slide already shows the code enormously; no need to repeat it
+    $("cornerCode").style.display = SLIDES[i].key === "title" ? "none" : "";
+    els[i].replaceChildren();
+    SLIDES[i].build(els[i], SLIDES[i]);
+    refreshSlide();
+  }
+
+  /* ---- slide 1: title, QR, room code ---- */
+  function buildTitle(el) {
+    el.innerHTML = `
+      <div class="title-grid">
+        <div>
+          <h1>${escapeHtml(cfg.workshopTitle)}</h1>
+          <p class="sub" style="max-width:24ch">${escapeHtml(cfg.workshopSubtitle)}</p>
+          <div class="joined"><b id="joinN">0</b><span>in the room</span></div>
+        </div>
+        <div>
+          <div class="qr-card" id="qrBox"></div>
+          <div class="join-line">
+            <div class="url">${escapeHtml(cfg.joinUrl.replace(/^https?:\/\//, ""))}</div>
+            <div class="code">${escapeHtml(cfg.roomCode)}</div>
+          </div>
+        </div>
+      </div>`;
+    try {
+      $("qrBox").innerHTML = QRCode.toSVG(cfg.joinUrl, { level: "M", quietZone: 1 });
+    } catch (e) {
+      $("qrBox").innerHTML =
+        `<div style="color:#8C2E25;font-size:15px;padding:12px">Could not draw the QR code: ${escapeHtml(e.message)}</div>`;
+    }
+  }
+
+  /* ---- slide 2: who is in the room ---- */
+  function buildWho(el) {
+    el.innerHTML = `
+      <div class="slide-head"><h2>Who's in the room</h2>
+        <p class="sub">Two halves of the same problem</p></div>
+      <div class="slide-body"><div class="who-grid" id="whoGrid"></div></div>`;
+  }
+  function fillWho() {
+    const grid = $("whoGrid");
+    if (!grid) return;
+    const ps = Store.state.participants || [];
+    grid.replaceChildren();
+    for (const d of cfg.disciplines) {
+      const mine = ps.filter(p => p.discipline === d.id);
+      const col = document.createElement("div");
+      col.className = "who-col";
+      const c = (cfg.colors[d.id] || cfg.colors.fallback);
+      const roles = cfg.roles.map(r => {
+        const n = mine.filter(p => p.role === r.id).length;
+        return n ? `<span>${n} ${escapeHtml(r.label.toLowerCase())}</span>` : "";
+      }).filter(Boolean).join("");
+      col.innerHTML =
+        `<div class="n" style="color:${c.base}">${mine.length}</div>
+         <div class="l">${escapeHtml(d.label)}</div>
+         <div class="who-roles">${roles}</div>`;
+      grid.appendChild(col);
+    }
+  }
+
+  /* ---- prompt slides: the live board ---- */
+  function buildPrompt(el, slide) {
+    el.innerHTML = `
+      <div class="slide-head">
+        <h2>${escapeHtml(slide.prompt.title)}</h2>
+        <p class="sub">${escapeHtml(slide.prompt.subtitle || "")}</p>
+      </div>
+      <div class="slide-body"><div class="board" id="board"></div></div>`;
+  }
+
+  /* ---- the "now we hand it to the AI" pause ---- */
+  function buildGather(el) {
+    el.innerHTML = `
+      <div class="slide-head"><h2>What you've told us</h2></div>
+      <div class="slide-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:3vw;align-content:center;height:100%">
+          <div class="who-col"><div class="n" id="gTotal">0</div><div class="l">concerns raised</div></div>
+          <div class="who-col"><div class="n" id="gNeph" style="color:${cfg.colors.nephro.base}">0</div><div class="l">from nephrology</div></div>
+          <div class="who-col"><div class="n" id="gPall" style="color:${cfg.colors.palliative.base}">0</div><div class="l">from palliative care</div></div>
+          <div class="who-col"><div class="n" id="gVoices">0</div><div class="l">people contributed</div></div>
+        </div>
+      </div>`;
+  }
+
+  /* ---- the problem statements the AI grouped ---- */
+  function buildProblems(el) {
+    el.innerHTML = `
+      <div class="slide-head"><h2>The gaps, in your words</h2>
+        <p class="sub">Every one of these came from what you wrote</p></div>
+      <div class="slide-body" style="overflow:hidden"><div class="problems" id="problemList"></div></div>`;
+  }
+  function fillProblems() {
+    const host = $("problemList");
+    if (!host) return;
+    const groups = Store.state.groups || [];
+    if (!groups.length) {
+      host.innerHTML = `<p class="sub" style="text-align:center">
+        Waiting for the grouped problems to be brought back in…</p>`;
+      return;
+    }
+    const palette = ["#7FB3D5","#E9A06B","#8FCFA8","#C59BD1","#E5CE7A","#84C5C5","#E39A9A","#A9A3D8"];
+    host.dataset.n = Math.min(groups.length, 10);
+    host.replaceChildren();
+    groups.forEach((g, i) => {
+      const cs = Store.state.concerns.filter(c => c.group_id === g.id);
+      const ss = Store.state.solutions.filter(s => s.group_id === g.id);
+      const neph = cs.filter(c => c.discipline === "nephro").length;
+      const pall = cs.filter(c => c.discipline === "palliative").length;
+      const card = document.createElement("div");
+      card.className = "problem-card";
+      card.innerHTML = `
+        <div class="tag" style="background:${palette[i % palette.length]}">${escapeHtml(g.id)}</div>
+        <div>
+          <div class="stmt">${escapeHtml(g.problem_statement || g.label)}</div>
+          <div class="from">from ${cs.length} concern${cs.length===1?"":"s"}
+            — ${neph} nephrology, ${pall} palliative care</div>
+        </div>
+        <div class="counts"><b>${ss.length}</b>idea${ss.length===1?"":"s"}</div>`;
+      host.appendChild(card);
+    });
+  }
+
+  /* ---- solution board: open, or focused on one problem ---- */
+  function buildSolve(el) {
+    el.innerHTML = `
+      <div class="slide-head"><h2 id="solveH">Closing the gaps</h2>
+        <p class="sub" id="solveSub">Pick a gap on your phone and add your idea</p></div>
+      <div class="slide-body"><div class="board" id="board"></div></div>`;
+  }
+
+  function buildClosing(el) {
+    el.innerHTML = `
+      <div class="closing">
+        <div>
+          <div class="big">Neither of us had<br>the whole picture</div>
+          <div class="sub" id="closeStats"></div>
+        </div>
+      </div>`;
+  }
+
+  /* ------------------------------------------------------------------------
+     THE BOARD
+     Notes are laid out on a loose grid with a little jitter and tilt so it
+     feels like paper on a wall rather than a spreadsheet. Beyond what fits,
+     the newest are shown and a counter says how many more there are — a
+     projector full of 3-pixel text helps nobody.
+     ---------------------------------------------------------------------- */
+  function renderBoard(notes, kind) {
+    const board = $("board");
+    if (!board) return;
+    const W = board.clientWidth, H = board.clientHeight;
+    if (W < 50 || H < 50) return;
+
+    if (viewMode === "cloud") {
+      WordCloud.render(board, notes, { max: 130 });
+      if (notes.length) {
+        const chip = document.createElement("div");
+        chip.className = "more-chip";
+        chip.textContent = notes.length + " note" + (notes.length === 1 ? "" : "s");
+        board.appendChild(chip);
+      }
+      return;
+    }
+
+    /* How many can we show and still be readable from the back row?
+       The hard floor is a minimum note width. Without it, a narrow screen (an
+       older 4:3 projector, say) packs in so many columns that every other word
+       has to be hyphenated to fit. Better to show fewer notes properly and be
+       honest about how many are not on screen. */
+    const MIN_NOTE_W = 168;
+    const target = Math.max(1, notes.length);
+    let cols = Math.ceil(Math.sqrt(target * (W / H) * 1.25));
+    cols = Math.min(Math.max(cols, 2), 11, Math.max(2, Math.floor(W / MIN_NOTE_W)));
+    let rows = Math.ceil(target / cols);
+    const maxRows = Math.max(1, Math.floor(H / 104));
+    let capacity = cols * Math.min(rows, maxRows);
+    if (rows > maxRows) rows = maxRows;
+
+    const shown = notes.slice(-capacity);
+    const hidden = notes.length - shown.length;
+
+    /* Cap the piece size so a full board stays readable, but let a nearly empty
+       board use bigger pieces — the first three answers of a round should not
+       look lost on a wall-sized screen. */
+    const capW = notes.length <= 8 ? 430 : notes.length <= 24 ? 330 : 300;
+    const capH = notes.length <= 8 ? 270 : notes.length <= 24 ? 210 : 190;
+    const cw = W / cols, ch = H / rows;
+    const pw = Math.min(cw * 0.86, capW), ph = Math.min(ch * 0.82, capH);
+
+    /* Pieces have a maximum sensible size, so with only a handful of notes the
+       cells would otherwise be enormous and the board would look half empty.
+       Shrink the grid to the pieces and centre the whole block instead. */
+    const cellW = Math.min(cw, pw / 0.86);
+    const cellH = Math.min(ch, ph / 0.82);
+    const originX = (W - cols * cellW) / 2;
+    const originY = (H - Math.ceil(shown.length / cols) * cellH) / 2;
+
+    /* A piece's tab sticks out beyond the rectangle, so the drawing is wider
+       than the piece. Without allowing for that overhang the last column gets
+       cut off at the edge of the screen. */
+    const overhang = Math.max(pw, ph) * 0.22;
+
+    board.replaceChildren();
+    shown.forEach((n, i) => {
+      const r = Math.floor(i / cols), c = i % cols;
+      const holder = document.createElement("div");
+      holder.className = "note-piece";
+      const tilt = (hash(n.id) % 700) / 100 - 3.5;      // steady per note
+      holder.style.setProperty("--tilt", tilt + "deg");
+      holder.style.left = (originX + c * cellW + (cellW - pw) / 2 - overhang) + "px";
+      holder.style.top  = (originY + r * cellH + (cellH - ph) / 2 - overhang) + "px";
+      holder.style.animationDelay = Math.min(i * 12, 500) + "ms";
+
+      const { svg, ink } = Jigsaw.noteSVG({
+        kind, discipline: n.discipline, role: n.role, width: pw, height: ph
+      });
+      /* A concern has a bite taken out of its right-hand edge, so its text has
+         to stop short of that. A solution's tab sticks OUTWARDS, leaving the
+         body whole, so its text can run nearly the full width. */
+      const inset = kind === "concern"
+        ? { x: pw * 0.07, w: pw * 0.66 }
+        : { x: pw * 0.08, w: pw * 0.84 };
+      Jigsaw.layoutText(svg, n.body,
+        { x: inset.x, y: ph*0.1, w: inset.w, h: ph*0.8 },
+        { size: Math.max(11, Math.round(ph/8.4)), min: 9, fill: ink, weight: "600" });
+      holder.appendChild(svg);
+      board.appendChild(holder);
+    });
+
+    if (hidden > 0) {
+      const chip = document.createElement("div");
+      chip.className = "more-chip";
+      chip.textContent = "+ " + hidden + " more";
+      board.appendChild(chip);
+    }
+  }
+
+  function hash(s) {
+    let h = 0;
+    for (let i = 0; i < String(s).length; i++) h = (h * 31 + String(s).charCodeAt(i)) | 0;
+    return Math.abs(h);
+  }
+
+  /* ---- keep whatever is on screen up to date ---- */
+  function refreshSlide() {
+    const s = SLIDES[current];
+    if (!s) return;
+    const st = Store.state;
+
+    $("liveCount").lastElementChild.textContent =
+      (st.participants || []).length + " in the room";
+
+    if (s.key === "title") {
+      const n = $("joinN");
+      if (n) n.textContent = (st.participants || []).length;
+    }
+    if (s.key === "who") fillWho();
+
+    if (s.key.startsWith("prompt:")) {
+      const pid = s.prompt.id;
+      renderBoard(st.concerns.filter(c => c.prompt_id === pid), "concern");
+    }
+
+    if (s.key === "gather") {
+      const cs = st.concerns;
+      const set = new Set(cs.map(c => c.participant_id).filter(Boolean));
+      setText("gTotal", cs.length);
+      setText("gNeph", cs.filter(c => c.discipline === "nephro").length);
+      setText("gPall", cs.filter(c => c.discipline === "palliative").length);
+      /* Notes added through the app always carry an anonymous participant id.
+         Rows seeded another way might not, and "0 people contributed" under a
+         board full of notes would read as a bug to the room. */
+      const lbl = document.querySelector("#gVoices + .l");
+      if (set.size === 0 && cs.length > 0) {
+        setText("gVoices", (st.participants || []).length);
+        if (lbl) lbl.textContent = "people in the room";
+      } else {
+        setText("gVoices", set.size);
+        if (lbl) lbl.textContent = "people contributed";
+      }
+    }
+
+    if (s.key === "problems") fillProblems();
+
+    if (s.key === "solve") {
+      const spot = st.room && st.room.spotlight_group;
+      const g = (st.groups || []).find(g => g.id === spot);
+      setText("solveH", g ? g.problem_statement : "Closing the gaps");
+      setText("solveSub", g
+        ? "Everyone on this one — add your idea"
+        : "Pick a gap on your phone and add your idea");
+      const list = spot
+        ? st.solutions.filter(s2 => s2.group_id === spot)
+        : st.solutions;
+      renderBoard(list, "solution");
+    }
+
+    if (s.key === "closing") {
+      const el = $("closeStats");
+      if (el) el.textContent =
+        `${st.concerns.length} concerns · ${(st.groups||[]).length} shared problems · ${st.solutions.length} ideas to close them`;
+    }
+  }
+
+  function setText(id, v) { const e = $(id); if (e) e.textContent = v; }
+  function escapeHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g,
+      c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+
+  /* ---- toolbar ---- */
+  $("tView").addEventListener("click", () => {
+    viewMode = viewMode === "wall" ? "cloud" : "wall";
+    $("tView").textContent = viewMode === "wall" ? "Word cloud" : "Post-it wall";
+    $("tView").setAttribute("aria-pressed", String(viewMode === "cloud"));
+    refreshSlide();
+  });
+  $("tFull").addEventListener("click", () => {
+    document.fullscreenElement ? document.exitFullscreen()
+                               : document.documentElement.requestFullscreen();
+  });
+
+  /* Arrow keys work too, so you can drive from a clicker if the control panel
+     is not to hand. */
+  addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === "PageDown") show(current + 1);
+    if (e.key === "ArrowLeft"  || e.key === "PageUp")   show(current - 1);
+    if (e.key === "w") $("tView").click();
+    if (e.key === "f") $("tFull").click();
+  });
+
+  let resizeT;
+  addEventListener("resize", () => {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(refreshSlide, 180);
+  });
+
+  $("cornerCode").innerHTML =
+    `<span>${escapeHtml(cfg.joinUrl.replace(/^https?:\/\//, ""))}</span><b>${escapeHtml(cfg.roomCode)}</b>`;
+
+  /* ---- connect and follow the facilitator ---- */
+  (async function () {
+    try {
+      await Store.init();
+      Store.onChange((what, st) => {
+        if (what === "offline") { $("offline").classList.remove("hidden"); return; }
+        $("offline").classList.add("hidden");
+        if (what === "room" && st.room) {
+          const target = Math.max(0, Math.min(SLIDES.length - 1, st.room.current_slide | 0));
+          if (target !== current) { show(target); return; }
+        }
+        refreshSlide();
+      });
+      await Store.startWatching({ intervalMs: 1200 });
+      // participant counts change slowly; fetch them on a gentler timer
+      setInterval(async () => {
+        try { Store.state.participants = await Store.listParticipants(); refreshSlide(); }
+        catch (e) {}
+      }, 5000);
+      Store.state.participants = await Store.listParticipants();
+      show(Store.state.room ? (Store.state.room.current_slide | 0) : 0);
+    } catch (e) {
+      document.body.innerHTML =
+        `<div style="display:grid;place-items:center;height:100vh;text-align:center;padding:40px">
+          <div><div style="font-size:30px;font-weight:700;margin-bottom:14px">Can't reach the workshop data</div>
+          <div style="color:#9BA6BC;font-size:18px;max-width:60ch;line-height:1.5">${escapeHtml(e.message || String(e))}</div></div>
+        </div>`;
+    }
+  })();
+})();
+</script>
+</body>
+</html>

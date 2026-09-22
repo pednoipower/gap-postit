@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Control — The Missing Piece</title>
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🎛️</text></svg>">
+</head>
+<body class="control">
+<div class="control-wrap">
+
+  <div class="panel" id="lockPanel">
+    <h2>Your control password</h2>
+    <p class="why">This is the phrase you put at the bottom of <code class="inline">schema.sql</code>
+      when you set up the database. It is not stored anywhere in these files, so
+      nobody who finds this page can drive your session.</p>
+    <div class="row">
+      <input class="text" id="token" type="password" placeholder="control password" style="flex:1;min-width:220px">
+      <button class="btn small" id="unlock">Unlock</button>
+    </div>
+    <label style="display:flex;gap:8px;align-items:center;margin-top:11px;font-size:13.5px;color:var(--text-dim)">
+      <input type="checkbox" id="remember"> Remember on this computer
+    </label>
+    <div id="lockMsg"></div>
+  </div>
+
+  <div id="main" class="hidden">
+
+    <div class="panel">
+      <h2>Right now</h2>
+      <div class="stat-row" id="stats"></div>
+      <div class="row" style="margin-top:14px">
+        <button class="toggle" id="boardToggle" aria-pressed="false">
+          <span class="pip"></span><span id="boardLbl">Board is closed</span>
+        </button>
+        <span style="font-size:13.5px;color:var(--text-dim)" id="backendNote"></span>
+      </div>
+      <p class="why" style="margin:11px 0 0">While the board is closed, nobody can add anything —
+        useful between rounds so people watch the screen instead of typing.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Slides</h2>
+      <p class="why">The projector follows whatever you pick here.</p>
+      <div class="slide-list" id="slideList"></div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn small ghost" id="prev">← Back</button>
+        <button class="btn small" id="next">Next →</button>
+      </div>
+    </div>
+
+    <div class="panel" id="spotPanel">
+      <h2>Spotlight one problem</h2>
+      <p class="why">Pulls every phone in the room onto the same gap. Use it when
+        the open board is spreading people too thin, or to work through the
+        problems one at a time. Turn it off to let people roam again.</p>
+      <div class="slide-list" id="spotList"></div>
+      <button class="btn small ghost" id="spotOff" style="margin-top:10px">Let people choose freely</button>
+    </div>
+
+    <div class="panel">
+      <h2>1. Export what people wrote</h2>
+      <p class="why">Take the <b>.txt</b> to your AI along with the prompt below.
+        The <b>.xlsx</b> is for you and your colleagues — it is colour-coded by
+        problem group and by discipline.</p>
+      <div class="row">
+        <button class="btn small" id="dlTxt">Download .txt (for the AI)</button>
+        <button class="btn small ghost" id="dlXlsx">Download .xlsx (for you)</button>
+        <button class="btn small ghost" id="dlJson">Download .json (backup)</button>
+        <button class="btn small ghost" id="dlSol">Solutions .txt</button>
+      </div>
+      <div id="expMsg"></div>
+    </div>
+
+    <div class="panel">
+      <h2>2. The prompt to give your AI</h2>
+      <p class="why">Copy this, paste it into Claude or ChatGPT, and attach the .txt you just downloaded.</p>
+      <button class="btn small ghost" id="copyPrompt">Copy the prompt</button>
+      <textarea class="text" id="aiPrompt" readonly style="margin-top:11px;min-height:230px"></textarea>
+    </div>
+
+    <div class="panel">
+      <h2>3. Bring the grouped problems back</h2>
+      <p class="why">Paste what the AI gave you. Before anything is saved, every
+        note it refers to is checked against what was actually said in this room.
+        If it invented one, nothing is imported and you'll be told which.</p>
+      <textarea class="text" id="importBox" placeholder='Paste the AI&apos;s JSON here…'></textarea>
+      <div class="row" style="margin-top:11px">
+        <button class="btn small" id="doImport">Check and import</button>
+        <button class="btn small ghost" id="pasteBtn">Paste from clipboard</button>
+      </div>
+      <div id="importMsg"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Before you start</h2>
+      <p class="why">Run a dry run, then clear it out so the real session starts clean.
+        A dated backup is saved automatically before anything is removed.</p>
+      <button class="btn small ghost" id="resetBtn"
+        style="border-color:#E4B8B3;color:#8C2E25">Clear this room</button>
+      <div id="resetMsg"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="assets/config.js"></script>
+<script src="assets/export.js"></script>
+<script src="assets/store-supabase.js"></script>
+<script src="assets/store-local.js"></script>
+<script src="assets/store.js"></script>
+<script>
+(function () {
+  "use strict";
+  const cfg = window.CONFIG;
+  const $ = id => document.getElementById(id);
+  let token = null, slides = [];
+
+  /* The slide list here has to match the projector's. Both are built from the
+     same config, so adding a question adds a slide in both places. */
+  function buildSlideList() {
+    const out = [
+      { key: "title",  label: "Title, QR code and room code" },
+      { key: "who",    label: "Who's in the room" }
+    ];
+    cfg.prompts.forEach(p => out.push({
+      key: "prompt:" + p.id, promptId: p.id, phase: "concerns",
+      label: "Question: " + p.title
+    }));
+    out.push({ key: "gather",   phase: "gather",    label: "What you've told us (the totals)" });
+    out.push({ key: "problems", phase: "problems",  label: "The gaps, in your words" });
+    out.push({ key: "solve",    phase: "solutions", label: "Closing the gaps (brainstorm)" });
+    out.push({ key: "closing",  phase: "closing",   label: "Closing slide" });
+    return out;
+  }
+  slides = buildSlideList();
+
+  function msg(host, kind, html) {
+    $(host).innerHTML = html ? `<div class="note-line ${kind}">${html}</div>` : "";
+  }
+
+  /* ---- unlocking ---- */
+  const savedToken = localStorage.getItem("missingpiece.token");
+  if (savedToken) { $("token").value = savedToken; $("remember").checked = true; }
+
+  $("unlock").addEventListener("click", unlock);
+  $("token").addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
+
+  async function unlock() {
+    const t = $("token").value.trim();
+    if (!t) return;
+    msg("lockMsg", "", "Checking…");
+    try {
+      await Store.init();
+      // a harmless change that proves the password is right
+      await Store.control(t, { phase: undefined });
+      token = t;
+      if ($("remember").checked) localStorage.setItem("missingpiece.token", t);
+      else localStorage.removeItem("missingpiece.token");
+      $("lockPanel").classList.add("hidden");
+      $("main").classList.remove("hidden");
+      $("backendNote").textContent = Store.backend === "local"
+        ? "running on the local network" : "connected to Supabase";
+      start();
+    } catch (e) {
+      msg("lockMsg", "bad", /token/i.test(e.message)
+        ? "That password doesn't match the one in the database."
+        : "Couldn't connect: " + escapeHtml(e.message));
+    }
+  }
+
+  /* ---- the live picture ---- */
+  function render() {
+    const st = Store.state, room = st.room;
+    if (!room) return;
+
+    const voices = new Set(st.concerns.map(c => c.participant_id).filter(Boolean));
+    $("stats").innerHTML = [
+      ["in the room", (st.participants || []).length],
+      ["concerns", st.concerns.length],
+      ["people who wrote", voices.size],
+      ["problem groups", (st.groups || []).length],
+      ["solutions", st.solutions.length],
+      ["queued on phones", "—"]
+    ].map(([k, v]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
+
+    $("boardToggle").setAttribute("aria-pressed", String(!!room.board_open));
+    $("boardLbl").textContent = room.board_open ? "Board is OPEN" : "Board is closed";
+
+    const cur = room.current_slide | 0;
+    $("slideList").replaceChildren();
+    slides.forEach((s, i) => {
+      const b = document.createElement("button");
+      b.className = "slide-btn";
+      b.setAttribute("aria-current", String(i === cur));
+      const count = s.promptId
+        ? st.concerns.filter(c => c.prompt_id === s.promptId).length
+        : s.key === "solve" ? st.solutions.length : null;
+      b.innerHTML = `<span class="n">${i + 1}</span><span>${escapeHtml(s.label)}</span>` +
+        (count !== null ? `<span class="meta">${count} note${count===1?"":"s"}</span>` : "");
+      b.addEventListener("click", () => goTo(i));
+      $("slideList").appendChild(b);
+    });
+
+    const groups = st.groups || [];
+    $("spotPanel").classList.toggle("hidden", groups.length === 0);
+    $("spotList").replaceChildren();
+    groups.forEach(g => {
+      const b = document.createElement("button");
+      b.className = "slide-btn";
+      b.setAttribute("aria-current", String(room.spotlight_group === g.id));
+      const n = st.solutions.filter(s => s.group_id === g.id).length;
+      b.innerHTML = `<span class="n">${escapeHtml(g.id)}</span>
+        <span>${escapeHtml(g.problem_statement || g.label)}</span>
+        <span class="meta">${n} idea${n===1?"":"s"}</span>`;
+      b.addEventListener("click", async () => {
+        await Store.control(token, { spotlight: g.id, slide: slides.findIndex(s => s.key === "solve"),
+                                     phase: "solutions" });
+      });
+      $("spotList").appendChild(b);
+    });
+  }
+
+  /* Moving to a slide also sets the phase and the active question, so the
+     phones in the room follow along without you touching anything else. */
+  async function goTo(i) {
+    const s = slides[Math.max(0, Math.min(slides.length - 1, i))];
+    const changes = { slide: slides.indexOf(s) };
+    if (s.phase) changes.phase = s.phase;
+    if (s.promptId) changes.prompt = s.promptId;
+    else if (s.phase && s.phase !== "solutions") changes.prompt = null;
+    if (s.key !== "solve") changes.spotlight = null;
+    // opening a question opens the board; everything else closes it
+    changes.open = !!s.promptId || s.key === "solve";
+    await Store.control(token, changes);
+    await refreshNow();
+  }
+
+  $("next").addEventListener("click", () => goTo((Store.state.room.current_slide | 0) + 1));
+  $("prev").addEventListener("click", () => goTo((Store.state.room.current_slide | 0) - 1));
+  $("boardToggle").addEventListener("click", async () => {
+    await Store.control(token, { open: !Store.state.room.board_open });
+    await refreshNow();
+  });
+  $("spotOff").addEventListener("click", async () => {
+    await Store.control(token, { spotlight: null });
+    await refreshNow();
+  });
+
+  /* ---- exports ---- */
+  async function snap() { return Store.snapshot(); }
+  const stamp = () => Exporter.stamp();
+
+  $("dlTxt").addEventListener("click", async () => {
+    const s = await snap();
+    Exporter.download(`${stamp()}-missing-piece-concerns.txt`, Exporter.toTXT(s, cfg));
+    msg("expMsg", "ok", `Downloaded ${s.concerns.length} concerns.`);
+  });
+  $("dlSol").addEventListener("click", async () => {
+    const s = await snap();
+    Exporter.download(`${stamp()}-missing-piece-solutions.txt`, Exporter.toSolutionsTXT(s, cfg));
+    msg("expMsg", "ok", `Downloaded ${s.solutions.length} solutions.`);
+  });
+  $("dlXlsx").addEventListener("click", async () => {
+    const s = await snap();
+    Exporter.download(`${stamp()}-missing-piece.xlsx`, Exporter.toXLSX(s, cfg));
+    msg("expMsg", "ok", "Spreadsheet downloaded — four sheets, colour-coded.");
+  });
+  $("dlJson").addEventListener("click", async () => {
+    const s = await snap();
+    Exporter.download(`${stamp()}-missing-piece-backup.json`,
+      JSON.stringify(s, null, 2), "application/json");
+    msg("expMsg", "ok", "Full backup downloaded.");
+  });
+
+  /* ---- the AI prompt ---- */
+  const AI_PROMPT = `You are helping run a clinical workshop called "The Missing Piece", bringing together a nephrology team and a palliative care team.
+
+Attached is a list of concerns written anonymously by workshop participants. Each line looks like:
+
+  C-001 | discipline | role | what they wrote
+
+YOUR TASK
+Group these concerns into a small number of shared underlying problems, and write a problem statement for each.
+
+RULES — these matter more than elegance:
+1. Use ONLY the labels (C-001 etc.) exactly as they appear. Never invent, renumber or alter a label. Every label you output must appear in the input.
+2. Every concern must appear in exactly one group. Do not silently drop any. If something genuinely fits nowhere, put it in a group called "Other".
+3. Aim for 4-8 groups. Fewer than 4 hides real differences; more than 8 is unusable in a room.
+4. A problem statement is ONE sentence, in the participants' own vocabulary, naming what is missing between the two teams. Not a solution. Not a slogan.
+5. Where a group contains concerns from BOTH disciplines, say so in the rationale — those are the most valuable groups in this workshop.
+6. Do not soften or sanitise. If people wrote that something is broken, the problem statement should say it is broken.
+
+OUTPUT
+Return ONLY a JSON array, no commentary before or after, in exactly this shape:
+
+[
+  {
+    "id": "G1",
+    "label": "Short name, 2-4 words",
+    "problem_statement": "One sentence naming what is missing.",
+    "rationale": "Why these belong together, and whether both disciplines raised it.",
+    "source_ids": ["C-001", "C-014", "C-022"]
+  }
+]`;
+  $("aiPrompt").value = AI_PROMPT;
+  $("copyPrompt").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(AI_PROMPT); $("copyPrompt").textContent = "Copied"; }
+    catch { $("aiPrompt").select(); document.execCommand("copy"); $("copyPrompt").textContent = "Copied"; }
+    setTimeout(() => $("copyPrompt").textContent = "Copy the prompt", 1800);
+  });
+
+  /* ---- importing ---- */
+  $("pasteBtn").addEventListener("click", async () => {
+    try { $("importBox").value = await navigator.clipboard.readText(); }
+    catch { msg("importMsg", "", "Your browser won't let us read the clipboard — paste with Ctrl/Cmd+V."); }
+  });
+
+  $("doImport").addEventListener("click", async () => {
+    let raw = $("importBox").value.trim();
+    if (!raw) return;
+
+    // AIs like to wrap JSON in ```json fences and add a friendly sentence.
+    // Strip all that rather than making you tidy it up by hand.
+    raw = raw.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
+    const first = raw.indexOf("["), last = raw.lastIndexOf("]");
+    if (first > 0 || last < raw.length - 1) {
+      if (first !== -1 && last !== -1) raw = raw.slice(first, last + 1);
+    }
+
+    let groups;
+    try { groups = JSON.parse(raw); }
+    catch (e) { return msg("importMsg", "bad", "That isn't valid JSON. " + escapeHtml(e.message)); }
+    if (!Array.isArray(groups)) return msg("importMsg", "bad", "Expected a list of groups.");
+
+    const problems = [];
+    groups.forEach((g, i) => {
+      if (!g.id) problems.push(`Group ${i + 1} has no id`);
+      if (!Array.isArray(g.source_ids) || !g.source_ids.length)
+        problems.push(`Group ${g.id || i + 1} lists no source notes`);
+      if (!g.problem_statement) problems.push(`Group ${g.id || i + 1} has no problem statement`);
+    });
+    const ids = groups.map(g => g.id);
+    if (new Set(ids).size !== ids.length) problems.push("Two groups share the same id");
+    if (problems.length)
+      return msg("importMsg", "bad", "Not imported:<br>• " + problems.map(escapeHtml).join("<br>• "));
+
+    msg("importMsg", "", "Checking every note against what was actually said…");
+    try {
+      const res = await Store.importGroups(token, groups);
+      const r = Array.isArray(res) ? res[0] : res;
+      if (r && r.ok === false && r.error === "unknown_refs") {
+        return msg("importMsg", "bad",
+          "<b>Nothing was imported.</b> The AI referred to notes that don't exist in this room:<br>" +
+          "<code class='inline'>" + escapeHtml((r.unknown || []).join(", ")) + "</code><br><br>" +
+          "Ask it to redo the grouping using only the labels in the file.");
+      }
+      const allConcerns = Store.state.concerns.length;
+      msg("importMsg", "ok",
+        `Imported <b>${r.groups}</b> problem groups covering <b>${r.linked}</b> concerns.` +
+        (r.ungrouped ? ` <b>${r.ungrouped}</b> concern(s) ended up in no group — worth a look.` : " Every concern was placed."));
+      await refreshNow();
+    } catch (e) {
+      msg("importMsg", "bad", "Import failed: " + escapeHtml(e.message));
+    }
+  });
+
+  /* ---- reset ---- */
+  $("resetBtn").addEventListener("click", async () => {
+    const st = Store.state;
+    const summary = `${st.concerns.length} concerns, ${st.solutions.length} solutions, ` +
+                    `${(st.groups||[]).length} groups and ${(st.participants||[]).length} participants`;
+    if (!confirm("This permanently deletes " + summary + " from room " + cfg.roomCode +
+                 ".\n\nDownload a backup first if you have not already.\n\nGo ahead?")) return;
+    if (!confirm("Last check — this cannot be undone. Clear room " + cfg.roomCode + "?")) return;
+    try {
+      await Store.resetRoom(token);
+      location.reload();
+    } catch (e) { msg("resetMsg", "bad", escapeHtml(e.message)); }
+  });
+
+  /* ---- keep the panel current ---- */
+  async function refreshNow() {
+    Store._state.concerns = []; Store._state.solutions = [];
+    Store._seen.concerns.clear(); Store._seen.solutions.clear();
+    const [room, concerns, solutions, groups, participants] = await Promise.all([
+      Store.getRoom(), Store.listConcerns(null), Store.listSolutions(null),
+      Store.listGroups(), Store.listParticipants()
+    ]);
+    Object.assign(Store._state, { room, concerns, solutions, groups, participants });
+    Store._seen.concerns = new Set(concerns.map(c => c.id));
+    Store._seen.solutions = new Set(solutions.map(s => s.id));
+    render();
+  }
+
+  function start() {
+    refreshNow();
+    setInterval(refreshNow, 2500);
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g,
+      c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+})();
+</script>
+</body>
+</html>
