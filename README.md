@@ -91,9 +91,13 @@ the control panel remembered, if both are open in the same browser).
 
 ### The AI step
 
-1. On the control panel, **Download .txt**.
-2. **Copy the prompt**, paste it into Claude or ChatGPT, attach the .txt.
+1. On the control panel, **Copy prompt + concerns**. The prompt already has
+   every concern in the room appended to it, so there is nothing to attach.
+2. Paste it into Claude or ChatGPT.
 3. Paste what comes back into the import box and press **Check and import**.
+
+(If you would rather send a file, **Download .txt** and **Prompt only** are
+still there.)
 
 You can paste the AI's reply exactly as it arrives — ```json fences and a
 chatty sentence either side are stripped for you.

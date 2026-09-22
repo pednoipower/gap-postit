@@ -86,8 +86,8 @@ This is the only part where the room waits on you. Have something for them to
 do — a coffee break, or a table discussion on "what do you think the biggest
 gap will turn out to be?"
 
-1. **Download .txt** on the control panel
-2. **Copy the prompt**, paste into your AI, attach the .txt
+1. **Copy prompt + concerns** on the control panel (the concerns are already in it)
+2. Paste into your AI
 3. Paste the reply into the import box, **Check and import**
 
 If it refuses because the AI invented a label, say so out loud — it is a good

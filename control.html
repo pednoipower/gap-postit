@@ -70,11 +70,13 @@
 
     <div class="panel">
       <h2>1. Export what people wrote</h2>
-      <p class="why">Take the <b>.txt</b> to your AI along with the prompt below.
-        The <b>.xlsx</b> is for you and your colleagues — it is colour-coded by
-        problem group and by discipline.</p>
+      <p class="why">The <b>.txt</b> is the concerns in the form the AI needs — but
+        the prompt in step 2 already has it built in, so you only need this if you
+        want the file on its own. The <b>.xlsx</b> is for you and your colleagues —
+        it is colour-coded by problem group and by discipline.</p>
       <div class="row">
-        <button class="btn small" id="dlTxt">Download .txt (for the AI)</button>
+        <button class="btn small" id="cpTxt">Copy .txt (for the AI)</button>
+        <button class="btn small ghost" id="dlTxt">Download .txt</button>
         <button class="btn small ghost" id="dlXlsx">Download .xlsx (for you)</button>
         <button class="btn small ghost" id="dlJson">Download .json (backup)</button>
         <button class="btn small ghost" id="dlSol">Solutions .txt</button>
@@ -84,8 +86,14 @@
 
     <div class="panel">
       <h2>2. The prompt to give your AI</h2>
-      <p class="why">Copy this, paste it into Claude or ChatGPT, and attach the .txt you just downloaded.</p>
-      <button class="btn small ghost" id="copyPrompt">Copy the prompt</button>
+      <p class="why">Everything is in here already — the instructions <i>and</i> every
+        concern in the room, kept up to date as notes arrive. Copy it, paste it
+        into Claude or ChatGPT, nothing to attach.</p>
+      <div class="row">
+        <button class="btn small" id="copyPrompt">Copy prompt + concerns</button>
+        <button class="btn small ghost" id="copyPromptOnly">Prompt only</button>
+        <span style="font-size:13.5px;color:var(--text-dim)" id="promptNote"></span>
+      </div>
       <textarea class="text" id="aiPrompt" readonly style="margin-top:11px;min-height:230px"></textarea>
     </div>
 
@@ -174,6 +182,7 @@
   function render() {
     const st = Store.state, room = st.room;
     if (!room) return;
+    renderPrompt();
 
     const voices = new Set(st.concerns.map(c => c.participant_id).filter(Boolean));
     $("stats").innerHTML = [
@@ -277,7 +286,7 @@
   /* ---- the AI prompt ---- */
   const AI_PROMPT = `You are helping run a clinical workshop called "The Missing Piece", bringing together a nephrology team and a palliative care team.
 
-Attached is a list of concerns written anonymously by workshop participants. Each line looks like:
+Below is a list of concerns written anonymously by workshop participants. Each line looks like:
 
   C-001 | discipline | role | what they wrote
 
@@ -304,11 +313,46 @@ Return ONLY a JSON array, no commentary before or after, in exactly this shape:
     "source_ids": ["C-001", "C-014", "C-022"]
   }
 ]`;
-  $("aiPrompt").value = AI_PROMPT;
-  $("copyPrompt").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(AI_PROMPT); $("copyPrompt").textContent = "Copied"; }
-    catch { $("aiPrompt").select(); document.execCommand("copy"); $("copyPrompt").textContent = "Copied"; }
-    setTimeout(() => $("copyPrompt").textContent = "Copy the prompt", 1800);
+  /* The concerns are appended to the prompt so one paste does the whole job. */
+  function concernsTXT() {
+    const st = Store.state;
+    return Exporter.toTXT({ room: st.room, concerns: st.concerns, solutions: st.solutions,
+      groups: st.groups || [], participants: st.participants || [],
+      exportedAt: new Date().toISOString() }, cfg);
+  }
+  function fullPrompt() {
+    return AI_PROMPT + "\n\n" + "=".repeat(74) + "\nTHE CONCERNS\n" + "=".repeat(74) + "\n\n" + concernsTXT();
+  }
+
+  /* Rewriting the textarea resets any selection, so only do it when the
+     concerns themselves have changed, not on every poll. */
+  let promptKey = null;
+  function renderPrompt() {
+    const st = Store.state;
+    const key = st.concerns.length + ":" + (st.concerns.length ? st.concerns[st.concerns.length - 1].id : "");
+    if (key === promptKey) return;
+    promptKey = key;
+    $("aiPrompt").value = fullPrompt();
+    $("promptNote").textContent = st.concerns.length
+      ? `${st.concerns.length} concern${st.concerns.length === 1 ? "" : "s"} included`
+      : "no concerns yet — they'll appear here as people write";
+  }
+
+  async function copyText(text, btn, label) {
+    try { await navigator.clipboard.writeText(text); }
+    catch {
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); ta.remove();
+    }
+    btn.textContent = "Copied";
+    setTimeout(() => btn.textContent = label, 1800);
+  }
+  $("copyPrompt").addEventListener("click", e => copyText(fullPrompt(), e.currentTarget, "Copy prompt + concerns"));
+  $("copyPromptOnly").addEventListener("click", e => copyText(AI_PROMPT, e.currentTarget, "Prompt only"));
+  $("cpTxt").addEventListener("click", async e => {
+    await copyText(concernsTXT(), e.currentTarget, "Copy .txt (for the AI)");
+    msg("expMsg", "ok", `Copied ${Store.state.concerns.length} concerns to the clipboard.`);
   });
 
   /* ---- importing ---- */

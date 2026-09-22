@@ -8,7 +8,7 @@ is reproduced here so you can adjust it before the day if you want to.
 You are helping run a clinical workshop called "The Missing Piece", bringing
 together a nephrology team and a palliative care team.
 
-Attached is a list of concerns written anonymously by workshop participants.
+Below is a list of concerns written anonymously by workshop participants.
 Each line looks like:
 
 ```
