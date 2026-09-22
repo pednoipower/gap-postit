@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609220812">
+<link rel="stylesheet" href="assets/theme.css?v=202609220831">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🎛️</text></svg>">
 </head>
 <body class="control">
@@ -68,75 +68,60 @@
 
     <div class="panel">
       <h2>Slides</h2>
-      <p class="why">The projector and every phone follow whatever you pick here. A gap slide
-        collects <b>blind</b> — the projector shows only a count — until you press <b>Reveal</b>,
-        which closes that gap and shows what would help and what we'd need, side by side.</p>
+      <p class="why">The projector and every phone follow whatever you pick here. Each gap has
+        two slides — <b>why is this happening?</b> then <b>how would we fix it?</b> Both collect
+        <b>blind</b> (the projector shows only a count) until you press <b>Reveal</b>, which
+        closes that round and shows the notes in both colours.</p>
       <div class="slide-list" id="slideList"></div>
       <div class="row" style="margin-top:12px">
         <button class="btn small ghost" id="prev">← Back</button>
         <button class="btn small" id="next">Next →</button>
-        <button class="btn small hidden" id="reveal" style="background:#2E9E6B">Reveal this gap</button>
+        <button class="btn small hidden" id="reveal" style="background:#2E9E6B">Reveal</button>
         <button class="btn small ghost hidden" id="unreveal">Collect again (blind)</button>
       </div>
     </div>
 
     <div class="panel">
       <h2>After the day — 1. Export everything</h2>
-      <p class="why">The <b>.xlsx</b> is the dataset: one sheet each for concerns,
-        what-would-help / what-we'd-need (with their how and why), own ideas, a
-        crosstab by gap × team × role, and who was there. Every row carries team,
-        role, setting and the anonymous phone id. The <b>.txt</b> files are for AI
-        or for reading.</p>
+      <p class="why">The <b>.xlsx</b> is the dataset: causes, what-we-would-do (existing
+        or new, each with why it would work), a crosstab by gap × team × role, the
+        gaps, and who was there. Every row carries team, role, setting and the
+        anonymous phone id. The <b>.txt</b> is the same notes grouped under each
+        gap, for reading or for an AI.</p>
       <div class="row">
-        <button class="btn small" id="cpTxt">Copy .txt (for the AI)</button>
-        <button class="btn small ghost" id="dlTxt">Download .txt</button>
-        <button class="btn small ghost" id="dlXlsx">Download .xlsx (for you)</button>
+        <button class="btn small" id="dlXlsx">Download .xlsx</button>
+        <button class="btn small ghost" id="cpTxt">Copy .txt</button>
+        <button class="btn small ghost" id="dlSol">Download .txt</button>
         <button class="btn small ghost" id="dlJson">Download .json (backup)</button>
-        <button class="btn small ghost" id="dlSol">Reactions & ideas .txt</button>
       </div>
       <div id="expMsg"></div>
     </div>
 
     <div class="panel">
-      <h2>After the day — 2. Group the concerns against the gaps</h2>
-      <p class="why">This is analysis, not something for the room. The prompt carries the
-        instructions <i>and</i> every concern; it asks the AI to sort them into the
-        gaps you loaded (and to add a group only if something fits none). Copy,
-        paste into Claude or ChatGPT, nothing to attach.</p>
+      <h2>After the day — 2. A first-draft summary per gap</h2>
+      <p class="why">Analysis, not something for the room. The prompt carries the
+        instructions <i>and</i> every note; it asks the AI for a first-pass synthesis
+        per gap — causes, then what to do — kept separate by team, citing note
+        labels so every claim is traceable. Copy, paste into Claude or ChatGPT.
+        Treat the result as a draft to code from, not as findings.</p>
       <div class="row">
-        <button class="btn small" id="copyPrompt">Copy prompt + concerns</button>
+        <button class="btn small" id="copyPrompt">Copy prompt + notes</button>
         <button class="btn small ghost" id="copyPromptOnly">Prompt only</button>
         <span style="font-size:13.5px;color:var(--text-dim)" id="promptNote"></span>
       </div>
       <textarea class="text" id="aiPrompt" readonly style="margin-top:11px;min-height:230px"></textarea>
     </div>
 
-    <div class="panel">
-      <h2>After the day — 3. Bring the grouping back</h2>
-      <p class="why">Paste what the AI gave you. Before anything is saved, every
-        note it refers to is checked against what was actually said in this room.
-        If it invented one, nothing is imported and you'll be told which.</p>
-      <p class="why"><b>If the AI can't do it, or you want to fix what it did:</b>
-        <a href="group.html" target="_blank">open the grouping board</a> and sort
-        the notes by hand. It saves through the same check.</p>
-      <textarea class="text" id="importBox" placeholder='Paste the AI&apos;s JSON here…'></textarea>
-      <div class="row" style="margin-top:11px">
-        <button class="btn small" id="doImport">Check and import</button>
-        <button class="btn small ghost" id="pasteBtn">Paste from clipboard</button>
-      </div>
-      <div id="importMsg"></div>
-    </div>
-
   </div>
 </div>
 
-<script src="assets/version.js?v=202609220812"></script>
-<script src="assets/config.js?v=202609220812"></script>
-<script src="assets/slides.js?v=202609220812"></script>
-<script src="assets/export.js?v=202609220812"></script>
-<script src="assets/store-supabase.js?v=202609220812"></script>
-<script src="assets/store-local.js?v=202609220812"></script>
-<script src="assets/store.js?v=202609220812"></script>
+<script src="assets/version.js?v=202609220831"></script>
+<script src="assets/config.js?v=202609220831"></script>
+<script src="assets/slides.js?v=202609220831"></script>
+<script src="assets/export.js?v=202609220831"></script>
+<script src="assets/store-supabase.js?v=202609220831"></script>
+<script src="assets/store-local.js?v=202609220831"></script>
+<script src="assets/store.js?v=202609220831"></script>
 <script>
 (function () {
   "use strict";
@@ -187,15 +172,15 @@
     if (!room) return;
     renderPrompt();
 
-    const voices = new Set(st.concerns.concat(st.solutions).map(c => c.participant_id).filter(Boolean));
+    const voices = new Set(st.solutions.map(c => c.participant_id).filter(Boolean));
     const kind = k => st.solutions.filter(x => x.kind === k).length;
     $("stats").innerHTML = [
       ["in the room", (st.participants || []).length],
       ["people who wrote", voices.size],
-      ["concerns", st.concerns.length],
-      ["would help", kind("facilitator")],
-      ["we'd need", kind("barrier")],
-      ["own ideas", kind("idea")]
+      ["causes", kind("cause")],
+      ["already exists", kind("asset")],
+      ["new ideas", kind("idea")],
+      ["gaps loaded", (st.groups || []).filter(g => g.id !== Slides.OVERALL).length]
     ].map(([k, v]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
     $("gapsNote").textContent = (st.groups || []).length
       ? `${st.groups.length} gaps loaded: ${st.groups.map(g => g.id).join(", ")}`
@@ -214,9 +199,9 @@
       const b = document.createElement("button");
       b.className = "slide-btn";
       b.setAttribute("aria-current", String(i === cur));
-      const count = s.promptId ? st.concerns.filter(c => c.prompt_id === s.promptId).length
-        : s.gapId ? st.solutions.filter(x => x.group_id === s.gapId && x.kind !== "idea").length
-        : s.key === "solve" ? st.solutions.filter(x => x.kind === "idea").length : null;
+      const count = s.gapId
+        ? st.solutions.filter(x => x.group_id === s.gapId && (s.phase === "why" ? x.kind === "cause" : x.kind !== "cause")).length
+        : null;
       b.innerHTML = `<span class="n">${i + 1}</span><span>${escapeHtml(s.label)}</span>` +
         (count !== null ? `<span class="meta">${count} note${count===1?"":"s"}</span>` : "");
       b.addEventListener("click", () => goTo(i));
@@ -224,8 +209,10 @@
     });
 
     const onGap = !!(slides[cur] && slides[cur].gapId);
-    $("reveal").classList.toggle("hidden", !(onGap && room.phase === "react"));
-    $("unreveal").classList.toggle("hidden", !(onGap && room.phase === "reveal"));
+    const collecting = room.phase === "why" || room.phase === "how";
+    const revealed = room.phase === "why_reveal" || room.phase === "how_reveal";
+    $("reveal").classList.toggle("hidden", !(onGap && collecting));
+    $("unreveal").classList.toggle("hidden", !(onGap && revealed));
   }
 
   /* Moving to a slide also sets the phase and the active question, so the
@@ -239,12 +226,12 @@
      Anything written after this moment could have been shaped by what is on
      screen, which is why the board closes at the same time. */
   $("reveal").addEventListener("click", async () => {
-    await Store.control(token, { phase: "reveal", open: false });
-    await refreshNow();
+    const ch = Slides.revealChanges(slides[Store.state.room.current_slide | 0], true);
+    if (ch) { await Store.control(token, ch); await refreshNow(); }
   });
   $("unreveal").addEventListener("click", async () => {
-    await Store.control(token, { phase: "react", open: true });
-    await refreshNow();
+    const ch = Slides.revealChanges(slides[Store.state.room.current_slide | 0], false);
+    if (ch) { await Store.control(token, ch); await refreshNow(); }
   });
 
   /* Load the gaps from config into the room. Replaces whatever gaps are
@@ -284,15 +271,10 @@
   async function snap() { return Store.snapshot(); }
   const stamp = () => Exporter.stamp();
 
-  $("dlTxt").addEventListener("click", async () => {
-    const s = await snap();
-    Exporter.download(`${stamp()}-missing-piece-concerns.txt`, Exporter.toTXT(s, cfg));
-    msg("expMsg", "ok", `Downloaded ${s.concerns.length} concerns.`);
-  });
   $("dlSol").addEventListener("click", async () => {
     const s = await snap();
-    Exporter.download(`${stamp()}-missing-piece-solutions.txt`, Exporter.toSolutionsTXT(s, cfg));
-    msg("expMsg", "ok", `Downloaded ${s.solutions.length} solutions.`);
+    Exporter.download(`${stamp()}-missing-piece-notes.txt`, Exporter.toSolutionsTXT(s, cfg));
+    msg("expMsg", "ok", `Downloaded ${s.solutions.length} notes.`);
   });
   $("dlXlsx").addEventListener("click", async () => {
     const s = await snap();
@@ -307,53 +289,38 @@
   });
 
   /* ---- the AI prompt ---- */
-  /* Themes the facilitator already expects, from the evidence. When present,
-     the AI is asked to sort into these first rather than invent its own. */
-  function seedRule() {
-    const seeds = cfg.seedThemes || [];
-    if (!seeds.length) return "";
-    return "\n   KNOWN THEMES: the evidence already points to these gaps. Use them as groups where concerns fit, keeping their names. Add a new group only for concerns that genuinely fit none of them.\n" +
-      seeds.map((t, i) => `     - ${t.label}: ${t.problem || ""}`).join("\n");
-  }
-  const AI_PROMPT = `You are helping run a clinical workshop called "The Missing Piece", bringing together a nephrology team and a palliative care team.
+  const AI_PROMPT = `You are helping analyse a 45-minute clinical workshop that brought together nephrology teams and palliative care teams from 16 Thai hospitals. Before the workshop, a pre-survey identified four gaps in how the two teams integrate care for end-stage kidney disease. In the room, for each gap, participants first wrote WHY the gap happens at their hospital, then WHAT they would do about it — either something that already exists there (marked "already exists") or something new — and why it would work.
 
-Below is a list of concerns written anonymously by workshop participants. Each line looks like:
+Below is every note, grouped under its gap. Each line looks like:
 
-  C-001 | discipline | role | what they wrote
+  S-014 | team | role | what they wrote — why it would work
+
+The team is "nephro" or "palliative". Every note is anonymous.
 
 YOUR TASK
-Group these concerns into a small number of shared underlying problems, and write a problem statement for each.
+For each gap, write a first-draft synthesis in Thai, in this order:
+1. สาเหตุ — the causes participants gave, grouped into 3–6 themes. For each theme, say whether nephrology, palliative care, or BOTH raised it, and cite the note labels.
+2. สิ่งที่มีอยู่แล้ว — assets participants said already exist and would help, with the reasons they gave.
+3. สิ่งใหม่ที่เสนอ — new ideas, grouped, with the reasons participants gave for why they would work. Note where an idea answers a cause named in part 1.
+4. จุดที่สองทีมมองต่างกัน — where the two teams gave different causes or different solutions for the same gap. This is the most important part; do not smooth it over.
 
-RULES — these matter more than elegance:
-1. Use ONLY the labels (C-001 etc.) exactly as they appear. Never invent, renumber or alter a label. Every label you output must appear in the input.
-2. Every concern must appear in exactly one group. Do not silently drop any. If something genuinely fits nowhere, put it in a group called "Other".
-3. Aim for 4-${cfg.maxGroups || 6} groups and never more than ${cfg.maxGroups || 6}. Fewer than 4 hides real differences; more than ${cfg.maxGroups || 6} is unusable in a room. If you have more, merge the smallest into a group called "Other".${seedRule()}
-4. A problem statement is ONE sentence, in the participants' own vocabulary, naming what is missing between the two teams. Not a solution. Not a slogan.
-5. Where a group contains concerns from BOTH disciplines, say so in the rationale — those are the most valuable groups in this workshop.
-6. Do not soften or sanitise. If people wrote that something is broken, the problem statement should say it is broken.
-7. LANGUAGE: write "label", "problem_statement" and "rationale" in ${cfg.aiOutputLanguage || "Thai"}, in the plain everyday register clinicians use with each other. The "id" values (G1, G2 …) and every C-label stay exactly as they are, in Latin characters.
+RULES
+- Use ONLY the labels (S-001 etc.) exactly as they appear. Never invent, renumber or alter a label. Every claim must cite at least one label.
+- Do not add causes or solutions that nobody wrote. If something is thin, say it is thin.
+- Keep participants' own vocabulary. Do not soften: if people wrote that something is broken, say it is broken.
+- This is a first draft for a human analyst to code from, not findings. Say so at the top.
 
 OUTPUT
-Return ONLY a JSON array, no commentary before or after, in exactly this shape:
+Thai prose with headings per gap (G1, G2, G3, G4, then ภาพรวม). Labels in Latin characters.`;
 
-[
-  {
-    "id": "G1",
-    "label": "Short name, 2-4 words",
-    "problem_statement": "One sentence naming what is missing.",
-    "rationale": "Why these belong together, and whether both disciplines raised it.",
-    "source_ids": ["C-001", "C-014", "C-022"]
-  }
-]`;
-  /* The concerns are appended to the prompt so one paste does the whole job. */
-  function concernsTXT() {
+  function notesTXT() {
     const st = Store.state;
-    return Exporter.toTXT({ room: st.room, concerns: st.concerns, solutions: st.solutions,
+    return Exporter.toSolutionsTXT({ room: st.room, concerns: [], solutions: st.solutions,
       groups: st.groups || [], participants: st.participants || [],
       exportedAt: new Date().toISOString() }, cfg);
   }
   function fullPrompt() {
-    return AI_PROMPT + "\n\n" + "=".repeat(74) + "\nTHE CONCERNS\n" + "=".repeat(74) + "\n\n" + concernsTXT();
+    return AI_PROMPT + "\n\n" + "=".repeat(74) + "\nTHE NOTES\n" + "=".repeat(74) + "\n\n" + notesTXT();
   }
 
   /* Rewriting the textarea resets any selection, so only do it when the
@@ -361,13 +328,13 @@ Return ONLY a JSON array, no commentary before or after, in exactly this shape:
   let promptKey = null;
   function renderPrompt() {
     const st = Store.state;
-    const key = st.concerns.length + ":" + (st.concerns.length ? st.concerns[st.concerns.length - 1].id : "");
+    const key = st.solutions.length + ":" + (st.solutions.length ? st.solutions[st.solutions.length - 1].id : "");
     if (key === promptKey) return;
     promptKey = key;
     $("aiPrompt").value = fullPrompt();
-    $("promptNote").textContent = st.concerns.length
-      ? `${st.concerns.length} concern${st.concerns.length === 1 ? "" : "s"} included`
-      : "no concerns yet — they'll appear here as people write";
+    $("promptNote").textContent = st.solutions.length
+      ? `${st.solutions.length} note${st.solutions.length === 1 ? "" : "s"} included`
+      : "no notes yet — they'll appear here as people write";
   }
 
   async function copyText(text, btn, label) {
@@ -380,99 +347,17 @@ Return ONLY a JSON array, no commentary before or after, in exactly this shape:
     btn.textContent = "Copied";
     setTimeout(() => btn.textContent = label, 1800);
   }
-  $("copyPrompt").addEventListener("click", e => copyText(fullPrompt(), e.currentTarget, "Copy prompt + concerns"));
+  $("copyPrompt").addEventListener("click", e => copyText(fullPrompt(), e.currentTarget, "Copy prompt + notes"));
   $("copyPromptOnly").addEventListener("click", e => copyText(AI_PROMPT, e.currentTarget, "Prompt only"));
   $("cpTxt").addEventListener("click", async e => {
-    await copyText(concernsTXT(), e.currentTarget, "Copy .txt (for the AI)");
-    msg("expMsg", "ok", `Copied ${Store.state.concerns.length} concerns to the clipboard.`);
-  });
-
-  /* ---- importing ---- */
-  $("pasteBtn").addEventListener("click", async () => {
-    try { $("importBox").value = await navigator.clipboard.readText(); }
-    catch { msg("importMsg", "", "Your browser won't let us read the clipboard — paste with Ctrl/Cmd+V."); }
-  });
-
-  $("doImport").addEventListener("click", async () => {
-    let raw = $("importBox").value.trim();
-    if (!raw) return;
-
-    // AIs like to wrap JSON in ```json fences and add a friendly sentence.
-    // Strip all that rather than making you tidy it up by hand.
-    raw = raw.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
-    const first = raw.indexOf("["), last = raw.lastIndexOf("]");
-    if (first > 0 || last < raw.length - 1) {
-      if (first !== -1 && last !== -1) raw = raw.slice(first, last + 1);
-    }
-
-    let groups;
-    try { groups = JSON.parse(raw); }
-    catch (e) { return msg("importMsg", "bad", "That isn't valid JSON. " + escapeHtml(e.message)); }
-    if (!Array.isArray(groups)) return msg("importMsg", "bad", "Expected a list of groups.");
-
-    const problems = [];
-    groups.forEach((g, i) => {
-      if (!g.id) problems.push(`Group ${i + 1} has no id`);
-      if (!Array.isArray(g.source_ids) || !g.source_ids.length)
-        problems.push(`Group ${g.id || i + 1} lists no source notes`);
-      if (!g.problem_statement) problems.push(`Group ${g.id || i + 1} has no problem statement`);
-    });
-    const ids = groups.map(g => g.id);
-    if (new Set(ids).size !== ids.length) problems.push("Two groups share the same id");
-    if (problems.length)
-      return msg("importMsg", "bad", "Not imported:<br>• " + problems.map(escapeHtml).join("<br>• "));
-
-    /* Too many groups is not an error, but it is unworkable in a room. Offer
-       to keep the biggest and fold the rest into "Other" — the facilitator
-       decides, nothing is silently changed. */
-    const cap = cfg.maxGroups || 6;
-    if (groups.length > cap && !$("doImport").dataset.capped) {
-      msg("importMsg", "warn",
-        `The AI returned <b>${groups.length}</b> groups; the room works best with at most <b>${cap}</b>.<br>` +
-        `<button class="btn small" id="capBtn" style="margin-top:9px">Keep the ${cap - 1} biggest, merge the rest into "Other"</button> ` +
-        `<button class="btn small ghost" id="capNo" style="margin-top:9px">Import all ${groups.length} anyway</button>`);
-      $("capBtn").addEventListener("click", () => {
-        const sorted = groups.slice().sort((a, b) => b.source_ids.length - a.source_ids.length);
-        const keep = sorted.slice(0, cap - 1), rest = sorted.slice(cap - 1);
-        const other = {
-          id: "G" + cap, label: "Other",
-          problem_statement: rest.map(g => g.problem_statement).join(" / "),
-          rationale: "Merged at import: " + rest.map(g => g.label || g.id).join(", "),
-          source_ids: rest.flatMap(g => g.source_ids)
-        };
-        $("importBox").value = JSON.stringify(keep.concat([other]), null, 2);
-        $("doImport").dataset.capped = "1";
-        $("doImport").click();
-      });
-      $("capNo").addEventListener("click", () => { $("doImport").dataset.capped = "1"; $("doImport").click(); });
-      return;
-    }
-    delete $("doImport").dataset.capped;
-
-    msg("importMsg", "", "Checking every note against what was actually said…");
-    try {
-      const res = await Store.importGroups(token, groups);
-      const r = Array.isArray(res) ? res[0] : res;
-      if (r && r.ok === false && r.error === "unknown_refs") {
-        return msg("importMsg", "bad",
-          "<b>Nothing was imported.</b> The AI referred to notes that don't exist in this room:<br>" +
-          "<code class='inline'>" + escapeHtml((r.unknown || []).join(", ")) + "</code><br><br>" +
-          "Ask it to redo the grouping using only the labels in the file.");
-      }
-      const allConcerns = Store.state.concerns.length;
-      msg("importMsg", "ok",
-        `Imported <b>${r.groups}</b> problem groups covering <b>${r.linked}</b> concerns.` +
-        (r.ungrouped ? ` <b>${r.ungrouped}</b> concern(s) ended up in no group — worth a look.` : " Every concern was placed."));
-      await refreshNow();
-    } catch (e) {
-      msg("importMsg", "bad", "Import failed: " + escapeHtml(e.message));
-    }
+    await copyText(notesTXT(), e.currentTarget, "Copy .txt");
+    msg("expMsg", "ok", `Copied ${Store.state.solutions.length} notes to the clipboard.`);
   });
 
   /* ---- reset ---- */
   $("resetBtn").addEventListener("click", async () => {
     const st = Store.state;
-    const summary = `${st.concerns.length} concerns, ${st.solutions.length} solutions, ` +
+    const summary = `${st.solutions.length} notes, ` +
                     `${(st.groups||[]).length} groups and ${(st.participants||[]).length} participants`;
     if (!confirm("This permanently deletes " + summary + " from room " + cfg.roomCode +
                  ".\n\nDownload a backup first if you have not already.\n\nGo ahead?")) return;

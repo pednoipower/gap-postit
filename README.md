@@ -1,20 +1,20 @@
 # The Missing Piece · ชิ้นส่วนที่หายไป
 
 A 45-minute live workshop tool for 150 people, built for one session: a
-nephrology team and a palliative care team in the same room, voicing where
-patients fall through the gap between them and reacting to what a program
-might do about it. Participants use their phones (in Thai); the room watches
-the projector; you drive it from a laptop.
+nephrology team and a palliative care team in the same room. A pre-survey of
+16 hospitals says *what* is missing — four gaps, each with a number. The
+room supplies *why* it happens and *how* to fix it. Participants use their
+phones (in Thai); the room watches the projector; you drive it from a laptop.
 
-Two things come out of it: a room that has seen the other team describe the
-same problems — and a dataset. For each gap the evidence points to, what
-people say would **help, and how**, what would **get in the way, and why**,
-and their own **if / then / because** ideas; every note tagged by team, role
-and setting, ready for barrier–facilitator or realist-style analysis.
+For each gap: **why is this happening here?** (blind, then revealed in both
+team colours), then **how would we fix it?** — something that already exists
+here, or something new, each with *why it would work*. Every note is tagged
+by team, role and setting, ready for barrier–facilitator or realist-style
+analysis.
 
-While people are writing, notes are plain post-its. The jigsaw appears only
-for the gaps themselves — a **piece with notches** — with the ideas gathering
-round it. Colour is discipline.
+Notes are plain post-its. The jigsaw is reserved for the gaps themselves — a
+**piece with notches** — with the causes and solutions gathering round it.
+Colour is discipline.
 
 See `docs/2026-09-22-run-of-show-45min.md` for the minute-by-minute script.
 
@@ -29,7 +29,6 @@ See `docs/2026-09-22-run-of-show-45min.md` for the minute-by-minute script.
 | `present.html` | the projector |
 | `control.html` | you, on a laptop or phone |
 | `health.html` | you, the day before |
-| `group.html` | you, after the day, to group concerns by hand |
 
 Plus one file you edit: **`assets/config.js`**. Everything else can be left alone.
 
@@ -107,51 +106,11 @@ They move the whole room — control panel, phones and board — not just the
 projector, so the first press asks for the control password (or reuses the one
 the control panel remembered, if both are open in the same browser).
 
-### The AI step
+### After the day
 
-1. On the control panel, **Copy prompt + concerns**. The prompt already has
-   every concern in the room appended to it, so there is nothing to attach.
-2. Paste it into Claude or ChatGPT.
-3. Paste what comes back into the import box and press **Check and import**.
-
-(If you would rather send a file, **Download .txt** and **Prompt only** are
-still there.)
-
-You can paste the AI's reply exactly as it arrives — ```json fences and a
-chatty sentence either side are stripped for you.
-
-**Before anything is saved, every note the AI refers to is checked against what
-was actually said in this room.** If it invents a `C-999` that nobody wrote,
-the import is refused, nothing is written, and you are told which label was
-wrong. Ask it to try again. This is the guard that keeps the problem statements
-honest — every one stays traceable to the words that produced it.
-
-### If the AI grouping doesn't work
-
-Three things can go wrong, and each has a way out that keeps the session moving:
-
-- **It returns too many groups.** The prompt asks for at most `maxGroups`
-  (set in `config.js`, default 6). If the AI ignores that, the import offers
-  one click: keep the biggest, merge the rest into "Other".
-- **You can't reach an AI at all**, or **what it returned is wrong for the
-  room.** Open `group.html`. Every concern is a post-it in a tray; drag them
-  (or tap several, then "Send selected here") into groups, name each group,
-  write its one-sentence problem, and **Save to the room**. It goes through
-  the same check as the AI path. Your draft is kept in the browser until you
-  save, so a refresh loses nothing.
-- **You already know what the gaps are likely to be.** Put them in
-  `seedThemes` in `config.js`. The AI is told to sort into those first, and
-  the grouping board starts with those columns already there — so the manual
-  fallback becomes "drop notes into known buckets", which takes minutes.
-
-### Spotlight
-
-Once the problems are in, the brainstorm is an open board: anyone can add an
-idea to any gap. If people spread too thin, or you want to work through the
-problems one at a time, **Spotlight** pulls all 150 phones onto the same
-problem. Turn it off to let people roam again.
-
----
+**Download .xlsx** for the dataset. The prompt on the control panel asks an
+AI for a first-draft synthesis per gap, citing note labels — a draft to code
+from, not findings.
 
 ## If the internet fails
 

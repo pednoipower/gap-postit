@@ -2,26 +2,26 @@
 
 Two goals, in this order of priority on the day:
 
-1. **The room feels that the two teams can fix this together.** People voice a
-   real problem, see at once that the other colour is describing the same
-   failures, then spend most of the time building rather than complaining.
-2. **Data for initial programme theories**: for each gap the evidence points
-   to, what people here say would *help* (and how) and what would *get in the
-   way* (and why), plus their own if/then/because ideas — every note tagged by
-   team, role and setting.
+1. **The room feels that the two teams can fix this together.** The survey
+   says *what* is missing; the people in the room supply *why* and *how*.
+   They are the authors, not the audience.
+2. **Data for initial programme theories**: for each of the four gaps, why
+   it happens here (causes), and what people would do — what already exists
+   and should be used more, and what is new — each with why it would work.
+   Every note tagged by team, role and setting.
 
-Nothing is analysed in the room. Grouping and coding happen afterwards.
+Nothing is analysed in the room.
 
 ---
 
 ## The day before
 
-- [ ] `config.js`: the gaps in `seedThemes` are real, in the order you want,
-      each with its one-sentence `proposal`. The phone shows exactly this text.
+- [ ] `config.js` → `seedThemes`: the four gaps, their survey numbers and
+      the program's proposals read correctly in Thai.
 - [ ] `control.html` → unlock → **Load the expected gaps**. Check the
-      projector's gaps slide shows them.
-- [ ] Dry run with two phones (one per team). Then **Clear this room**
-      (loads nothing away — the gaps stay).
+      projector's gaps slide shows all four with their numbers.
+- [ ] Dry run with two phones (one per team). Then **Clear this room** and
+      **Load the expected gaps** again.
 - [ ] `health.html` → **Run the checks**, all green.
 - [ ] Scan the QR from the back of the room.
 
@@ -30,65 +30,57 @@ Nothing is analysed in the room. Grouping and coding happen afterwards.
 Slide 1 (QR) then slide 2 (who's in the room). Phones ask team, role, and
 where they mainly work. Say out loud: *nothing is linked to your name.*
 
-## 0:04 — One question (9–10 min)
+## 0:04 — The four gaps from the pre-survey (2 min)
 
-Slide 3. Board opens automatically. *Think of a real patient — where did they
-fall through the gap between our two teams?* Optional tap: when it happens.
+Slide 3. Four pieces, each with its survey number in red. *These are what
+16 hospitals told us. They have numbers. None of them is about any one
+person — and the survey can't tell us why. You can.* Phones show the same
+list.
 
-The wall is live, in both colours. When the two colours are visibly saying the
-same things, point at it. That is the moment the room decides this is a shared
-problem, not one side's fault. Close with the arrow key or Next.
+## 0:06 — Four gaps, 7 minutes each (28 min)
 
-## 0:14 — The gaps from the pre-survey (2 min)
+For each gap, two slides.
 
-Slide 4. Four pieces: the gap, the survey number in red (*2 จาก 16 รพ.*),
-and what the program proposes for it. *These are known. They have numbers.
-That is why we're here — and it is the system, not any one of you.* No
-phones. See `docs/2026-09-22-gaps-from-presurvey.md` for where each comes from.
+**WHY (3 min).** The phone shows the gap and its number and asks *what in
+the system makes this happen at your hospital?* — one box. The projector is
+blind: a count and the split by team. At 2:30, **Reveal**: the causes in
+both colours. Read out one from each colour. If both teams named the same
+cause, say so; that is the point of the room. Do not discuss.
 
-## 0:16 — Four gap slides, 4 min each (16 min)
+**HOW (4 min).** The phone shows the program's proposal as a seed (*build
+on it, or propose something else*), then asks people to pick **something
+that already exists here — use it more** or **something new**, and to give
+*what* and *why it would work here*. Both boxes required. The projector
+keeps the causes on screen and shows a count for the answers. At 3:30,
+**Reveal**: causes and solutions side by side; "already exists" notes are
+marked ✓. Read one existing and one new. Move on.
 
-Slides 5–8. For each: the phone shows the proposal and asks people to pick
-**something here that would help** or **something that would get in the
-way**, then two boxes — *what*, and *how / why*. Both are required; the send
-button says so.
+Slides 4–11: G1 why, G1 how, G2 why, G2 how, G3 why, G3 how, G4 why, G4 how.
 
-The projector is **blind**: only a count and the split by team. Say so.
-At about 3:30, press **Reveal** on the control panel. The board for that gap
-closes, and the projector shows what-would-help and what-we'd-need side by
-side, in both colours, each note with its how/why.
+## 0:34 — Overall (5 min)
 
-Read out one *helps* from each colour, then one *obstacle*. Move on. Do not
-discuss — 4 minutes is the whole budget.
+Slide 12. Same *how* format, for something the two teams should do that is
+not about any one gap. No seed. Reveal at 4:30.
 
-## 0:32 — Their own ideas (8 min)
+## 0:39 — Close (5 min)
 
-Slide 9. Board opens. They pick a gap — or **ภาพรวม** for an idea that is
-about the two teams in general — then three boxes: *If we… / then… /
-because people would…* All three required. Point at the example on screen.
-The wall is live; ideas carry the gap they answer.
-
-Throughout, the phone shows a three-step strip (story · gaps n/4 · ideas)
-so people know where they are; during the gaps slide and each reveal it
-also lists the gaps, for anyone who cannot read the projector.
-
-## 0:40 — Close (4 min)
-
-Slide 10. *Neither of us had the whole picture*, with tonight's counts and how
-many gaps both teams answered. If `signupUrl` is set, the QR for people
-willing to be interviewed appears here — separate from everything they wrote.
+Slide 13. *Neither of us had the whole picture*, with tonight's counts and
+how many gaps both teams answered. If `signupUrl` is set, the QR for people
+willing to be interviewed appears here — separate from everything they
+wrote. Tell them the summary comes back to both teams.
 
 ---
 
 ## Afterwards
 
-**Download .xlsx** on the control panel. Six sheets: concerns, help-and-need
-(what + how/why), own ideas, a crosstab by gap × team × role, the gaps, and
-who was there. Every row carries team, role, setting and the anonymous phone
-id, so within-person chains can be reassembled without identity.
+**Download .xlsx** on the control panel: causes; what-we-would-do (existing
+or new, with why it would work); a crosstab by gap × team × role; the gaps;
+who was there. Every row carries team, role, setting and the anonymous
+phone id, so within-person chains can be reassembled without identity.
 
-The AI prompt on the control panel groups the *concerns* against the loaded
-gaps; the manual board (`group.html`) does the same by hand.
+The AI prompt on the control panel drafts a per-gap synthesis — causes,
+existing assets, new ideas, and where the two teams differ — citing note
+labels. It is a draft to code from, not findings.
 
 ## If something breaks
 

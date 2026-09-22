@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609220812">
+<link rel="stylesheet" href="assets/theme.css?v=202609220831">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -103,8 +103,9 @@
   .react-reveal .col h3 { margin:0 0 1vh; font-size:clamp(16px,1.7vw,30px); font-weight:750; display:flex; align-items:baseline; gap:.6em; }
   .react-reveal .col h3 span { font-size:.7em; color:#8A94A8; font-weight:600; }
   .react-reveal .col .board { position:relative; flex:1; }
-  .react-reveal .col.helps h3 { color:#8FCFA8; }
-  .react-reveal .col.needs h3 { color:#E5CE7A; }
+  .react-reveal.two { grid-template-columns: .72fr 2fr; }
+  .react-reveal .col.causes h3 { color:#E5CE7A; }
+  .react-reveal .col.fixes h3  { color:#8FCFA8; }
   .signup { display:flex; align-items:center; gap:2vw; justify-content:center; margin-top:4vh; }
   .signup .qr { background:#fff; border-radius:16px; padding:12px; width:clamp(110px,12vw,200px); }
   .signup .qr svg { display:block; width:100%; height:auto; }
@@ -126,16 +127,16 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609220812"></script>
-<script src="assets/config.js?v=202609220812"></script>
-<script src="assets/strings.js?v=202609220812"></script>
-<script src="assets/slides.js?v=202609220812"></script>
-<script src="assets/qrcode.js?v=202609220812"></script>
-<script src="assets/jigsaw.js?v=202609220812"></script>
-<script src="assets/wordcloud.js?v=202609220812"></script>
-<script src="assets/store-supabase.js?v=202609220812"></script>
-<script src="assets/store-local.js?v=202609220812"></script>
-<script src="assets/store.js?v=202609220812"></script>
+<script src="assets/version.js?v=202609220831"></script>
+<script src="assets/config.js?v=202609220831"></script>
+<script src="assets/strings.js?v=202609220831"></script>
+<script src="assets/slides.js?v=202609220831"></script>
+<script src="assets/qrcode.js?v=202609220831"></script>
+<script src="assets/jigsaw.js?v=202609220831"></script>
+<script src="assets/wordcloud.js?v=202609220831"></script>
+<script src="assets/store-supabase.js?v=202609220831"></script>
+<script src="assets/store-local.js?v=202609220831"></script>
+<script src="assets/store.js?v=202609220831"></script>
 <script>
 (function () {
   "use strict";
@@ -152,13 +153,8 @@
      Here each slide also gets its builder.
      ---------------------------------------------------------------------- */
   const SLIDES = Slides.build(cfg);
-  const BUILDERS = { title: buildTitle, who: buildWho, evidence: buildEvidence, solve: buildSolve, closing: buildClosing };
-  SLIDES.forEach(s => {
-    s.build = s.key.startsWith("prompt:") ? buildPrompt
-            : s.key.startsWith("react:")  ? buildReact
-            : BUILDERS[s.key];
-    if (s.promptId) s.prompt = (cfg.prompts || []).find(p => p.id === s.promptId);
-  });
+  const BUILDERS = { title: buildTitle, who: buildWho, evidence: buildEvidence, closing: buildClosing };
+  SLIDES.forEach(s => { s.build = s.gapId ? buildGap : BUILDERS[s.key]; });
   window.SLIDES = SLIDES;
 
   let current = -1, viewMode = "wall";
@@ -235,16 +231,6 @@
     }
   }
 
-  /* ---- slide: a question, with the live wall ---- */
-  function buildPrompt(el, slide) {
-    el.innerHTML = `
-      <div class="slide-head">
-        <h2>${escapeHtml(slide.prompt.title)}</h2>
-        <p class="sub">${escapeHtml(slide.prompt.subtitle || "")}</p>
-      </div>
-      <div class="slide-body"><div class="board" id="board"></div></div>`;
-  }
-
   /* ---- slide: the gaps from the evidence, as pieces ---- */
   function buildEvidence(el) {
     el.innerHTML = `
@@ -263,9 +249,9 @@
     const W = 440, H = opts.tall ? 320 : 260;
     const st = Store.state;
     const rs = st.solutions.filter(x => x.group_id === g.id);
-    const helps = rs.filter(x => x.kind === "facilitator").length;
-    const needs = rs.filter(x => x.kind === "barrier").length;
-    const ideas = rs.filter(x => x.kind === "idea").length;
+    const helps = rs.filter(x => x.kind === "cause").length;
+    const needs = rs.filter(x => x.kind === "asset" || x.kind === "idea").length;
+    const ideas = 0;
     const accent = groupColor(i);
     const { svg } = Jigsaw.problemSVG({ width: W, height: H, accent });
     const txt = (str, x, y, size, fill, weight, anchor) => {
@@ -335,59 +321,69 @@
     });
   }
 
-  /* ---- slide: one gap — blind while collecting, revealed on command ---- */
-  function buildReact(el, slide) {
+  /* ---- slide: one gap, WHY or HOW — blind while collecting, revealed on command ---- */
+  function buildGap(el, slide) {
     el.innerHTML = `
-      <div class="slide-head"><h2 id="reactH"></h2><p class="sub" id="reactSub"></p></div>
-      <div class="slide-body"><div id="reactBody" style="height:100%;position:relative"></div></div>`;
-    reactLayout = null;
+      <div class="slide-head"><h2 id="gapH"></h2><p class="sub" id="gapSub"></p></div>
+      <div class="slide-body"><div id="gapBody" style="height:100%;position:relative"></div></div>`;
+    gapLayout = null;
   }
-  let reactLayout = null;
+  let gapLayout = null;
 
-  function fillReact(slide) {
+  function fillGap(slide) {
     const st = Store.state, g = gapById(slide.gapId), i = gapIndex(slide.gapId);
-    const revealed = st.room && st.room.phase === "reveal";
-    setText("reactH", g ? g.label : slide.gapId);
-    setText("reactSub", g ? (revealed ? (g.proposal || "") : t("pj_blind_sub")) : t("pj_waiting_gaps"));
+    const ph = st.room ? st.room.phase : "";
+    const isWhy = slide.phase === "why";
+    const revealed = ph === "why_reveal" || ph === "how_reveal";
+    const isOverall = slide.gapId === Slides.OVERALL;
+    setText("gapH", isOverall ? t("pj_overall") : (g ? g.label : slide.gapId));
+    setText("gapSub", !g ? t("pj_waiting_gaps")
+      : isWhy ? (revealed ? t("pj_why_revealed") : t("pj_why_blind"))
+              : (revealed ? t("pj_how_revealed") : t("pj_how_blind")));
     if (!g) return;
-    const rs = st.solutions.filter(x => x.group_id === g.id && x.kind !== "idea");
-    const want = (revealed ? "reveal" : "blind") + ":" + g.id;
-    const body = $("reactBody");
-    if (reactLayout !== want) {
-      reactLayout = want;
-      if (!revealed) {
+    const all = st.solutions.filter(x => x.group_id === g.id);
+    const causes = all.filter(x => x.kind === "cause");
+    const fixes  = all.filter(x => x.kind === "asset" || x.kind === "idea");
+    const live   = isWhy ? causes : fixes;
+    const want = (isWhy ? "why" : "how") + ":" + (revealed ? "r" : "b") + ":" + g.id;
+    const body = $("gapBody");
+    if (gapLayout !== want) {
+      gapLayout = want;
+      if (isWhy && !revealed) {
         body.innerHTML = `<div class="react-blind">
-          <div class="piece" id="reactPiece"></div>
+          <div class="piece" id="gapPiece"></div>
           <div class="count"><div class="n" id="rN">0</div><div class="l">${escapeHtml(t("pj_answers"))}</div>
             <div class="split" id="rSplit"></div></div></div>`;
+      } else if (isWhy && revealed) {
+        body.innerHTML = `<div class="react-reveal two">
+          <div class="piece" id="gapPiece"></div>
+          <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div></div>`;
+      } else if (!isWhy && !revealed) {
+        /* HOW, collecting: the causes just revealed stay on screen as
+           context; the answers being written are only a count */
+        body.innerHTML = `<div class="react-reveal">
+          <div class="piece" id="gapPiece"></div>
+          <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div>
+          <div class="count" style="align-self:center;text-align:center"><div class="n" id="rN" style="font-size:clamp(60px,9vw,180px);font-weight:800;line-height:1">0</div>
+            <div class="l" style="color:#9BA6BC;font-size:clamp(16px,1.7vw,28px)">${escapeHtml(t("pj_answers"))}</div><div class="split" id="rSplit" style="display:flex;gap:2vw;justify-content:center;margin-top:2vh;font-size:clamp(13px,1.3vw,22px);color:#7D879C"></div></div></div>`;
       } else {
         body.innerHTML = `<div class="react-reveal">
-          <div class="piece" id="reactPiece"></div>
-          <div class="col helps"><h3>${escapeHtml(t("pj_helps"))} <span id="hN"></span></h3><div class="board" id="boardHelps"></div></div>
-          <div class="col needs"><h3>${escapeHtml(t("pj_needs"))} <span id="bN"></span></h3><div class="board" id="boardNeeds"></div></div></div>`;
+          <div class="piece" id="gapPiece"></div>
+          <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div>
+          <div class="col fixes"><h3>${escapeHtml(t("pj_solutions"))} <span id="fN"></span></h3><div class="board" id="boardFixes"></div></div></div>`;
       }
-      $("reactPiece").appendChild(problemPiece(g, i, { tall: true, blind: !revealed }));
+      if (!isOverall) $("gapPiece").appendChild(problemPiece(g, i, { tall: true, blind: true }));
+      else $("gapPiece").innerHTML = `<div style="color:#9BA6BC;font-size:clamp(16px,1.8vw,30px);line-height:1.5;padding:2vw">${escapeHtml(t("overall_sub"))}</div>`;
     }
     if (!revealed) {
-      setText("rN", rs.length);
+      setText("rN", live.length);
       $("rSplit").innerHTML = cfg.disciplines.map(d => {
-        const n = rs.filter(x => x.discipline === d.id).length;
-        return `<div style="color:${(cfg.colors[d.id]||cfg.colors.fallback).base}"><b>${n}</b>${escapeHtml(d.label)}</div>`;
+        const n = live.filter(x => x.discipline === d.id).length;
+        return `<div style="color:${(cfg.colors[d.id]||cfg.colors.fallback).base}"><b style="display:block;font-size:1.5em">${n}</b>${escapeHtml(d.label)}</div>`;
       }).join("");
-    } else {
-      const helps = rs.filter(x => x.kind === "facilitator"), needs = rs.filter(x => x.kind === "barrier");
-      setText("hN", helps.length); setText("bN", needs.length);
-      renderBoard(helps, "facilitator", $("boardHelps"));
-      renderBoard(needs, "barrier", $("boardNeeds"));
     }
-  }
-
-  /* ---- slide: their own ideas ---- */
-  function buildSolve(el) {
-    el.innerHTML = `
-      <div class="slide-head"><h2>${escapeHtml(t("pj_ideas"))}</h2>
-        <p class="sub">${escapeHtml(t("pj_ideas_sub"))}</p></div>
-      <div class="slide-body"><div class="board" id="board"></div></div>`;
+    if ($("boardCauses")) { setText("cN", causes.length); renderBoard(causes, "cause", $("boardCauses")); }
+    if ($("boardFixes"))  { setText("fN", fixes.length);  renderBoard(fixes, "fix", $("boardFixes")); }
   }
 
   /* ---- slide: closing ---- */
@@ -411,8 +407,10 @@
      (its how / why), drawn smaller beneath the main text.
      ---------------------------------------------------------------------- */
   function noteText(n, kind) {
-    if (kind === "idea") return { main: n.body + (n.outcome ? " → " + n.outcome : ""), sub: n.reason || "" };
-    return { main: n.body, sub: n.reason || "" };
+    // something that already exists here is marked, so the room can see how
+    // much of the answer is "use what we have" versus "build something new"
+    const main = (n.kind === "asset" ? "✓ " + t("pj_asset_mark") + " · " : "") + n.body;
+    return { main, sub: n.reason || "" };
   }
 
   function renderBoard(notes, kind, host) {
@@ -460,10 +458,8 @@
       holder.className = "note-piece";
       const tilt = (hash(n.id) % 700) / 100 - 3.5;
       holder.style.setProperty("--tilt", tilt + "deg");
-      const gi = (kind !== "concern") ? gapIndex(n.group_id) : -1;
       const { svg, ink, pad } = Jigsaw.postitSVG({
-        discipline: n.discipline, role: n.role, width: pw, height: ph,
-        tag: kind === "idea" && gi >= 0 ? n.group_id : null, tagColor: gi >= 0 ? groupColor(gi) : null
+        discipline: n.discipline, role: n.role, width: pw, height: ph
       });
       holder.style.left = (originX + c * cellW + (cellW - pw) / 2 - pad) + "px";
       holder.style.top  = (originY + r * cellH + (cellH - ph) / 2 - pad) + "px";
@@ -509,21 +505,19 @@
 
     if (s.key === "title") { const n = $("joinN"); if (n) n.textContent = (st.participants || []).length; }
     if (s.key === "who") fillWho();
-    if (s.key.startsWith("prompt:")) renderBoard(st.concerns.filter(c => c.prompt_id === s.prompt.id), "concern");
     if (s.key === "evidence") fillProblems();
-    if (s.key.startsWith("react:")) fillReact(s);
-    if (s.key === "solve") renderBoard(st.solutions.filter(x => x.kind === "idea"), "idea");
+    if (s.gapId) fillGap(s);
     if (s.key === "closing") {
       const el = $("closeStats");
       if (el) {
-        const f = st.solutions.filter(x => x.kind === "facilitator").length;
-        const b = st.solutions.filter(x => x.kind === "barrier").length;
+        const c = st.solutions.filter(x => x.kind === "cause").length;
+        const a = st.solutions.filter(x => x.kind === "asset").length;
         const i = st.solutions.filter(x => x.kind === "idea").length;
-        const both = (st.groups || []).filter(g => g.id !== "GX").filter(g => {
+        const both = (st.groups || []).filter(g => g.id !== Slides.OVERALL).filter(g => {
           const ds = new Set(st.solutions.filter(x => x.group_id === g.id).map(x => x.discipline));
           return ds.size >= 2;
         }).length;
-        el.textContent = t("pj_stats", { c: st.concerns.length, f, b, i, g: both });
+        el.textContent = t("pj_stats", { c, a, i, g: both });
       }
     }
   }
@@ -577,7 +571,7 @@
   });
 
   let resizeT;
-  addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(() => { reactLayout = null; refreshSlide(); }, 180); });
+  addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(() => { gapLayout = null; refreshSlide(); }, 180); });
 
   $("cornerCode").innerHTML =
     `<span>${escapeHtml(cfg.joinUrl.replace(/^https?:\/\//, ""))}</span><b>${escapeHtml(cfg.roomCode)}</b>`;

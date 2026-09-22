@@ -191,7 +191,7 @@ async function api(req, res, pathname, query) {
       return send(res, 400, { error: 'note is empty or too long' });
     if ((payload.reason || '').length > 400 || (payload.outcome || '').length > 400)
       return send(res, 400, { error: 'note is too long' });
-    if (table === 'solutions' && !['idea', 'facilitator', 'barrier'].includes(payload.kind || 'idea'))
+    if (table === 'solutions' && !['cause', 'asset', 'idea', 'facilitator', 'barrier'].includes(payload.kind || 'idea'))
       return send(res, 400, { error: 'unknown kind' });
 
     const list = DB[table];

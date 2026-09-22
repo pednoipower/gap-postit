@@ -252,97 +252,60 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
     const pById = {}; (snap.participants || []).forEach(p => pById[p.id] = p);
     const settingOf = row => { const p = pById[row.participant_id]; return p ? labelFor(cfg.settings || [], p.setting) : ""; };
     const when = iso => (iso || "").replace("T", " ").slice(0, 19);
-    const KIND = { facilitator: "Would help", barrier: "We'd need", idea: "Own idea" };
+    const KIND = { cause: "Cause", asset: "Already exists", idea: "New idea", facilitator: "Would help", barrier: "Obstacle" };
 
-    /* Sheet 1 — every concern, in the order it was said */
-    const concernRows = [[
-      H("Ref"), H("Question"), H("Concern"), H("When it happens"), H("Role"), H("Discipline"),
-      H("Setting"), H("Phone id"), H("Gap"), H("Gap problem"), H("Time")
+    /* Sheet 1 — causes: why the gap happens here */
+    const causeRows = [[
+      H("Ref"), H("Gap"), H("Gap label"), H("Cause"), H("Role"), H("Discipline"), H("Setting"), H("Phone id"), H("Time")
     ]];
-    for (const c of snap.concerns) {
-      const gs = groupStyle(c.group_id);
-      concernRows.push([
-        { v: c.ref, s: styleIndex.mono },
-        { v: labelFor(cfg.prompts, c.prompt_id), s: gs },
-        { v: c.body, s: gs },
-        { v: labelFor(cfg.situations || [], c.situation), s: gs },
-        { v: labelFor(cfg.roles, c.role), s: gs },
-        { v: labelFor(cfg.disciplines, c.discipline), s: discStyle(c.discipline) },
-        { v: settingOf(c), s: gs },
-        { v: c.participant_id || "", s: styleIndex.mono },
-        { v: c.group_id || "(not grouped)", s: gs },
-        { v: c.group_id && gById[c.group_id] ? gById[c.group_id].problem_statement : "", s: gs },
-        { v: when(c.created_at), s: styleIndex.mono }
-      ]);
-    }
-
-    /* Sheet 2 — what would help / what we'd need, each with its how or why */
-    const reactRows = [[
-      H("Ref"), H("Gap"), H("Gap label"), H("Proposal"), H("Type"), H("What"), H("How / why"),
-      H("Role"), H("Discipline"), H("Setting"), H("Phone id"), H("Time")
-    ]];
-    for (const r of snap.solutions.filter(x => x.kind === "facilitator" || x.kind === "barrier")) {
+    for (const r of snap.solutions.filter(x => x.kind === "cause")) {
       const gs = groupStyle(r.group_id), g = gById[r.group_id] || {};
-      reactRows.push([
-        { v: r.ref, s: styleIndex.mono },
-        { v: r.group_id, s: gs },
-        { v: g.label || "", s: gs },
-        { v: g.proposal || "", s: gs },
-        { v: KIND[r.kind], s: gs },
+      causeRows.push([
+        { v: r.ref, s: styleIndex.mono }, { v: r.group_id, s: gs }, { v: g.label || "", s: gs },
         { v: r.body, s: gs },
-        { v: r.reason || "", s: gs },
         { v: labelFor(cfg.roles, r.role), s: gs },
         { v: labelFor(cfg.disciplines, r.discipline), s: discStyle(r.discipline) },
-        { v: settingOf(r), s: gs },
-        { v: r.participant_id || "", s: styleIndex.mono },
-        { v: when(r.created_at), s: styleIndex.mono }
+        { v: settingOf(r), s: gs }, { v: r.participant_id || "", s: styleIndex.mono }, { v: when(r.created_at), s: styleIndex.mono }
       ]);
     }
 
-    /* Sheet 3 — their own ideas: if / then / because */
-    const ideaRows = [[
-      H("Ref"), H("Gap"), H("Gap label"), H("If we…"), H("Then…"), H("Because…"),
+    /* Sheet 2 — what we would do: existing assets and new ideas, each with why it would work */
+    const fixRows = [[
+      H("Ref"), H("Gap"), H("Gap label"), H("Type"), H("What"), H("Why it would work here"),
       H("Role"), H("Discipline"), H("Setting"), H("Phone id"), H("Time")
     ]];
-    for (const r of snap.solutions.filter(x => !x.kind || x.kind === "idea")) {
+    for (const r of snap.solutions.filter(x => x.kind !== "cause")) {
       const gs = groupStyle(r.group_id), g = gById[r.group_id] || {};
-      ideaRows.push([
-        { v: r.ref, s: styleIndex.mono },
-        { v: r.group_id, s: gs },
-        { v: g.label || "", s: gs },
-        { v: r.body, s: gs },
-        { v: r.outcome || "", s: gs },
-        { v: r.reason || "", s: gs },
+      fixRows.push([
+        { v: r.ref, s: styleIndex.mono }, { v: r.group_id, s: gs }, { v: g.label || "", s: gs },
+        { v: KIND[r.kind] || r.kind || "", s: gs },
+        { v: r.body, s: gs }, { v: r.reason || "", s: gs },
         { v: labelFor(cfg.roles, r.role), s: gs },
         { v: labelFor(cfg.disciplines, r.discipline), s: discStyle(r.discipline) },
-        { v: settingOf(r), s: gs },
-        { v: r.participant_id || "", s: styleIndex.mono },
-        { v: when(r.created_at), s: styleIndex.mono }
+        { v: settingOf(r), s: gs }, { v: r.participant_id || "", s: styleIndex.mono }, { v: when(r.created_at), s: styleIndex.mono }
       ]);
     }
 
-    /* Sheet 4 — crosstab: gap × discipline × role */
-    const xRows = [[H("Gap"), H("Gap label"), H("Discipline"), H("Role"),
-                    H("Would help"), H("We'd need"), H("Own ideas"), H("Concerns (grouped)")]];
+    /* Sheet 3 — crosstab: gap × discipline × role */
+    const xRows = [[H("Gap"), H("Gap label"), H("Discipline"), H("Role"), H("Causes"), H("Already exists"), H("New ideas")]];
     for (const g of (snap.groups || [])) {
       for (const d of (cfg.disciplines || [])) for (const r of (cfg.roles || [])) {
         const sel = x => x.group_id === g.id && x.discipline === d.id && x.role === r.id;
-        const f = snap.solutions.filter(x => sel(x) && x.kind === "facilitator").length;
-        const b = snap.solutions.filter(x => sel(x) && x.kind === "barrier").length;
-        const i = snap.solutions.filter(x => sel(x) && (!x.kind || x.kind === "idea")).length;
-        const c = snap.concerns.filter(sel).length;
-        if (!f && !b && !i && !c) continue;
+        const c = snap.solutions.filter(x => sel(x) && x.kind === "cause").length;
+        const a = snap.solutions.filter(x => sel(x) && x.kind === "asset").length;
+        const i = snap.solutions.filter(x => sel(x) && x.kind === "idea").length;
+        if (!c && !a && !i) continue;
         const gs = groupStyle(g.id);
         xRows.push([{ v: g.id, s: styleIndex.mono }, { v: g.label, s: gs },
           { v: labelFor(cfg.disciplines, d.id), s: discStyle(d.id) }, { v: r.label, s: gs },
-          { v: f, s: gs }, { v: b, s: gs }, { v: i, s: gs }, { v: c, s: gs }]);
+          { v: c, s: gs }, { v: a, s: gs }, { v: i, s: gs }]);
       }
     }
 
-    /* Sheet 5 — the gaps themselves */
+    /* Sheet 4 — the gaps themselves */
     const summaryRows = [[
-      H("Gap"), H("Label"), H("Problem"), H("Survey"), H("Proposal"), H("Would help"), H("We'd need"),
-      H("Own ideas"), H("Concerns grouped"), H("Answered by nephrology"), H("Answered by palliative")
+      H("Gap"), H("Label"), H("Problem"), H("Survey"), H("Proposal"), H("Causes"), H("Already exists"),
+      H("New ideas"), H("Answered by nephrology"), H("Answered by palliative")
     ]];
     for (const g of (snap.groups || [])) {
       const rs = snap.solutions.filter(x => x.group_id === g.id);
@@ -350,16 +313,15 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
       summaryRows.push([
         { v: g.id, s: styleIndex.mono }, { v: g.label, s: gs }, { v: g.problem_statement, s: gs },
         { v: g.stat || "", s: gs }, { v: g.proposal || "", s: gs },
-        { v: rs.filter(x => x.kind === "facilitator").length, s: gs },
-        { v: rs.filter(x => x.kind === "barrier").length, s: gs },
-        { v: rs.filter(x => !x.kind || x.kind === "idea").length, s: gs },
-        { v: snap.concerns.filter(c => c.group_id === g.id).length, s: gs },
+        { v: rs.filter(x => x.kind === "cause").length, s: gs },
+        { v: rs.filter(x => x.kind === "asset").length, s: gs },
+        { v: rs.filter(x => x.kind === "idea").length, s: gs },
         { v: rs.filter(x => x.discipline === "nephro").length, s: gs },
         { v: rs.filter(x => x.discipline === "palliative").length, s: gs }
       ]);
     }
 
-    /* Sheet 6 — who was in the room */
+    /* Sheet 5 — who was in the room */
     const counts = {};
     for (const p of (snap.participants || [])) {
       const k = p.discipline + "|" + p.role + "|" + (p.setting || "");
@@ -374,11 +336,10 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
                   { v: (snap.participants || []).length, s: styleIndex.bold }]);
 
     const sheets = [
-      { name: "Concerns",       xml: sheetXml(concernRows, { widths: [9, 30, 62, 18, 12, 16, 16, 38, 8, 46, 20] }) },
-      { name: "Help and need",  xml: sheetXml(reactRows,   { widths: [9, 6, 24, 40, 12, 52, 52, 12, 16, 16, 38, 20] }) },
-      { name: "Own ideas",      xml: sheetXml(ideaRows,    { widths: [9, 6, 24, 46, 40, 46, 12, 16, 16, 38, 20] }) },
-      { name: "Crosstab",       xml: sheetXml(xRows,       { widths: [6, 24, 16, 12, 12, 12, 12, 18] }) },
-      { name: "Gaps",           xml: sheetXml(summaryRows, { widths: [6, 24, 52, 36, 52, 12, 12, 12, 16, 20, 20] }) },
+      { name: "Causes",         xml: sheetXml(causeRows,   { widths: [9, 6, 30, 62, 12, 16, 16, 38, 20] }) },
+      { name: "What we would do", xml: sheetXml(fixRows,   { widths: [9, 6, 30, 14, 52, 52, 12, 16, 16, 38, 20] }) },
+      { name: "Crosstab",       xml: sheetXml(xRows,       { widths: [6, 30, 16, 12, 10, 14, 10] }) },
+      { name: "Gaps",           xml: sheetXml(summaryRows, { widths: [6, 30, 52, 36, 52, 10, 14, 10, 20, 20] }) },
       { name: "Who was there",  xml: sheetXml(whoRows,     { widths: [18, 14, 18, 10] }) }
     ];
     return buildWorkbook(sheets, stylesXml);
@@ -426,28 +387,28 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
   function toSolutionsTXT(snap, cfg) {
     const L = [];
     const clean = v => String(v || "").replace(/\s+/g, " ").trim();
-    L.push("THE MISSING PIECE — what would help, what we'd need, and our own ideas");
+    L.push("THE MISSING PIECE — why each gap happens, and what we would do");
     L.push("Exported: " + new Date(snap.exportedAt).toLocaleString());
     L.push("");
-    L.push("Each line: LABEL [discipline/role] what — how/why");
+    L.push("Each line: LABEL | team | role | what they wrote — why it would work");
     L.push("");
     for (const g of (snap.groups || [])) {
       const rs = snap.solutions.filter(x => x.group_id === g.id);
-      const f = rs.filter(x => x.kind === "facilitator"), b = rs.filter(x => x.kind === "barrier");
-      const i = rs.filter(x => !x.kind || x.kind === "idea");
+      const c = rs.filter(x => x.kind === "cause"), a = rs.filter(x => x.kind === "asset"), i = rs.filter(x => x.kind === "idea");
+      if (!rs.length && g.id === "GX") continue;
       L.push("=".repeat(74));
-      L.push(`${g.id}  ${g.label}`);
-      L.push("PROBLEM:  " + clean(g.problem_statement));
+      L.push(`${g.id}  ${clean(g.label)}`);
+      if (g.stat) L.push("SURVEY:   " + clean(g.stat));
       if (g.proposal) L.push("PROPOSAL: " + clean(g.proposal));
       L.push("-".repeat(74));
-      L.push("WOULD HELP (" + f.length + "):");
-      f.forEach(x => L.push(`  ${x.ref} [${x.discipline}/${x.role}] ${clean(x.body)} — ${clean(x.reason)}`));
+      L.push("WHY IT HAPPENS (" + c.length + "):");
+      c.forEach(x => L.push(`  ${x.ref} | ${x.discipline} | ${x.role} | ${clean(x.body)}`));
       L.push("");
-      L.push("WE'D NEED (" + b.length + "):");
-      b.forEach(x => L.push(`  ${x.ref} [${x.discipline}/${x.role}] ${clean(x.body)} — ${clean(x.reason)}`));
+      L.push("ALREADY EXISTS, USE IT MORE (" + a.length + "):");
+      a.forEach(x => L.push(`  ${x.ref} | ${x.discipline} | ${x.role} | ${clean(x.body)} — ${clean(x.reason)}`));
       L.push("");
-      L.push("OWN IDEAS (" + i.length + "):");
-      i.forEach(x => L.push(`  ${x.ref} [${x.discipline}/${x.role}] IF ${clean(x.body)} THEN ${clean(x.outcome)} BECAUSE ${clean(x.reason)}`));
+      L.push("NEW IDEAS (" + i.length + "):");
+      i.forEach(x => L.push(`  ${x.ref} | ${x.discipline} | ${x.role} | ${clean(x.body)} — ${clean(x.reason)}`));
       L.push("");
     }
     return L.join("\n");

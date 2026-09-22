@@ -71,30 +71,11 @@ window.CONFIG = {
   ],
 
   /* --------------------------------------------------------------------------
-     6. THE PROMPT QUESTIONS (Phase 1 — voicing concerns)
-     --------------------------------------------------------------------------
-     Each one becomes its own slide. `hint` is the grey placeholder text inside
-     the participant's typing box.
+     6. (The 45-minute format has no free question round: the gaps in section
+        11 drive the whole session. `prompts` is kept empty for the health
+        check and older exports.)
      ------------------------------------------------------------------------ */
-  prompts: [
-    {
-      id: "p1",
-      title: "นึกถึงผู้ป่วยจริงหนึ่งราย — เขาหลุดจากรอยต่อระหว่างสองทีมเราตรงไหน?",
-      subtitle: "ไม่ต้องระบุชื่อ เขียนสิ่งที่เกิดขึ้นจริง",
-      hint: "เช่น ไม่มีใครบอกครอบครัวว่าหยุดฟอกไตได้"
-    }
-  ],
-
-  /* Situations a participant can tap to say WHEN the gap happens most.
-     Optional on the phone; leave the list empty to hide it. */
-  situations: [
-    { id: "start",     label: "เริ่มฟอกไต" },
-    { id: "deterior",  label: "อาการทรุดลง" },
-    { id: "afterhrs",  label: "นอกเวลาราชการ" },
-    { id: "discharge", label: "จำหน่าย–ส่งต่อ" },
-    { id: "family",    label: "คุยกับครอบครัว" },
-    { id: "other",     label: "อื่น ๆ" }
-  ],
+  prompts: [],
 
   /* Where the participant mainly works. Asked once at join, so every note
      can be read by setting as well as by team and role. Keep every option

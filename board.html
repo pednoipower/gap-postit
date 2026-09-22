@@ -5,19 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609220812">
+<link rel="stylesheet" href="assets/theme.css?v=202609220831">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
 <style>
-  /* the proposal the room is reacting to, shown above the two stance buttons */
-  .proposal { background: var(--paper-2); border-radius: var(--r-md); padding: 13px 15px; margin-bottom: 12px; }
-  .proposal .k { font-size: 12.5px; color: var(--text-dim); font-weight: 600; letter-spacing: .04em; margin-bottom: 4px; }
-  .proposal .v { font-size: 17px; font-weight: 650; line-height: 1.35; }
+  .stat-line { font-size: 14px; color: #8C2E25; font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
+  .seed { background: var(--paper-2); border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 14px; }
+  .seed .k { font-size: 12.5px; color: var(--text-dim); font-weight: 600; letter-spacing: .04em; margin-bottom: 3px; }
+  .seed .v { font-size: 16px; font-weight: 600; line-height: 1.4; }
+  .seed .n { font-size: 12.5px; color: var(--text-dim); margin-top: 5px; }
   .stance { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .stance .choice { text-align: center; padding: 14px 10px; line-height: 1.3; }
-  .stance .choice[data-stance="facilitator"][aria-pressed="true"] { --pick: #2E9E6B; }
-  .stance .choice[data-stance="barrier"][aria-pressed="true"]     { --pick: #D4A020; }
+  .stance .choice[data-stance="asset"][aria-pressed="true"] { --pick: #2E9E6B; }
+  .stance .choice[data-stance="idea"][aria-pressed="true"]  { --pick: #1F9AB8; }
   .field textarea.note { min-height: 84px; }
   .field .lbl { font-size: 15.5px; }
+  .why-note { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; margin: 0 0 12px; }
   /* where am I in the session */
   .steps { display:flex; gap:6px; margin:2px 0 14px; }
   .steps span { flex:1; text-align:center; font-size:12.5px; font-weight:600; color:var(--text-dim);
@@ -31,7 +33,6 @@
   .gap-row b { display:block; font-size:15.5px; line-height:1.4; }
   .gap-row small { display:block; font-size:13.5px; color:var(--text-dim); line-height:1.5; margin-top:2px; }
   .gap-row small.st { color:#8C2E25; font-weight:600; }
-  .proposal .st { font-size:13px; color:#8C2E25; font-weight:600; margin-bottom:8px; }
 </style>
 </head>
 <body class="participant">
@@ -57,62 +58,40 @@
     <div id="gapsList"></div>
   </div>
 
-  <!-- CONCERNS: one box, plus an optional "when does this happen" -->
-  <div class="card hidden" id="concernCard">
-    <label class="field">
-      <textarea class="note" id="cBody" maxlength="400" rows="4" autocomplete="off" autocorrect="on"></textarea>
-      <div class="counter" id="cCount"></div>
+  <!-- WHY: what in the system makes this happen here -->
+  <div class="card hidden" id="whyCard">
+    <p class="stat-line" id="whyStat"></p>
+    <label class="field" style="margin-bottom:0">
+      <span class="lbl" id="whyLbl"></span>
+      <textarea class="note" id="wBody" maxlength="400" rows="4" autocomplete="off" autocorrect="on"></textarea>
     </label>
-    <label class="field hidden" id="whenField" style="margin-bottom:0">
-      <span class="lbl" id="whenLbl"></span>
-      <div class="choices wrap-auto" id="whenChoices"></div>
-    </label>
+    <p class="why-note" style="margin:10px 0 0" id="whyNote"></p>
   </div>
 
-  <!-- REACT: what would help / what would get in the way, each with its how/why -->
-  <div class="card hidden" id="reactCard">
-    <div class="proposal">
-      <div class="st" id="propStat"></div>
-      <div class="k" id="propK"></div>
-      <div class="v" id="propV"></div>
+  <!-- HOW: something that exists here / something new, and why it would work -->
+  <div class="card hidden" id="howCard">
+    <div class="seed" id="seedBox">
+      <div class="k" id="seedK"></div>
+      <div class="v" id="seedV"></div>
+      <div class="n" id="seedN"></div>
     </div>
     <label class="field">
       <span class="lbl" id="stanceLbl"></span>
-      <div class="stance" id="stance">
-        <button type="button" class="choice" data-stance="facilitator" aria-pressed="false" id="stFac"></button>
-        <button type="button" class="choice" data-stance="barrier" aria-pressed="false" id="stBar"></button>
+      <div class="stance">
+        <button type="button" class="choice" data-stance="asset" aria-pressed="false" id="stAsset"></button>
+        <button type="button" class="choice" data-stance="idea"  aria-pressed="false" id="stIdea"></button>
       </div>
     </label>
-    <div id="reactFields" class="hidden">
+    <div id="howFields" class="hidden">
       <label class="field">
-        <span class="lbl" id="rWhatLbl"></span>
-        <textarea class="note" id="rWhat" maxlength="400" rows="3" autocomplete="off" autocorrect="on"></textarea>
+        <span class="lbl" id="hWhatLbl"></span>
+        <textarea class="note" id="hWhat" maxlength="400" rows="3" autocomplete="off" autocorrect="on"></textarea>
       </label>
       <label class="field" style="margin-bottom:0">
-        <span class="lbl" id="rWhyLbl"></span>
-        <textarea class="note" id="rWhy" maxlength="400" rows="3" autocomplete="off" autocorrect="on"></textarea>
+        <span class="lbl" id="hWhyLbl"></span>
+        <textarea class="note" id="hWhy" maxlength="400" rows="3" autocomplete="off" autocorrect="on"></textarea>
       </label>
     </div>
-  </div>
-
-  <!-- IDEA: their own theory — if / then / because -->
-  <div class="card hidden" id="ideaCard">
-    <label class="field">
-      <span class="lbl" id="gapLbl"></span>
-      <div class="choices" id="gapChoices"></div>
-    </label>
-    <label class="field">
-      <span class="lbl" id="ifLbl"></span>
-      <textarea class="note" id="iIf" maxlength="400" rows="3" autocomplete="off" autocorrect="on"></textarea>
-    </label>
-    <label class="field">
-      <span class="lbl" id="thenLbl"></span>
-      <textarea class="note" id="iThen" maxlength="400" rows="2" autocomplete="off" autocorrect="on"></textarea>
-    </label>
-    <label class="field" style="margin-bottom:0">
-      <span class="lbl" id="becauseLbl"></span>
-      <textarea class="note" id="iBecause" maxlength="400" rows="3" autocomplete="off" autocorrect="on"></textarea>
-    </label>
   </div>
 
   <div class="mine hidden" id="mineBox">
@@ -127,12 +106,12 @@
   <p class="hint center" style="opacity:.5;font-size:11px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609220812"></script>
-<script src="assets/config.js?v=202609220812"></script>
-<script src="assets/strings.js?v=202609220812"></script>
-<script src="assets/store-supabase.js?v=202609220812"></script>
-<script src="assets/store-local.js?v=202609220812"></script>
-<script src="assets/store.js?v=202609220812"></script>
+<script src="assets/version.js?v=202609220831"></script>
+<script src="assets/config.js?v=202609220831"></script>
+<script src="assets/strings.js?v=202609220831"></script>
+<script src="assets/store-supabase.js?v=202609220831"></script>
+<script src="assets/store-local.js?v=202609220831"></script>
+<script src="assets/store.js?v=202609220831"></script>
 <script>
 (function () {
   "use strict";
@@ -151,11 +130,11 @@
   if (cfg.colors.nephro)     root.setProperty("--nephro", cfg.colors.nephro.base);
   if (cfg.colors.palliative) root.setProperty("--pall",   cfg.colors.palliative.base);
   const myColor = (cfg.colors[me.discipline] || cfg.colors.fallback).base;
+  const OVERALL = "GX";
+  const PALETTE = ["#7FB3D5","#E9A06B","#8FCFA8","#C59BD1","#E5CE7A","#84C5C5","#E39A9A","#A9A3D8"];
 
   let room = null, groups = [];
-  let situation = null;          // concerns: the optional "when" tap
-  let stance = null;             // react: "facilitator" | "barrier"
-  let chosenGroup = null;        // idea: which gap
+  let stance = null;             // how: "asset" | "idea"
   let lastSentAt = 0, sending = false;
   const mine = [];               // this person's own notes, echoed back
 
@@ -163,18 +142,14 @@
   const perRound = cfg.maxPerPersonPerPrompt || 5;
 
   /* ---- static labels ---- */
-  $("whenLbl").textContent = t("when_lbl");
-  $("propK").textContent = t("react_title");
-  $("stanceLbl").textContent = t("react_pick");
-  $("stFac").textContent = t("react_fac");
-  $("stBar").textContent = t("react_bar");
-  $("gapLbl").textContent = t("idea_gap");
-  $("ifLbl").textContent = t("idea_if");
-  $("thenLbl").textContent = t("idea_then");
-  $("becauseLbl").textContent = t("idea_because");
-  $("iIf").placeholder = t("idea_if_hint");
-  $("iThen").placeholder = t("idea_then_hint");
-  $("iBecause").placeholder = t("idea_because_hint");
+  $("whyLbl").textContent = t("why_lbl");
+  $("wBody").placeholder = t("why_hint");
+  $("whyNote").textContent = t("why_note");
+  $("seedK").textContent = t("how_seed");
+  $("seedN").textContent = t("how_seed_note");
+  $("stanceLbl").textContent = t("how_pick");
+  $("stAsset").textContent = t("how_asset");
+  $("stIdea").textContent = t("how_new");
 
   /* Feedback goes next to the send button, where the person is looking.
      Connection problems also go at the top, where they stay visible. */
@@ -187,35 +162,38 @@
 
   /* ---- which mode are we in? ---- */
   function mode() {
-    if (!room || !room.board_open) return "wait";
-    if (room.phase === "concerns")  return "concern";
-    if (room.phase === "react" && room.spotlight_group) return "react";
-    if (room.phase === "solutions") return "idea";
+    if (!room || !room.board_open || !room.spotlight_group) return "wait";
+    if (room.phase === "why") return "why";
+    if (room.phase === "how") return "how";
     return "wait";
   }
   const currentGap = () => groups.find(g => g.id === (room && room.spotlight_group));
-  const OVERALL = "GX";                                   // the "not about one gap" bucket
   const realGaps = () => groups.filter(g => g.id !== OVERALL);
-  const PALETTE = ["#7FB3D5","#E9A06B","#8FCFA8","#C59BD1","#E5CE7A","#84C5C5","#E39A9A","#A9A3D8"];
 
-  /* Three steps: tell your story · the gaps (n of N) · your ideas. */
+  /* ---- step strip: gap n/N · why | how · overall ---- */
   function renderSteps() {
     const ph = room ? room.phase : "lobby";
     const gaps = realGaps();
-    const gi = gaps.findIndex(g => g.id === (room && room.spotlight_group));
-    const cur = ph === "concerns" ? 0 : (ph === "react" || ph === "reveal" || ph === "evidence") ? 1 : (ph === "solutions" || ph === "closing") ? 2 : -1;
-    const labels = [t("step_story"),
-      t("step_gaps") + (cur === 1 && gi >= 0 && gaps.length ? ` ${gi + 1}/${gaps.length}` : ""),
-      t("step_ideas")];
+    const spot = room && room.spotlight_group;
+    const gi = gaps.findIndex(g => g.id === spot);
+    const inGap = (ph === "why" || ph === "why_reveal" || ph === "how" || ph === "how_reveal") && spot && spot !== OVERALL;
+    const inOverall = (ph === "how" || ph === "how_reveal") && spot === OVERALL;
+    const isWhy = ph === "why" || ph === "why_reveal";
+    const items = [
+      { l: t("step_gap") + (inGap && gi >= 0 ? ` ${gi + 1}/${gaps.length}` : ""), cur: ph === "evidence" || inGap, done: inOverall || ph === "closing" },
+      { l: t("step_why"), cur: inGap && isWhy, done: (inGap && !isWhy) || inOverall || ph === "closing" },
+      { l: t("step_how"), cur: inGap && !isWhy, done: inOverall || ph === "closing" },
+      { l: t("step_overall"), cur: inOverall, done: ph === "closing" }
+    ];
     $("steps").replaceChildren();
-    labels.forEach((l, i) => {
+    items.forEach(it => {
       const e = document.createElement("span");
-      e.textContent = (i + 1) + " " + l;
-      if (i === cur) e.setAttribute("aria-current", "step");
-      if (cur > i) e.classList.add("done");
+      e.textContent = it.l;
+      if (it.cur) e.setAttribute("aria-current", "step");
+      if (it.done && !it.cur) e.classList.add("done");
       $("steps").appendChild(e);
     });
-    $("steps").classList.toggle("hidden", cur < 0);
+    $("steps").classList.toggle("hidden", ph === "lobby");
   }
 
   function renderGapsList() {
@@ -225,78 +203,40 @@
       const d = document.createElement("div");
       d.className = "gap-row";
       d.innerHTML = `<span class="g" style="background:${PALETTE[i % PALETTE.length]}">${g.id}</span>
-        <div><b></b><small class="st"></small><small></small></div>`;
+        <div><b></b><small class="st"></small></div>`;
       d.querySelector("b").textContent = g.label;
       d.querySelector("small.st").textContent = g.stat || "";
-      d.querySelector("small.st").style.display = g.stat ? "" : "none";
-      d.querySelectorAll("small")[1].textContent = g.proposal || g.problem_statement || "";
       host.appendChild(d);
     });
   }
 
-  /* ---- choice chips ---- */
-  function chips(host, items, onPick, current) {
-    host.replaceChildren();
-    for (const it of items) {
-      const b = document.createElement("button");
-      b.type = "button"; b.className = "choice";
-      b.dataset.id = it.id;
-      b.setAttribute("aria-pressed", String(current === it.id));
-      b.style.setProperty("--pick", myColor);
-      b.textContent = it.label;
-      b.addEventListener("click", () => {
-        onPick(it.id);
-        /* update in place: rebuilding mid-click can deliver a second click
-           to whatever replaces the button */
-        [...host.children].forEach(c => c.setAttribute("aria-pressed", String(c.dataset.id === it.id)));
-        refreshSend();
-      });
-      host.appendChild(b);
-    }
-  }
-
-  if ((cfg.situations || []).length) {
-    $("whenField").classList.remove("hidden");
-    chips($("whenChoices"), cfg.situations, id => { situation = situation === id ? null : id;
-      [...$("whenChoices").children].forEach(c => c.setAttribute("aria-pressed", String(c.dataset.id === situation))); }, null);
-  }
-
-  $("stFac").addEventListener("click", () => setStance("facilitator"));
-  $("stBar").addEventListener("click", () => setStance("barrier"));
+  /* ---- how: pick what kind of thing you are proposing ---- */
+  $("stAsset").addEventListener("click", () => setStance("asset"));
+  $("stIdea").addEventListener("click", () => setStance("idea"));
   function setStance(s) {
     stance = s;
-    $("stFac").setAttribute("aria-pressed", String(s === "facilitator"));
-    $("stBar").setAttribute("aria-pressed", String(s === "barrier"));
-    $("reactFields").classList.remove("hidden");
-    $("rWhatLbl").textContent = t(s === "facilitator" ? "fac_what" : "bar_what");
-    $("rWhyLbl").textContent  = t(s === "facilitator" ? "fac_how"  : "bar_why");
-    $("rWhat").placeholder = t(s === "facilitator" ? "fac_what_hint" : "bar_what_hint");
-    $("rWhy").placeholder  = t(s === "facilitator" ? "fac_how_hint"  : "bar_why_hint");
+    $("stAsset").setAttribute("aria-pressed", String(s === "asset"));
+    $("stIdea").setAttribute("aria-pressed", String(s === "idea"));
+    $("howFields").classList.remove("hidden");
+    $("hWhatLbl").textContent = t("how_what");
+    $("hWhyLbl").textContent = t("how_why");
+    $("hWhat").placeholder = t(s === "asset" ? "how_what_hint_a" : "how_what_hint_n");
+    $("hWhy").placeholder  = t(s === "asset" ? "how_why_hint_a"  : "how_why_hint_n");
     refreshSend();
-    $("rWhat").focus({ preventScroll: true });
-  }
-
-  function renderGapChoices() {
-    const items = realGaps().map(g => ({ id: g.id, label: g.label }));
-    if (groups.some(g => g.id === OVERALL)) items.push({ id: OVERALL, label: t("idea_overall") });
-    chips($("gapChoices"), items, id => { chosenGroup = id; renderMine(); }, chosenGroup);
+    $("hWhat").focus({ preventScroll: true });
   }
 
   /* ---- what has this person sent in the current round? ---- */
   function myNotesForNow() {
     const m = mode();
-    return mine.filter(n =>
-      m === "concern" ? n.kind === "concern" && n.promptId === room.active_prompt_id :
-      m === "react"   ? n.kind !== "concern" && n.kind !== "idea" && n.groupId === room.spotlight_group :
-      m === "idea"    ? n.kind === "idea" : false);
+    return mine.filter(n => n.groupId === room.spotlight_group &&
+      (m === "why" ? n.kind === "cause" : m === "how" ? n.kind !== "cause" : false));
   }
 
-  /* ---- the send button knows what is missing ---- */
   function fields() {
     const m = mode();
-    if (m === "concern") return { body: $("cBody").value.trim() };
-    if (m === "react")   return { body: $("rWhat").value.trim(), reason: $("rWhy").value.trim() };
-    if (m === "idea")    return { body: $("iIf").value.trim(), outcome: $("iThen").value.trim(), reason: $("iBecause").value.trim() };
+    if (m === "why") return { body: $("wBody").value.trim() };
+    if (m === "how") return { body: $("hWhat").value.trim(), reason: $("hWhy").value.trim() };
     return {};
   }
   function tooLong(f) { return Object.values(f).some(v => v && v.length > max); }
@@ -304,33 +244,25 @@
   function refreshSend() {
     const m = mode(), f = fields();
     const cooling = Date.now() - lastSentAt < (cfg.submitCooldownSeconds || 3) * 1000;
-    const atLimit = myNotesForNow().length >= perRound;
+    const atLimit = m !== "wait" && myNotesForNow().length >= perRound;
     let missing = null, label = "";
-    if (m === "concern") { missing = !f.body; label = t("send_add"); }
-    if (m === "react")   { missing = !stance ? "stance" : (!f.body || !f.reason) ? "both" : null; label = t("send_react"); }
-    if (m === "idea")    { missing = !chosenGroup ? "gap" : (!f.body || !f.outcome || !f.reason) ? "three" : null; label = t("send_idea"); }
+    if (m === "why") { missing = !f.body ? "one" : null; label = t("send_why"); }
+    if (m === "how") { missing = !stance ? "stance" : (!f.body || !f.reason) ? "both" : null; label = t("send_how"); }
     const ok = m !== "wait" && !missing && !tooLong(f) && !cooling && !sending && !atLimit;
     $("send").disabled = !ok;
     $("send").textContent =
       sending ? t("sending") :
       atLimit ? t("at_limit") :
-      missing === "stance" ? t("react_pick_first") :
-      missing === "gap"    ? t("pick_gap_first") :
+      missing === "stance" ? t("how_pick_first") :
       missing === "both"   ? t("need_both") :
-      missing === "three"  ? t("need_three") :
       cooling ? t("cooling") : label;
   }
   setInterval(refreshSend, 400);
-  ["cBody","rWhat","rWhy","iIf","iThen","iBecause"].forEach(id => $(id).addEventListener("input", refreshSend));
-  $("cBody").addEventListener("input", () => {
-    const n = $("cBody").value.length, c = $("cCount");
-    c.textContent = n + " / " + max;
-    c.className = "counter" + (n > max ? " over" : n > max * 0.85 ? " near" : "");
-  });
+  ["wBody","hWhat","hWhy"].forEach(id => $(id).addEventListener("input", refreshSend));
 
   /* ---- echo back what they have sent this round ---- */
   function renderMine() {
-    const list = myNotesForNow();
+    const list = mode() === "wait" ? [] : myNotesForNow();
     $("mineBox").classList.toggle("hidden", list.length === 0);
     $("mineHead").textContent = list.length === 1 ? t("mine_one") : t("mine_n", { n: list.length });
     $("mineList").replaceChildren();
@@ -340,8 +272,7 @@
       d.style.setProperty("--pick", myColor);
       const r = document.createElement("span"); r.className = "ref"; r.textContent = n.queued ? "…" : "✓";
       const tx = document.createElement("span");
-      tx.textContent = n.kind === "idea" ? `${n.body} → ${n.outcome} — ${n.reason}`
-                    : n.reason ? `${n.body} — ${n.reason}` : n.body;
+      tx.textContent = n.reason ? `${n.body} — ${n.reason}` : n.body;
       d.append(r, tx);
       $("mineList").appendChild(d);
     }
@@ -353,71 +284,58 @@
     room = r;
     if (!room) return;
     const m = mode();
-    /* A round is identified by what it is about — the question, the gap, or
-       "ideas" — not by whether the board happens to be open. So when the
-       facilitator closes a round, a half-typed note survives, and it is only
-       cleared when a genuinely different round begins. */
-    const target = room.phase === "concerns" ? "q:" + room.active_prompt_id
-                 : (room.phase === "react" || room.phase === "reveal") ? "gap:" + room.spotlight_group
-                 : room.phase === "solutions" ? "ideas" : room.phase;
-    const key = target;
+    const g = currentGap();
+    const isOverall = room.spotlight_group === OVERALL;
 
-    // a new round: clear everything so nobody posts a stale answer
+    /* A round is identified by what it is about — this gap's WHY or this
+       gap's HOW — not by whether the board happens to be open. So a
+       half-typed note survives a round closing, and is only cleared when a
+       genuinely different round begins. */
+    const key = (room.phase === "why" || room.phase === "why_reveal") ? "why:" + room.spotlight_group
+              : (room.phase === "how" || room.phase === "how_reveal") ? "how:" + room.spotlight_group
+              : room.phase;
     if (key !== lastKey) {
       lastKey = key;
-      ["cBody","rWhat","rWhy","iIf","iThen","iBecause"].forEach(id => $(id).value = "");
-      situation = null; stance = null;
-      $("stFac").setAttribute("aria-pressed", "false"); $("stBar").setAttribute("aria-pressed", "false");
-      $("reactFields").classList.add("hidden");
-      [...$("whenChoices").children].forEach(c => c.setAttribute("aria-pressed", "false"));
-      $("cCount").textContent = "0 / " + max;
+      ["wBody","hWhat","hWhy"].forEach(id => $(id).value = "");
+      stance = null;
+      $("stAsset").setAttribute("aria-pressed", "false"); $("stIdea").setAttribute("aria-pressed", "false");
+      $("howFields").classList.add("hidden");
     }
 
-    $("concernCard").classList.toggle("hidden", m !== "concern");
-    $("reactCard").classList.toggle("hidden", m !== "react");
-    $("ideaCard").classList.toggle("hidden", m !== "idea");
+    $("whyCard").classList.toggle("hidden", m !== "why");
+    $("howCard").classList.toggle("hidden", m !== "how");
     $("waitCard").classList.toggle("hidden", m !== "wait");
     $("foot").classList.toggle("hidden", m === "wait");
-    const showGaps = m === "wait" && (room.phase === "evidence" || room.phase === "reveal") && realGaps().length > 0;
+    const showGaps = m === "wait" && (room.phase === "evidence" || room.phase === "why_reveal" || room.phase === "how_reveal") && realGaps().length > 0;
     $("gapsCard").classList.toggle("hidden", !showGaps);
-    if (showGaps) { $("gapsIntro").textContent = room.phase === "evidence" ? t("gaps_intro") : t("reveal_next"); renderGapsList(); }
+    if (showGaps) {
+      $("gapsIntro").textContent = room.phase === "evidence" ? t("gaps_intro") : room.phase === "why_reveal" ? t("reveal_why") : t("reveal_how");
+      renderGapsList();
+    }
     renderSteps();
 
-    if (m === "concern") {
-      const p = (cfg.prompts || []).find(p => p.id === room.active_prompt_id) || cfg.prompts[0] || {};
-      $("promptTitle").textContent = p.title || "";
-      $("promptSub").textContent = p.subtitle || "";
-      $("cBody").placeholder = p.hint || "";
-    } else if (m === "react") {
-      const g = currentGap();
+    if (m === "why") {
       $("promptTitle").textContent = g ? g.label : "";
-      $("promptSub").textContent = g ? (g.problem_statement || "") : "";
-      $("propV").textContent = g ? (g.proposal || g.problem_statement || "") : "";
-      $("propStat").textContent = g && g.stat ? g.stat : "";
-      $("propStat").style.display = g && g.stat ? "" : "none";
-    } else if (m === "idea") {
-      $("promptTitle").textContent = t("idea_title");
-      $("promptSub").textContent = t("idea_sub");
-      renderGapChoices();
+      $("promptSub").textContent = t("why_title");
+      $("whyStat").textContent = g && g.stat ? g.stat : "";
+    } else if (m === "how") {
+      $("promptTitle").textContent = isOverall ? t("overall_title") : (g ? g.label : "");
+      $("promptSub").textContent = isOverall ? t("overall_sub") : t("how_title");
+      const seed = g && !isOverall && g.proposal;
+      $("seedBox").classList.toggle("hidden", !seed);
+      if (seed) $("seedV").textContent = g.proposal;
     } else {
-      const g = currentGap();
       if (room.phase === "lobby") {
         $("promptTitle").textContent = t("wait_title"); $("promptSub").textContent = t("wait_sub");
         $("waitText").textContent = t("wait_lobby");
       } else if (room.phase === "closing") {
         $("promptTitle").textContent = cfg.workshopTitle; $("promptSub").textContent = "";
         $("waitText").textContent = t("wait_closing");
-      } else if ((room.phase === "react" || room.phase === "reveal") && g) {
-        $("promptTitle").textContent = g.label; $("promptSub").textContent = g.proposal || "";
-        const typed = $("rWhat").value.trim() || $("rWhy").value.trim();
+      } else if ((room.phase === "why" || room.phase === "why_reveal" || room.phase === "how" || room.phase === "how_reveal") && g) {
+        $("promptTitle").textContent = isOverall ? t("overall_title") : g.label;
+        $("promptSub").textContent = (room.phase === "why" || room.phase === "why_reveal") ? t("why_title") : t("how_title");
+        const typed = $("wBody").value.trim() || $("hWhat").value.trim() || $("hWhy").value.trim();
         $("waitText").textContent = t("wait_closed") + (typed ? " · " + t("draft_kept") : "");
-      } else if (room.phase === "evidence") {
-        $("promptTitle").textContent = cfg.workshopTitle; $("promptSub").textContent = "";
-        $("waitText").textContent = t("wait_screen");
-      } else if (room.phase === "concerns") {
-        const p = (cfg.prompts || []).find(p => p.id === room.active_prompt_id) || cfg.prompts[0] || {};
-        $("promptTitle").textContent = p.title || ""; $("promptSub").textContent = "";
-        $("waitText").textContent = t("wait_closed") + ($("cBody").value.trim() ? " · " + t("draft_kept") : "");
       } else {
         $("promptTitle").textContent = cfg.workshopTitle; $("promptSub").textContent = "";
         $("waitText").textContent = t("wait_screen");
@@ -432,24 +350,16 @@
     const m = mode(), f = fields();
     if (m === "wait") return;
     sending = true; refreshSend();
-
-    const common = { role: me.role, discipline: me.discipline, participantId: me.id };
-    const entry = { kind: m === "concern" ? "concern" : m === "react" ? stance : "idea",
-                    body: f.body, reason: f.reason || null, outcome: f.outcome || null,
-                    promptId: room.active_prompt_id, groupId: m === "react" ? room.spotlight_group : chosenGroup,
-                    queued: false };
+    const kind = m === "why" ? "cause" : stance;          // "asset" | "idea"
+    const entry = { kind, body: f.body, reason: f.reason || null, groupId: room.spotlight_group, queued: false };
     try {
-      const res = m === "concern"
-        ? await Store.addConcern({ promptId: room.active_prompt_id, body: f.body, situation, ...common })
-        : await Store.addSolution({ groupId: entry.groupId, kind: entry.kind, body: f.body,
-                                    reason: f.reason, outcome: f.outcome || null, ...common });
+      const res = await Store.addSolution({ groupId: entry.groupId, kind, body: f.body, reason: f.reason || null,
+        outcome: null, role: me.role, discipline: me.discipline, participantId: me.id });
       if (res.ok) {
         entry.queued = !!res.queued;
         mine.push(entry);
-        if (m === "concern") { $("cBody").value = ""; $("cCount").textContent = "0 / " + max; situation = null;
-          [...$("whenChoices").children].forEach(c => c.setAttribute("aria-pressed", "false")); }
-        if (m === "react")   { $("rWhat").value = ""; $("rWhy").value = ""; }
-        if (m === "idea")    { $("iIf").value = ""; $("iThen").value = ""; $("iBecause").value = ""; }
+        if (m === "why") $("wBody").value = "";
+        if (m === "how") { $("hWhat").value = ""; $("hWhy").value = ""; }
         lastSentAt = Date.now();
         status(res.queued ? "warn" : "ok", res.queued ? t("sent_queued") : t("sent_ok"));
         setTimeout(() => status(null, null, true), res.queued ? 6000 : 2600);
@@ -468,7 +378,7 @@
   async function poll() {
     try {
       const [r, g] = await Promise.all([Store.getRoom(), Store.listGroups()]);
-      if (JSON.stringify(g) !== JSON.stringify(groups)) { groups = g; if (mode() === "idea") renderGapChoices(); }
+      if (JSON.stringify(g) !== JSON.stringify(groups)) groups = g;
       applyRoom(r);
       if (lostShown) { status(null, null, true); lostShown = false; }
     } catch (e) {

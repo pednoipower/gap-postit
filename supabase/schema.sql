@@ -129,11 +129,11 @@ create index if not exists solutions_group_idx on public.solutions(room_code, gr
 --   concerns.situation    when the gap happens most (optional tap)
 --   groups.proposal       the one concrete thing the program proposes for
 --                         this gap — what the room reacts to
---   solutions.kind        'facilitator' (what would help) | 'barrier' (what
---                         would get in the way) | 'idea' (their own theory)
---   solutions.reason      the HOW (facilitator) or WHY (barrier), or the
---                         "because" of their own theory. Required on the phone.
---   solutions.outcome     the "then" of their own theory
+--   solutions.kind        'cause' (why this gap happens here) | 'asset'
+--                         (something that already exists here and would help)
+--                         | 'idea' (something new we should do)
+--   solutions.reason      for asset/idea: why it would work here. Required.
+--   solutions.outcome     unused in the current flow; kept for older data
 -- ----------------------------------------------------------------------------
 alter table public.participants add column if not exists setting   text;
 alter table public.concerns     add column if not exists situation text;
@@ -262,7 +262,10 @@ create policy add_solution on public.solutions for insert with check (
   and char_length(body) between 1 and 400
   and char_length(coalesce(reason,  '')) <= 400
   and char_length(coalesce(outcome, '')) <= 400
-  and kind in ('idea', 'facilitator', 'barrier')
+  -- 'cause' = why the gap happens here · 'asset' = something that already
+  -- exists here and would help · 'idea' = something new we should do
+  -- ('facilitator' / 'barrier' kept so an older page cannot be refused)
+  and kind in ('cause', 'asset', 'idea', 'facilitator', 'barrier')
   and exists (select 1 from public.groups g where g.room_code = room_code and g.id = group_id)
 );
 
