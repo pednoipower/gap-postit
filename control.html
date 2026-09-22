@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609220831">
+<link rel="stylesheet" href="assets/theme.css?v=202609220844">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🎛️</text></svg>">
 </head>
 <body class="control">
@@ -115,13 +115,13 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609220831"></script>
-<script src="assets/config.js?v=202609220831"></script>
-<script src="assets/slides.js?v=202609220831"></script>
-<script src="assets/export.js?v=202609220831"></script>
-<script src="assets/store-supabase.js?v=202609220831"></script>
-<script src="assets/store-local.js?v=202609220831"></script>
-<script src="assets/store.js?v=202609220831"></script>
+<script src="assets/version.js?v=202609220844"></script>
+<script src="assets/config.js?v=202609220844"></script>
+<script src="assets/slides.js?v=202609220844"></script>
+<script src="assets/export.js?v=202609220844"></script>
+<script src="assets/store-supabase.js?v=202609220844"></script>
+<script src="assets/store-local.js?v=202609220844"></script>
+<script src="assets/store.js?v=202609220844"></script>
 <script>
 (function () {
   "use strict";
@@ -178,6 +178,7 @@
       ["in the room", (st.participants || []).length],
       ["people who wrote", voices.size],
       ["causes", kind("cause")],
+      ["where it works", kind("works")],
       ["already exists", kind("asset")],
       ["new ideas", kind("idea")],
       ["gaps loaded", (st.groups || []).filter(g => g.id !== Slides.OVERALL).length]
@@ -200,7 +201,7 @@
       b.className = "slide-btn";
       b.setAttribute("aria-current", String(i === cur));
       const count = s.gapId
-        ? st.solutions.filter(x => x.group_id === s.gapId && (s.phase === "why" ? x.kind === "cause" : x.kind !== "cause")).length
+        ? st.solutions.filter(x => x.group_id === s.gapId && (s.phase === "why" ? (x.kind === "cause" || x.kind === "works") : (x.kind === "asset" || x.kind === "idea"))).length
         : null;
       b.innerHTML = `<span class="n">${i + 1}</span><span>${escapeHtml(s.label)}</span>` +
         (count !== null ? `<span class="meta">${count} note${count===1?"":"s"}</span>` : "");
@@ -289,17 +290,16 @@
   });
 
   /* ---- the AI prompt ---- */
-  const AI_PROMPT = `You are helping analyse a 45-minute clinical workshop that brought together nephrology teams and palliative care teams from 16 Thai hospitals. Before the workshop, a pre-survey identified four gaps in how the two teams integrate care for end-stage kidney disease. In the room, for each gap, participants first wrote WHY the gap happens at their hospital, then WHAT they would do about it — either something that already exists there (marked "already exists") or something new — and why it would work.
+  const AI_PROMPT = `You are helping analyse a 45-minute clinical workshop that brought together nephrology teams and palliative care teams from 16 Thai hospitals. Before the workshop, a pre-survey identified four gaps in how the two teams integrate care for end-stage kidney disease. In the room, for each gap, participants first said whether the gap exists at their own hospital and wrote WHY it happens there — or, if it does not exist there, WHAT MAKES IT WORK there (marked "works here") — then WHAT they would do about it — either something that already exists there (marked "already exists") or something new — and why it would work.
 
-Below is every note, grouped under its gap. Each line looks like:
-
-  S-014 | team | role | what they wrote — why it would work
+Below is every note, grouped under its gap. WHY-round notes were written as a fill-in-the-blank — WHEN (context) | WHO (actor) | DOES (response) | BECAUSE (reasoning or missing resource) — so each one is already a candidate context–mechanism chain. HOW-round lines are: what — why it would work here.
 
 The team is "nephro" or "palliative". Every note is anonymous.
 
 YOUR TASK
 For each gap, write a first-draft synthesis in Thai, in this order:
-1. สาเหตุ — the causes participants gave, grouped into 3–6 themes. For each theme, say whether nephrology, palliative care, or BOTH raised it, and cite the note labels.
+1. สาเหตุ — group the WHY chains into 3–6 mechanisms of failure. For each: the typical context (WHEN), the actor (WHO), the response (DOES), and the reasoning or missing resource (BECAUSE) — in participants' words. Say whether nephrology, palliative care, or BOTH raised it, and cite the note labels.
+1b. ที่ทำได้แล้ว — what participants from hospitals WITHOUT this gap said makes it work there. Match each against the causes in part 1: which cause does it answer? These are the strongest clues about what a program should reproduce.
 2. สิ่งที่มีอยู่แล้ว — assets participants said already exist and would help, with the reasons they gave.
 3. สิ่งใหม่ที่เสนอ — new ideas, grouped, with the reasons participants gave for why they would work. Note where an idea answers a cause named in part 1.
 4. จุดที่สองทีมมองต่างกัน — where the two teams gave different causes or different solutions for the same gap. This is the most important part; do not smooth it over.

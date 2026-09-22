@@ -161,10 +161,11 @@
     /* kind: "facilitator" | "barrier" | "idea"
        reason: the how / why (required on the phone for every kind)
        outcome: the "then" of an idea; null for facilitators and barriers */
-    async addSolution({ groupId, kind, body, reason, outcome, role, discipline, participantId }) {
+    async addSolution({ groupId, kind, body, reason, outcome, actor, context, role, discipline, participantId }) {
       const payload = {
         id: uuid(), room_code: cfg.roomCode, group_id: groupId,
         kind: kind || "idea", body, reason: reason || null, outcome: outcome || null,
+        actor: actor || null, context: context || null,
         role, discipline, participant_id: participantId || null
       };
       return this._send("solutions", payload);

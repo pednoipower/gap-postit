@@ -77,6 +77,18 @@ window.CONFIG = {
      ------------------------------------------------------------------------ */
   prompts: [],
 
+  /* The WHO tap in the "why" round. Who is the actor in the chain of events
+     that produces the gap (or that makes it work). Short — it prints on a
+     post-it. */
+  actors: [
+    { id: "nephro_doc",   label: "แพทย์โรคไต" },
+    { id: "nephro_nurse", label: "พยาบาลไต" },
+    { id: "pc_team",      label: "ทีมประคับประคอง" },
+    { id: "patient",      label: "ผู้ป่วย/ครอบครัว" },
+    { id: "system",       label: "ระบบ/ผู้บริหาร รพ." },
+    { id: "other",        label: "อื่น ๆ" }
+  ],
+
   /* Where the participant mainly works. Asked once at join, so every note
      can be read by setting as well as by team and role. Keep every option
      big enough (10+ people) that nobody is identifiable from it. */

@@ -41,11 +41,23 @@ list.
 
 For each gap, two slides.
 
-**WHY (3 min).** The phone shows the gap and its number and asks *what in
-the system makes this happen at your hospital?* — one box. The projector is
-blind: a count and the split by team. At 2:30, **Reveal**: the causes in
-both colours. Read out one from each colour. If both teams named the same
-cause, say so; that is the point of the room. Do not discuss.
+**WHY (3 min).** The phone shows the gap and its number and first asks
+*at your hospital: still the case / not the case — it works here*. Then a
+fill-in-the-blank, all four required:
+
+> **ใคร** (tap) · **เมื่อ**… · **มักจะ**… · **เพราะ**…
+
+— who, in what situation, does or doesn't do what, because of what reason or
+missing resource. People from hospitals where it already works fill the
+mirror image (*เมื่อ… จะ… เพราะ…*): what makes it work there. Say out loud:
+*one sentence that pins down where it breaks — talk about the system, not
+people.*
+
+The projector is blind: a count and the split by team. At 2:30, **Reveal**:
+each note reads as its sentence — causes on one side, *where it works, and
+why* on the other. Read out one cause from each colour, then one "works
+here" if there is one: that is the room's proof it can be done. Do not
+discuss.
 
 **HOW (4 min).** The phone shows the program's proposal as a seed (*build
 on it, or propose something else*), then asks people to pick **something
@@ -73,9 +85,10 @@ wrote. Tell them the summary comes back to both teams.
 
 ## Afterwards
 
-**Download .xlsx** on the control panel: causes; what-we-would-do (existing
-or new, with why it would work); a crosstab by gap × team × role; the gaps;
-who was there. Every row carries team, role, setting and the anonymous
+**Download .xlsx** on the control panel: *Why* (type, who, when, does,
+because — one row per chain, from both hospitals with the gap and without);
+*What we would do* (existing or new, with why it would work); a crosstab by
+gap × team × role; the gaps; who was there. Every row carries team, role, setting and the anonymous
 phone id, so within-person chains can be reassembled without identity.
 
 The AI prompt on the control panel drafts a per-gap synthesis — causes,

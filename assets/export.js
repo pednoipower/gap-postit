@@ -252,17 +252,19 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
     const pById = {}; (snap.participants || []).forEach(p => pById[p.id] = p);
     const settingOf = row => { const p = pById[row.participant_id]; return p ? labelFor(cfg.settings || [], p.setting) : ""; };
     const when = iso => (iso || "").replace("T", " ").slice(0, 19);
-    const KIND = { cause: "Cause", asset: "Already exists", idea: "New idea", facilitator: "Would help", barrier: "Obstacle" };
+    const KIND = { cause: "Cause (gap exists here)", works: "Works here (no gap)", asset: "Already exists", idea: "New idea", facilitator: "Would help", barrier: "Obstacle" };
 
-    /* Sheet 1 — causes: why the gap happens here */
+    /* Sheet 1 — why: causes where the gap exists, and what makes it work where it doesn't */
     const causeRows = [[
-      H("Ref"), H("Gap"), H("Gap label"), H("Cause"), H("Role"), H("Discipline"), H("Setting"), H("Phone id"), H("Time")
+      H("Ref"), H("Gap"), H("Gap label"), H("Type"), H("Who"), H("When (context)"), H("Does (response)"), H("Because (mechanism)"),
+      H("Role"), H("Discipline"), H("Setting"), H("Phone id"), H("Time")
     ]];
-    for (const r of snap.solutions.filter(x => x.kind === "cause")) {
+    for (const r of snap.solutions.filter(x => x.kind === "cause" || x.kind === "works")) {
       const gs = groupStyle(r.group_id), g = gById[r.group_id] || {};
       causeRows.push([
         { v: r.ref, s: styleIndex.mono }, { v: r.group_id, s: gs }, { v: g.label || "", s: gs },
-        { v: r.body, s: gs },
+        { v: KIND[r.kind], s: gs }, { v: labelFor(cfg.actors || [], r.actor), s: gs },
+        { v: r.context || "", s: gs }, { v: r.body, s: gs }, { v: r.reason || "", s: gs },
         { v: labelFor(cfg.roles, r.role), s: gs },
         { v: labelFor(cfg.disciplines, r.discipline), s: discStyle(r.discipline) },
         { v: settingOf(r), s: gs }, { v: r.participant_id || "", s: styleIndex.mono }, { v: when(r.created_at), s: styleIndex.mono }
@@ -274,7 +276,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
       H("Ref"), H("Gap"), H("Gap label"), H("Type"), H("What"), H("Why it would work here"),
       H("Role"), H("Discipline"), H("Setting"), H("Phone id"), H("Time")
     ]];
-    for (const r of snap.solutions.filter(x => x.kind !== "cause")) {
+    for (const r of snap.solutions.filter(x => x.kind === "asset" || x.kind === "idea")) {
       const gs = groupStyle(r.group_id), g = gById[r.group_id] || {};
       fixRows.push([
         { v: r.ref, s: styleIndex.mono }, { v: r.group_id, s: gs }, { v: g.label || "", s: gs },
@@ -287,18 +289,19 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
     }
 
     /* Sheet 3 — crosstab: gap × discipline × role */
-    const xRows = [[H("Gap"), H("Gap label"), H("Discipline"), H("Role"), H("Causes"), H("Already exists"), H("New ideas")]];
+    const xRows = [[H("Gap"), H("Gap label"), H("Discipline"), H("Role"), H("Causes"), H("Works here"), H("Already exists"), H("New ideas")]];
     for (const g of (snap.groups || [])) {
       for (const d of (cfg.disciplines || [])) for (const r of (cfg.roles || [])) {
         const sel = x => x.group_id === g.id && x.discipline === d.id && x.role === r.id;
         const c = snap.solutions.filter(x => sel(x) && x.kind === "cause").length;
+        const w = snap.solutions.filter(x => sel(x) && x.kind === "works").length;
         const a = snap.solutions.filter(x => sel(x) && x.kind === "asset").length;
         const i = snap.solutions.filter(x => sel(x) && x.kind === "idea").length;
-        if (!c && !a && !i) continue;
+        if (!c && !w && !a && !i) continue;
         const gs = groupStyle(g.id);
         xRows.push([{ v: g.id, s: styleIndex.mono }, { v: g.label, s: gs },
           { v: labelFor(cfg.disciplines, d.id), s: discStyle(d.id) }, { v: r.label, s: gs },
-          { v: c, s: gs }, { v: a, s: gs }, { v: i, s: gs }]);
+          { v: c, s: gs }, { v: w, s: gs }, { v: a, s: gs }, { v: i, s: gs }]);
       }
     }
 
@@ -336,9 +339,9 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
                   { v: (snap.participants || []).length, s: styleIndex.bold }]);
 
     const sheets = [
-      { name: "Causes",         xml: sheetXml(causeRows,   { widths: [9, 6, 30, 62, 12, 16, 16, 38, 20] }) },
+      { name: "Why",            xml: sheetXml(causeRows,   { widths: [9, 6, 30, 20, 16, 40, 40, 46, 12, 16, 16, 38, 20] }) },
       { name: "What we would do", xml: sheetXml(fixRows,   { widths: [9, 6, 30, 14, 52, 52, 12, 16, 16, 38, 20] }) },
-      { name: "Crosstab",       xml: sheetXml(xRows,       { widths: [6, 30, 16, 12, 10, 14, 10] }) },
+      { name: "Crosstab",       xml: sheetXml(xRows,       { widths: [6, 30, 16, 12, 10, 12, 14, 10] }) },
       { name: "Gaps",           xml: sheetXml(summaryRows, { widths: [6, 30, 52, 36, 52, 10, 14, 10, 20, 20] }) },
       { name: "Who was there",  xml: sheetXml(whoRows,     { widths: [18, 14, 18, 10] }) }
     ];
@@ -390,19 +393,24 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
     L.push("THE MISSING PIECE — why each gap happens, and what we would do");
     L.push("Exported: " + new Date(snap.exportedAt).toLocaleString());
     L.push("");
-    L.push("Each line: LABEL | team | role | what they wrote — why it would work");
+    L.push("WHY lines: LABEL | team | role | WHEN context | WHO actor | DOES response | BECAUSE mechanism");
+    L.push("HOW lines: LABEL | team | role | what — why it would work here");
     L.push("");
     for (const g of (snap.groups || [])) {
       const rs = snap.solutions.filter(x => x.group_id === g.id);
-      const c = rs.filter(x => x.kind === "cause"), a = rs.filter(x => x.kind === "asset"), i = rs.filter(x => x.kind === "idea");
+      const c = rs.filter(x => x.kind === "cause"), w = rs.filter(x => x.kind === "works"), a = rs.filter(x => x.kind === "asset"), i = rs.filter(x => x.kind === "idea");
       if (!rs.length && g.id === "GX") continue;
       L.push("=".repeat(74));
       L.push(`${g.id}  ${clean(g.label)}`);
       if (g.stat) L.push("SURVEY:   " + clean(g.stat));
       if (g.proposal) L.push("PROPOSAL: " + clean(g.proposal));
       L.push("-".repeat(74));
-      L.push("WHY IT HAPPENS (" + c.length + "):");
-      c.forEach(x => L.push(`  ${x.ref} | ${x.discipline} | ${x.role} | ${clean(x.body)}`));
+      L.push("WHY IT HAPPENS — from hospitals where the gap exists (" + c.length + "):");
+      const sent = x => `WHEN ${clean(x.context)} | WHO ${clean(x.actor)} | DOES ${clean(x.body)} | BECAUSE ${clean(x.reason)}`;
+      c.forEach(x => L.push(`  ${x.ref} | ${x.discipline} | ${x.role} | ${sent(x)}`));
+      L.push("");
+      L.push("WHAT MAKES IT WORK — from hospitals where it does not (" + w.length + "):");
+      w.forEach(x => L.push(`  ${x.ref} | ${x.discipline} | ${x.role} | ${sent(x)}`));
       L.push("");
       L.push("ALREADY EXISTS, USE IT MORE (" + a.length + "):");
       a.forEach(x => L.push(`  ${x.ref} | ${x.discipline} | ${x.role} | ${clean(x.body)} — ${clean(x.reason)}`));

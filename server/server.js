@@ -189,9 +189,10 @@ async function api(req, res, pathname, query) {
     if (!room.board_open) return send(res, 400, { error: 'the board is closed' });
     if (!payload.body || payload.body.length > 400)
       return send(res, 400, { error: 'note is empty or too long' });
-    if ((payload.reason || '').length > 400 || (payload.outcome || '').length > 400)
+    if ((payload.reason || '').length > 400 || (payload.outcome || '').length > 400 ||
+        (payload.context || '').length > 400 || (payload.actor || '').length > 60)
       return send(res, 400, { error: 'note is too long' });
-    if (table === 'solutions' && !['cause', 'asset', 'idea', 'facilitator', 'barrier'].includes(payload.kind || 'idea'))
+    if (table === 'solutions' && !['cause', 'works', 'asset', 'idea', 'facilitator', 'barrier'].includes(payload.kind || 'idea'))
       return send(res, 400, { error: 'unknown kind' });
 
     const list = DB[table];

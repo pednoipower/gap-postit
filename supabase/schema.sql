@@ -129,9 +129,10 @@ create index if not exists solutions_group_idx on public.solutions(room_code, gr
 --   concerns.situation    when the gap happens most (optional tap)
 --   groups.proposal       the one concrete thing the program proposes for
 --                         this gap — what the room reacts to
---   solutions.kind        'cause' (why this gap happens here) | 'asset'
---                         (something that already exists here and would help)
---                         | 'idea' (something new we should do)
+--   solutions.kind        'cause' (why this gap happens here) | 'works' (from a
+--                         site that does NOT have the gap: what makes it work
+--                         there) | 'asset' (something that already exists here
+--                         and would help) | 'idea' (something new we should do)
 --   solutions.reason      for asset/idea: why it would work here. Required.
 --   solutions.outcome     unused in the current flow; kept for older data
 -- ----------------------------------------------------------------------------
@@ -142,6 +143,10 @@ alter table public.groups       add column if not exists stat      text;   -- th
 alter table public.solutions    add column if not exists kind      text not null default 'idea';
 alter table public.solutions    add column if not exists reason    text;
 alter table public.solutions    add column if not exists outcome   text;
+-- the WHY round is a fill-in-the-blank: WHO (actor) · WHEN (context) ·
+-- DOES (body) · BECAUSE (reason). Context and actor get their own columns.
+alter table public.solutions    add column if not exists actor     text;
+alter table public.solutions    add column if not exists context   text;
 create index if not exists solutions_kind_idx on public.solutions(room_code, kind);
 
 
@@ -262,10 +267,12 @@ create policy add_solution on public.solutions for insert with check (
   and char_length(body) between 1 and 400
   and char_length(coalesce(reason,  '')) <= 400
   and char_length(coalesce(outcome, '')) <= 400
+  and char_length(coalesce(context, '')) <= 400
+  and char_length(coalesce(actor,   '')) <= 60
   -- 'cause' = why the gap happens here · 'asset' = something that already
   -- exists here and would help · 'idea' = something new we should do
   -- ('facilitator' / 'barrier' kept so an older page cannot be refused)
-  and kind in ('cause', 'asset', 'idea', 'facilitator', 'barrier')
+  and kind in ('cause', 'works', 'asset', 'idea', 'facilitator', 'barrier')
   and exists (select 1 from public.groups g where g.room_code = room_code and g.id = group_id)
 );
 

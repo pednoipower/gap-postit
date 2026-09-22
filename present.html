@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609220831">
+<link rel="stylesheet" href="assets/theme.css?v=202609220844">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -105,6 +105,7 @@
   .react-reveal .col .board { position:relative; flex:1; }
   .react-reveal.two { grid-template-columns: .72fr 2fr; }
   .react-reveal .col.causes h3 { color:#E5CE7A; }
+  .react-reveal .col.works h3  { color:#8FCFA8; }
   .react-reveal .col.fixes h3  { color:#8FCFA8; }
   .signup { display:flex; align-items:center; gap:2vw; justify-content:center; margin-top:4vh; }
   .signup .qr { background:#fff; border-radius:16px; padding:12px; width:clamp(110px,12vw,200px); }
@@ -127,16 +128,16 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609220831"></script>
-<script src="assets/config.js?v=202609220831"></script>
-<script src="assets/strings.js?v=202609220831"></script>
-<script src="assets/slides.js?v=202609220831"></script>
-<script src="assets/qrcode.js?v=202609220831"></script>
-<script src="assets/jigsaw.js?v=202609220831"></script>
-<script src="assets/wordcloud.js?v=202609220831"></script>
-<script src="assets/store-supabase.js?v=202609220831"></script>
-<script src="assets/store-local.js?v=202609220831"></script>
-<script src="assets/store.js?v=202609220831"></script>
+<script src="assets/version.js?v=202609220844"></script>
+<script src="assets/config.js?v=202609220844"></script>
+<script src="assets/strings.js?v=202609220844"></script>
+<script src="assets/slides.js?v=202609220844"></script>
+<script src="assets/qrcode.js?v=202609220844"></script>
+<script src="assets/jigsaw.js?v=202609220844"></script>
+<script src="assets/wordcloud.js?v=202609220844"></script>
+<script src="assets/store-supabase.js?v=202609220844"></script>
+<script src="assets/store-local.js?v=202609220844"></script>
+<script src="assets/store.js?v=202609220844"></script>
 <script>
 (function () {
   "use strict";
@@ -249,7 +250,7 @@
     const W = 440, H = opts.tall ? 320 : 260;
     const st = Store.state;
     const rs = st.solutions.filter(x => x.group_id === g.id);
-    const helps = rs.filter(x => x.kind === "cause").length;
+    const helps = rs.filter(x => x.kind === "cause" || x.kind === "works").length;
     const needs = rs.filter(x => x.kind === "asset" || x.kind === "idea").length;
     const ideas = 0;
     const accent = groupColor(i);
@@ -343,8 +344,9 @@
     if (!g) return;
     const all = st.solutions.filter(x => x.group_id === g.id);
     const causes = all.filter(x => x.kind === "cause");
+    const works  = all.filter(x => x.kind === "works");
     const fixes  = all.filter(x => x.kind === "asset" || x.kind === "idea");
-    const live   = isWhy ? causes : fixes;
+    const live   = isWhy ? causes.concat(works) : fixes;
     const want = (isWhy ? "why" : "how") + ":" + (revealed ? "r" : "b") + ":" + g.id;
     const body = $("gapBody");
     if (gapLayout !== want) {
@@ -355,9 +357,12 @@
           <div class="count"><div class="n" id="rN">0</div><div class="l">${escapeHtml(t("pj_answers"))}</div>
             <div class="split" id="rSplit"></div></div></div>`;
       } else if (isWhy && revealed) {
-        body.innerHTML = `<div class="react-reveal two">
+        /* causes on one side; on the other, people from sites where this
+           already works and what makes it work — the room's proof it can be done */
+        body.innerHTML = `<div class="react-reveal">
           <div class="piece" id="gapPiece"></div>
-          <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div></div>`;
+          <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div>
+          <div class="col works"><h3>${escapeHtml(t("pj_works"))} <span id="wN"></span></h3><div class="board" id="boardWorks"></div></div></div>`;
       } else if (!isWhy && !revealed) {
         /* HOW, collecting: the causes just revealed stay on screen as
            context; the answers being written are only a count */
@@ -383,6 +388,7 @@
       }).join("");
     }
     if ($("boardCauses")) { setText("cN", causes.length); renderBoard(causes, "cause", $("boardCauses")); }
+    if ($("boardWorks"))  { setText("wN", works.length);  renderBoard(works, "works", $("boardWorks")); }
     if ($("boardFixes"))  { setText("fN", fixes.length);  renderBoard(fixes, "fix", $("boardFixes")); }
   }
 
@@ -406,7 +412,15 @@
      THE BOARD — post-its on a loose grid. A note may carry a second line
      (its how / why), drawn smaller beneath the main text.
      ---------------------------------------------------------------------- */
+  const actorLabel = id => ((cfg.actors || []).find(a => a.id === id) || {}).label || "";
   function noteText(n, kind) {
+    // a WHY note reads as the sentence the blanks made: when · who does · because
+    if (n.kind === "cause" || n.kind === "works") {
+      const who = actorLabel(n.actor);
+      const main = (n.context ? "เมื่อ" + n.context + " · " : "") + (who ? who + " " : "") +
+                   (n.kind === "cause" ? "มักจะ " : "จะ ") + n.body;
+      return { main, sub: n.reason ? "เพราะ " + n.reason : "" };
+    }
     // something that already exists here is marked, so the room can see how
     // much of the answer is "use what we have" versus "build something new"
     const main = (n.kind === "asset" ? "✓ " + t("pj_asset_mark") + " · " : "") + n.body;
@@ -511,13 +525,14 @@
       const el = $("closeStats");
       if (el) {
         const c = st.solutions.filter(x => x.kind === "cause").length;
+        const w = st.solutions.filter(x => x.kind === "works").length;
         const a = st.solutions.filter(x => x.kind === "asset").length;
         const i = st.solutions.filter(x => x.kind === "idea").length;
         const both = (st.groups || []).filter(g => g.id !== Slides.OVERALL).filter(g => {
           const ds = new Set(st.solutions.filter(x => x.group_id === g.id).map(x => x.discipline));
           return ds.size >= 2;
         }).length;
-        el.textContent = t("pj_stats", { c, a, i, g: both });
+        el.textContent = t("pj_stats", { c, w, a, i, g: both });
       }
     }
   }
