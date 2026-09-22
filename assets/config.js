@@ -46,7 +46,7 @@ window.CONFIG = {
 
   // The web address participants type in, shown under the QR code.
   // Keep it SHORT — people will be squinting at it from the back row.
-  joinUrl: "https://your-site.example.com",
+  joinUrl: "https://pednoipower.github.io/gap-postit/",
 
   // The room code. 4 letters, no vowels (so it can never spell anything rude,
   // and so O/0 and I/1 confusion is impossible).
