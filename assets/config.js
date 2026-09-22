@@ -163,34 +163,40 @@ window.CONFIG = {
      maxGroups is only used by the after-the-day AI grouping step.
      ------------------------------------------------------------------------ */
   maxGroups: 6,
-  // The four gaps below come from the pre-survey of the 16 pilot hospitals
-  // (PreSurvey25.9.69.pdf, Sept 2026): `stat` is the survey number shown on
-  // the piece, `proposal` is the survey's own development proposal for that
-  // gap. See docs/2026-09-22-gaps-from-presurvey.md for the mapping.
+  // The four gaps below are the four site-level indicators with the most
+  // Unmet results in the pre-survey of the 16 pilot hospitals (Sept 2026),
+  // one indicator each, not merged. Each maps to one question on the survey
+  // form; `problem` is worded on the survey's own criterion and its most
+  // common answer, `stat` is the survey number, `proposal` is the survey's
+  // own development proposal. See docs/2026-09-22-gaps-from-presurvey.md.
   seedThemes: [
     {
-      label:    "คัดกรองยังขึ้นกับตัวบุคคล",
-      problem:  "การคัดกรองผู้ป่วยเข้าสู่ CKM ยังขึ้นกับแต่ละทีมและแต่ละคน ผู้ป่วยจึงเข้าถึงช้า หรือไม่ได้เข้าเลย",
-      stat:     "มีระบบคัดกรองชัดเจนและใช้ประจำ 2 จาก 16 รพ.",
-      proposal: "กำหนดเกณฑ์คัดกรอง กลุ่มเป้าหมาย ผู้รับผิดชอบ และแบบบันทึกผลคัดกรอง ที่ใช้เหมือนกันทุกจุด"
+      // Form Q6 — Met = "มีระบบชัดเจนและใช้เป็นประจำ"
+      label:    "คัดกรอง CKM ไม่เป็นระบบ",
+      problem:  "ยังไม่มีระบบคัดกรองผู้ป่วยที่อาจเหมาะกับ CKM ที่ชัดเจนและใช้เป็นประจำ — ที่มีอยู่ขึ้นกับแพทย์หรือทีมแต่ละคน",
+      stat:     "มีระบบชัดเจนใช้ประจำ 2 จาก 16 รพ. · “มีบ้าง ขึ้นกับแพทย์/ทีม” 14 จาก 24 ผู้ตอบ",
+      proposal: "กำหนดเกณฑ์คัดกรอง กลุ่มเป้าหมาย ผู้รับผิดชอบ และแบบบันทึกผลคัดกรอง"
     },
     {
-      label:    "ส่งปรึกษารายกรณี ไม่มี pathway ร่วม",
-      problem:  "ช่องทาง consult มีเกือบทุกแห่ง แต่ยังส่งปรึกษาเป็นรายกรณี ไม่มี pathway และไม่ได้ทบทวนผู้ป่วยร่วมกันระหว่างสองทีม",
-      stat:     "มี pathway ชัดเจน 5 จาก 16 รพ. · บูรณาการระดับ 3–4 เพียง 7 จาก 16",
-      proposal: "written pathway จาก CKD clinic ถึงทีม PC พร้อมผู้ประสานงาน และ case review ร่วมเป็นประจำ"
+      // Form Q7 — Met = "มี pathway และ workflow การส่งต่อจาก CKD clinic ชัดเจน"
+      label:    "ไม่มี pathway จาก CKD clinic ไป PC",
+      problem:  "ไม่มี pathway และ workflow ส่งต่อผู้ป่วย advanced CKD จาก CKD clinic ไปปรึกษา palliative care — ส่งปรึกษาเป็นรายกรณี",
+      stat:     "มี pathway และ workflow ชัดเจน 5 จาก 16 รพ. · ส่งปรึกษาเป็นรายกรณี 17 จาก 24 ผู้ตอบ",
+      proposal: "written pathway ส่งต่อจาก CKD clinic ถึงทีม PC พร้อมเกณฑ์ส่งต่อ ช่องทาง consult และผู้ประสานงาน"
     },
     {
-      label:    "ACP มาช้า และทำเฉพาะ CKM",
-      problem:  "ACP ส่วนใหญ่ทำเฉพาะผู้ป่วยที่เลือก CKM และเริ่มหลังอาการทรุด ผู้ป่วยที่เลือก HD, PD หรือ KT แทบไม่ได้คุย",
-      stat:     "ทำ ACP ครบทุกทางเลือก 1 จาก 16 รพ. — ทั้งที่มีเอกสารลงนามแล้ว 13 จาก 16",
-      proposal: "เริ่ม ACP ก่อนตัดสินใจ KRT กับผู้ป่วย ESKD ทุกทางเลือก ใช้เอกสารมาตรฐาน ลงนาม และทบทวนเมื่ออาการเปลี่ยน"
+      // Form Q8 + Q10 — Met = a defined joint working model and integration level ≥ 3
+      label:    "ทำงานร่วมกันเฉพาะรายซับซ้อน",
+      problem:  "สองทีมเชื่อมโยงกันเฉพาะผู้ป่วยรายที่ซับซ้อน ผ่านการส่งปรึกษา OPD/IPD — ยังไม่ทำงานร่วมกันสม่ำเสมอ และไม่มี workflow ร่วม",
+      stat:     "บูรณาการระดับ 3–4 7 จาก 16 รพ. · ระดับ 1–2 13 จาก 24 ผู้ตอบ · joint clinic 5 รพ. case conference 1 รพ.",
+      proposal: "รูปแบบทำงานร่วมที่กำหนดไว้ เช่น joint clinic หรือ case conference ประจำ และ case review ร่วมสองทีม"
     },
     {
-      label:    "ส่งต่อแต่โรค ไม่ส่งเป้าหมายการดูแล",
-      problem:  "ข้อมูลที่ส่งต่อไป ER และชุมชนเน้นวินิจฉัยและการรักษา แต่มักไม่มีเป้าหมายการดูแล แผนระยะท้าย และผลประเมินอาการ",
-      stat:     "ส่งเป้าหมายการดูแล 10 จาก 16 · แผนระยะท้าย 9 · ผลประเมินอาการ 6",
-      proposal: "EMR alert และ minimum data set สำหรับส่งต่อ ที่มีอาการ เป้าหมายการดูแล แผนฉุกเฉิน และ feedback กลับมา"
+      // Form Q13 + Q15 — Met = "ทำ ACP ในผู้ป่วย ESKD ไม่ว่าเลือกการรักษาแบบใด"
+      label:    "ACP เฉพาะผู้ที่เลือก CKM และเริ่มช้า",
+      problem:  "ACP ทำเฉพาะผู้ป่วย ESKD ที่เลือก CKM และมักเริ่มหลังเลือก CKM หรือหลังอาการมากขึ้น — ผู้ที่เลือก HD, PD หรือ KT ไม่ได้ทำ",
+      stat:     "ทำ ACP ทุกทางเลือก 1 จาก 16 รพ. · เฉพาะ CKM 17 จาก 24 ผู้ตอบ · เริ่มก่อนตัดสินใจ KRT 5 จาก 24",
+      proposal: "ทำ ACP ในผู้ป่วย ESKD ทุกทางเลือก เริ่มตั้งแต่ CKD stage 4–5 ก่อนตัดสินใจบำบัดทดแทนไต ใช้เอกสารมาตรฐาน ลงนาม และทบทวนเมื่ออาการเปลี่ยน"
     }
   ],
 
