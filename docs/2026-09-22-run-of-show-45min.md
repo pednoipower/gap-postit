@@ -49,9 +49,9 @@ fill-in-the-blank, all four required:
 
 — in what situation, who, does or doesn't do what, because of what reason or
 missing resource. The sentence assembles itself on the phone as they type.
-*Situation* is deliberately wide — time, place, workload, policy or KPIs,
-information, the relationship between the teams, the patient's path — not
-only the patient's clinical stage; the phone says so under the blank.
+*Situation* is free text with the plainest possible hint — *where, when,
+what is going on* — so people describe rather than classify. Context is
+coded afterwards with `docs/2026-09-22-context-codebook.md`.
 People from hospitals where it already works fill the mirror image
 (*[gap] ไม่เกิดที่ รพ. ของเรา เนื่องจาก ในสถานการณ์… ใคร จะ… เพราะ…*).
 
