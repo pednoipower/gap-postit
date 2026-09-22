@@ -28,6 +28,15 @@
   <div id="main" class="hidden">
 
     <div class="panel">
+      <h2>Before you start</h2>
+      <p class="why">Run a dry run, then clear it out so the real session starts clean.
+        A dated backup is saved automatically before anything is removed.</p>
+      <button class="btn small ghost" id="resetBtn"
+        style="border-color:#E4B8B3;color:#8C2E25">Clear this room</button>
+      <div id="resetMsg"></div>
+    </div>
+
+    <div class="panel">
       <h2>Right now</h2>
       <div class="stat-row" id="stats"></div>
       <div class="row" style="margin-top:14px">
@@ -91,15 +100,6 @@
         <button class="btn small ghost" id="pasteBtn">Paste from clipboard</button>
       </div>
       <div id="importMsg"></div>
-    </div>
-
-    <div class="panel">
-      <h2>Before you start</h2>
-      <p class="why">Run a dry run, then clear it out so the real session starts clean.
-        A dated backup is saved automatically before anything is removed.</p>
-      <button class="btn small ghost" id="resetBtn"
-        style="border-color:#E4B8B3;color:#8C2E25">Clear this room</button>
-      <div id="resetMsg"></div>
     </div>
 
   </div>
@@ -375,6 +375,11 @@ Return ONLY a JSON array, no commentary before or after, in exactly this shape:
                  ".\n\nDownload a backup first if you have not already.\n\nGo ahead?")) return;
     if (!confirm("Last check — this cannot be undone. Clear room " + cfg.roomCode + "?")) return;
     try {
+      // the promise in the panel text: nothing is removed until a backup is on disk
+      msg("resetMsg", "", "Saving a backup first…");
+      const s = await snap();
+      Exporter.download(`${stamp()}-missing-piece-backup-before-clear.json`,
+        JSON.stringify(s, null, 2), "application/json");
       await Store.resetRoom(token);
       location.reload();
     } catch (e) { msg("resetMsg", "bad", escapeHtml(e.message)); }
