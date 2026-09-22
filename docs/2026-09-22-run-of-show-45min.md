@@ -61,9 +61,14 @@ discuss — 5 minutes is the whole budget.
 
 ## 0:31 — Their own ideas (9 min)
 
-Slide 8. Board opens. Three boxes: *If we… / then… / because people would…*
-All three required. Point at the example on screen. The wall is live; ideas
-carry the gap they answer.
+Slide 8. Board opens. They pick a gap — or **ภาพรวม** for an idea that is
+about the two teams in general — then three boxes: *If we… / then… /
+because people would…* All three required. Point at the example on screen.
+The wall is live; ideas carry the gap they answer.
+
+Throughout, the phone shows a three-step strip (story · gaps n/3 · ideas)
+so people know where they are; during the gaps slide and each reveal it
+also lists the gaps, for anyone who cannot read the projector.
 
 ## 0:40 — Close (4 min)
 

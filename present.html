@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609220605">
+<link rel="stylesheet" href="assets/theme.css?v=202609220709">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -51,9 +51,10 @@
      one projected screen. You cannot scroll a projector. */
   .problems { display:grid; gap:1.6vh; height:100%; align-content:center; padding-bottom:6vh; }
   /* grouped view: every problem is a jigsaw piece, laid out in a grid */
-  .problems.pieces { grid-template-columns: repeat(var(--cols, 2), 1fr); gap: 1vh 1vw; align-items: stretch; padding-bottom: 2vh; }
-  .problem-piece { position: relative; min-height: 0; display: grid; place-items: center; }
-  .problem-piece svg { width: 100%; height: 100%; max-height: 100%; }
+  .problems.pieces { grid-template-columns: repeat(var(--cols, 2), 1fr); grid-auto-rows: minmax(0, 1fr);
+    gap: 1vh 1vw; align-items: stretch; align-content: stretch; padding-bottom: 1vh; }
+  .problem-piece { position: relative; min-height: 0; min-width: 0; display: grid; place-items: center; overflow: hidden; }
+  .problem-piece svg { width: 100%; height: 100%; }
   .spot-problem svg { width: 100%; height: 100%; }
   .problems[data-n="6"] .stmt, .problems[data-n="7"] .stmt { font-size:clamp(15px,1.72vw,30px); }
   .problems[data-n="8"] .stmt, .problems[data-n="9"] .stmt,
@@ -125,16 +126,16 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609220605"></script>
-<script src="assets/config.js?v=202609220605"></script>
-<script src="assets/strings.js?v=202609220605"></script>
-<script src="assets/slides.js?v=202609220605"></script>
-<script src="assets/qrcode.js?v=202609220605"></script>
-<script src="assets/jigsaw.js?v=202609220605"></script>
-<script src="assets/wordcloud.js?v=202609220605"></script>
-<script src="assets/store-supabase.js?v=202609220605"></script>
-<script src="assets/store-local.js?v=202609220605"></script>
-<script src="assets/store.js?v=202609220605"></script>
+<script src="assets/version.js?v=202609220709"></script>
+<script src="assets/config.js?v=202609220709"></script>
+<script src="assets/strings.js?v=202609220709"></script>
+<script src="assets/slides.js?v=202609220709"></script>
+<script src="assets/qrcode.js?v=202609220709"></script>
+<script src="assets/jigsaw.js?v=202609220709"></script>
+<script src="assets/wordcloud.js?v=202609220709"></script>
+<script src="assets/store-supabase.js?v=202609220709"></script>
+<script src="assets/store-local.js?v=202609220709"></script>
+<script src="assets/store.js?v=202609220709"></script>
 <script>
 (function () {
   "use strict";
@@ -294,14 +295,14 @@
   function fillProblems() {
     const host = $("problemList");
     if (!host) return;
-    const groups = Store.state.groups || [];
+    const groups = (Store.state.groups || []).filter(g => g.id !== "GX");
     if (!groups.length) {
       host.className = "problems";
       host.innerHTML = `<p class="sub" style="text-align:center">${escapeHtml(t("pj_waiting_gaps"))}</p>`;
       return;
     }
     host.className = "problems pieces";
-    host.style.setProperty("--cols", groups.length <= 4 ? 2 : groups.length <= 6 ? 3 : 4);
+    host.style.setProperty("--cols", groups.length <= 3 ? groups.length : groups.length <= 6 ? 3 : 4);
     host.replaceChildren();
     groups.forEach((g, i) => {
       const cell = document.createElement("div");
@@ -495,7 +496,7 @@
         const f = st.solutions.filter(x => x.kind === "facilitator").length;
         const b = st.solutions.filter(x => x.kind === "barrier").length;
         const i = st.solutions.filter(x => x.kind === "idea").length;
-        const both = (st.groups || []).filter(g => {
+        const both = (st.groups || []).filter(g => g.id !== "GX").filter(g => {
           const ds = new Set(st.solutions.filter(x => x.group_id === g.id).map(x => x.discipline));
           return ds.size >= 2;
         }).length;

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609220605">
+<link rel="stylesheet" href="assets/theme.css?v=202609220709">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
 <style>
   /* the proposal the room is reacting to, shown above the two stance buttons */
@@ -18,10 +18,24 @@
   .stance .choice[data-stance="barrier"][aria-pressed="true"]     { --pick: #D4A020; }
   .field textarea.note { min-height: 84px; }
   .field .lbl { font-size: 15.5px; }
+  /* where am I in the session */
+  .steps { display:flex; gap:6px; margin:2px 0 14px; }
+  .steps span { flex:1; text-align:center; font-size:12.5px; font-weight:600; color:var(--text-dim);
+    padding:7px 4px; border-radius:8px; background:var(--paper-2); line-height:1.3; }
+  .steps span[aria-current="step"] { background:var(--text); color:#fff; }
+  .steps span.done { color:#1D6B48; background:#EAF6F0; }
+  .gap-row { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--edge); }
+  .gap-row:first-child { border-top:0; padding-top:0; }
+  .gap-row .g { flex:none; width:30px; height:30px; border-radius:7px; display:grid; place-items:center;
+    font-size:12px; font-weight:800; color:#0E1118; }
+  .gap-row b { display:block; font-size:15.5px; line-height:1.4; }
+  .gap-row small { display:block; font-size:13.5px; color:var(--text-dim); line-height:1.5; margin-top:2px; }
 </style>
 </head>
 <body class="participant">
 <div class="wrap">
+
+  <div class="steps" id="steps" aria-label="ขั้นตอน"></div>
 
   <div class="masthead">
     <h1 id="promptTitle"></h1>
@@ -33,6 +47,12 @@
   <!-- shown whenever there is nothing to type -->
   <div class="card center" id="waitCard">
     <p class="hint" style="margin:6px 0 0" id="waitText"></p>
+  </div>
+
+  <!-- the gaps, readable on the phone while the projector shows them -->
+  <div class="card hidden" id="gapsCard">
+    <p class="hint" style="margin:0 0 12px" id="gapsIntro"></p>
+    <div id="gapsList"></div>
   </div>
 
   <!-- CONCERNS: one box, plus an optional "when does this happen" -->
@@ -104,12 +124,12 @@
   <p class="hint center" style="opacity:.5;font-size:11px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609220605"></script>
-<script src="assets/config.js?v=202609220605"></script>
-<script src="assets/strings.js?v=202609220605"></script>
-<script src="assets/store-supabase.js?v=202609220605"></script>
-<script src="assets/store-local.js?v=202609220605"></script>
-<script src="assets/store.js?v=202609220605"></script>
+<script src="assets/version.js?v=202609220709"></script>
+<script src="assets/config.js?v=202609220709"></script>
+<script src="assets/strings.js?v=202609220709"></script>
+<script src="assets/store-supabase.js?v=202609220709"></script>
+<script src="assets/store-local.js?v=202609220709"></script>
+<script src="assets/store.js?v=202609220709"></script>
 <script>
 (function () {
   "use strict";
@@ -171,6 +191,43 @@
     return "wait";
   }
   const currentGap = () => groups.find(g => g.id === (room && room.spotlight_group));
+  const OVERALL = "GX";                                   // the "not about one gap" bucket
+  const realGaps = () => groups.filter(g => g.id !== OVERALL);
+  const PALETTE = ["#7FB3D5","#E9A06B","#8FCFA8","#C59BD1","#E5CE7A","#84C5C5","#E39A9A","#A9A3D8"];
+
+  /* Three steps: tell your story · the gaps (n of N) · your ideas. */
+  function renderSteps() {
+    const ph = room ? room.phase : "lobby";
+    const gaps = realGaps();
+    const gi = gaps.findIndex(g => g.id === (room && room.spotlight_group));
+    const cur = ph === "concerns" ? 0 : (ph === "react" || ph === "reveal" || ph === "evidence") ? 1 : (ph === "solutions" || ph === "closing") ? 2 : -1;
+    const labels = [t("step_story"),
+      t("step_gaps") + (cur === 1 && gi >= 0 && gaps.length ? ` ${gi + 1}/${gaps.length}` : ""),
+      t("step_ideas")];
+    $("steps").replaceChildren();
+    labels.forEach((l, i) => {
+      const e = document.createElement("span");
+      e.textContent = (i + 1) + " " + l;
+      if (i === cur) e.setAttribute("aria-current", "step");
+      if (cur > i) e.classList.add("done");
+      $("steps").appendChild(e);
+    });
+    $("steps").classList.toggle("hidden", cur < 0);
+  }
+
+  function renderGapsList() {
+    const host = $("gapsList");
+    host.replaceChildren();
+    realGaps().forEach((g, i) => {
+      const d = document.createElement("div");
+      d.className = "gap-row";
+      d.innerHTML = `<span class="g" style="background:${PALETTE[i % PALETTE.length]}">${g.id}</span>
+        <div><b></b><small></small></div>`;
+      d.querySelector("b").textContent = g.label;
+      d.querySelector("small").textContent = g.proposal || g.problem_statement || "";
+      host.appendChild(d);
+    });
+  }
 
   /* ---- choice chips ---- */
   function chips(host, items, onPick, current) {
@@ -215,7 +272,9 @@
   }
 
   function renderGapChoices() {
-    chips($("gapChoices"), groups.map(g => ({ id: g.id, label: g.label })), id => { chosenGroup = id; renderMine(); }, chosenGroup);
+    const items = realGaps().map(g => ({ id: g.id, label: g.label }));
+    if (groups.some(g => g.id === OVERALL)) items.push({ id: OVERALL, label: t("idea_overall") });
+    chips($("gapChoices"), items, id => { chosenGroup = id; renderMine(); }, chosenGroup);
   }
 
   /* ---- what has this person sent in the current round? ---- */
@@ -289,7 +348,14 @@
     room = r;
     if (!room) return;
     const m = mode();
-    const key = room.phase + "|" + room.active_prompt_id + "|" + room.spotlight_group;
+    /* A round is identified by what it is about — the question, the gap, or
+       "ideas" — not by whether the board happens to be open. So when the
+       facilitator closes a round, a half-typed note survives, and it is only
+       cleared when a genuinely different round begins. */
+    const target = room.phase === "concerns" ? "q:" + room.active_prompt_id
+                 : (room.phase === "react" || room.phase === "reveal") ? "gap:" + room.spotlight_group
+                 : room.phase === "solutions" ? "ideas" : room.phase;
+    const key = target;
 
     // a new round: clear everything so nobody posts a stale answer
     if (key !== lastKey) {
@@ -307,6 +373,10 @@
     $("ideaCard").classList.toggle("hidden", m !== "idea");
     $("waitCard").classList.toggle("hidden", m !== "wait");
     $("foot").classList.toggle("hidden", m === "wait");
+    const showGaps = m === "wait" && (room.phase === "evidence" || room.phase === "reveal") && realGaps().length > 0;
+    $("gapsCard").classList.toggle("hidden", !showGaps);
+    if (showGaps) { $("gapsIntro").textContent = room.phase === "evidence" ? t("gaps_intro") : t("reveal_next"); renderGapsList(); }
+    renderSteps();
 
     if (m === "concern") {
       const p = (cfg.prompts || []).find(p => p.id === room.active_prompt_id) || cfg.prompts[0] || {};
@@ -332,7 +402,15 @@
         $("waitText").textContent = t("wait_closing");
       } else if ((room.phase === "react" || room.phase === "reveal") && g) {
         $("promptTitle").textContent = g.label; $("promptSub").textContent = g.proposal || "";
-        $("waitText").textContent = t("wait_closed");
+        const typed = $("rWhat").value.trim() || $("rWhy").value.trim();
+        $("waitText").textContent = t("wait_closed") + (typed ? " · " + t("draft_kept") : "");
+      } else if (room.phase === "evidence") {
+        $("promptTitle").textContent = cfg.workshopTitle; $("promptSub").textContent = "";
+        $("waitText").textContent = t("wait_screen");
+      } else if (room.phase === "concerns") {
+        const p = (cfg.prompts || []).find(p => p.id === room.active_prompt_id) || cfg.prompts[0] || {};
+        $("promptTitle").textContent = p.title || ""; $("promptSub").textContent = "";
+        $("waitText").textContent = t("wait_closed") + ($("cBody").value.trim() ? " · " + t("draft_kept") : "");
       } else {
         $("promptTitle").textContent = cfg.workshopTitle; $("promptSub").textContent = "";
         $("waitText").textContent = t("wait_screen");

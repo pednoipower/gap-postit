@@ -25,7 +25,6 @@
     wait_lobby:       { th: "เข้าห้องแล้ว มองที่จอ — เดี๋ยวเริ่มกัน", en: "You're in. Look up at the screen — we'll start shortly." },
     wait_closed:      { th: "รอบนี้ปิดแล้ว มองที่จอ",                 en: "That round is closed. Look up at the screen." },
     wait_screen:      { th: "มองที่จอ",                              en: "Look up at the screen." },
-    wait_closing:     { th: "ขอบคุณ — สิ่งที่คุณเขียนคือชิ้นส่วนที่หายไป", en: "Thank you — what you wrote is the missing piece." },
 
     // concerns
     when_lbl:         { th: "เกิดขึ้นบ่อยตอนไหน (ถ้าอยากระบุ)",      en: "When does this happen most? (optional)" },
@@ -72,6 +71,16 @@
     lost:             { th: "สัญญาณหาย — กำลังลองใหม่ สิ่งที่เขียนไว้ไม่หาย", en: "Lost connection — still trying. Anything you write is kept safe." },
     mine_one:         { th: "คุณส่งแล้ว 1 ข้อ",                          en: "You've added 1 note" },
     mine_n:           { th: "คุณส่งแล้ว {n} ข้อ",                        en: "You've added {n} notes" },
+
+    // step strip and between-round text
+    step_story:       { th: "เล่าเรื่อง",                                en: "Your story" },
+    step_gaps:        { th: "ช่องว่าง",                                  en: "Gaps" },
+    step_ideas:       { th: "ไอเดีย",                                    en: "Ideas" },
+    gaps_intro:       { th: "ช่องว่างที่เราจะคุยกันวันนี้ — สิ่งที่คุณเขียนไปจะถูกจัดกลุ่มเข้ากับช่องว่างเหล่านี้หลังจบงาน", en: "The gaps we'll work on today — what you wrote will be grouped against these after the session" },
+    reveal_next:      { th: "ดูที่จอ — เดี๋ยวไปช่องว่างถัดไป",              en: "Look at the screen — next gap coming up" },
+    idea_overall:     { th: "ภาพรวม — ไม่เจาะจงช่องว่างใด",                 en: "Overall — not about one gap" },
+    wait_closing:     { th: "ขอบคุณ — สิ่งที่คุณเขียนคือชิ้นส่วนที่หายไป เราจะรวบรวมทั้งหมดและส่งสรุปกลับให้ทั้งสองทีม", en: "Thank you — what you wrote is the missing piece. We'll gather it all and send a summary back to both teams." },
+    draft_kept:       { th: "ข้อความที่พิมพ์ค้างไว้ยังอยู่ — จะส่งได้เมื่อรอบเปิดอีกครั้ง", en: "What you were typing is kept — you can send it if the round reopens" },
 
     // projector
     pj_in_room:       { th: "คนในห้อง",                                  en: "in the room" },

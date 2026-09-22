@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609220605">
+<link rel="stylesheet" href="assets/theme.css?v=202609220709">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🎛️</text></svg>">
 </head>
 <body class="control">
@@ -130,13 +130,13 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609220605"></script>
-<script src="assets/config.js?v=202609220605"></script>
-<script src="assets/slides.js?v=202609220605"></script>
-<script src="assets/export.js?v=202609220605"></script>
-<script src="assets/store-supabase.js?v=202609220605"></script>
-<script src="assets/store-local.js?v=202609220605"></script>
-<script src="assets/store.js?v=202609220605"></script>
+<script src="assets/version.js?v=202609220709"></script>
+<script src="assets/config.js?v=202609220709"></script>
+<script src="assets/slides.js?v=202609220709"></script>
+<script src="assets/export.js?v=202609220709"></script>
+<script src="assets/store-supabase.js?v=202609220709"></script>
+<script src="assets/store-local.js?v=202609220709"></script>
+<script src="assets/store.js?v=202609220709"></script>
 <script>
 (function () {
   "use strict";
@@ -259,6 +259,10 @@
       id: "G" + (i + 1), label: tm.label, problem_statement: tm.problem || tm.label,
       proposal: tm.proposal || "", rationale: "Loaded from config.js", source_ids: []
     }));
+    // a bucket for ideas that are not about any one gap; the projector and
+    // the gap slides ignore it, the ideas round and the export include it
+    groups.push({ id: "GX", label: "ภาพรวม", problem_statement: "ไอเดียที่ไม่เจาะจงช่องว่างใด",
+                  proposal: "", rationale: "Overall bucket for ideas", source_ids: [] });
     msg("loadMsg", "", "Loading…");
     try {
       const res = await Store.importGroups(token, groups);
