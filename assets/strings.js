@@ -89,6 +89,7 @@
     pj_evidence:      { th: "ช่องว่างที่หลักฐานชี้ไว้",                     en: "The gaps the evidence points to" },
     pj_evidence_sub:  { th: "และสิ่งที่โครงการเสนอจะทำกับแต่ละช่องว่าง",     en: "And what the program proposes for each" },
     pj_proposal:      { th: "ข้อเสนอ",                                    en: "Proposal" },
+    pj_evidence_lbl:  { th: "จาก pre-survey",                             en: "From the pre-survey" },
     pj_blind_sub:     { th: "ตอบในมือถือ — จะเปิดเผยพร้อมกันเมื่อครบเวลา",  en: "Answer on your phone — revealed together when time is up" },
     pj_answers:       { th: "คำตอบ",                                      en: "answers" },
     pj_helps:         { th: "สิ่งที่จะช่วย",                               en: "What would help" },

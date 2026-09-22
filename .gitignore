@@ -2,3 +2,6 @@
 server/workshop-data.json
 
 .DS_Store
+
+# survey results and other source documents stay off the public repo
+*.pdf

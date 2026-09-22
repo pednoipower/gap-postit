@@ -341,7 +341,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
 
     /* Sheet 5 — the gaps themselves */
     const summaryRows = [[
-      H("Gap"), H("Label"), H("Problem"), H("Proposal"), H("Would help"), H("We'd need"),
+      H("Gap"), H("Label"), H("Problem"), H("Survey"), H("Proposal"), H("Would help"), H("We'd need"),
       H("Own ideas"), H("Concerns grouped"), H("Answered by nephrology"), H("Answered by palliative")
     ]];
     for (const g of (snap.groups || [])) {
@@ -349,7 +349,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
       const gs = groupStyle(g.id);
       summaryRows.push([
         { v: g.id, s: styleIndex.mono }, { v: g.label, s: gs }, { v: g.problem_statement, s: gs },
-        { v: g.proposal || "", s: gs },
+        { v: g.stat || "", s: gs }, { v: g.proposal || "", s: gs },
         { v: rs.filter(x => x.kind === "facilitator").length, s: gs },
         { v: rs.filter(x => x.kind === "barrier").length, s: gs },
         { v: rs.filter(x => !x.kind || x.kind === "idea").length, s: gs },
@@ -378,7 +378,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
       { name: "Help and need",  xml: sheetXml(reactRows,   { widths: [9, 6, 24, 40, 12, 52, 52, 12, 16, 16, 38, 20] }) },
       { name: "Own ideas",      xml: sheetXml(ideaRows,    { widths: [9, 6, 24, 46, 40, 46, 12, 16, 16, 38, 20] }) },
       { name: "Crosstab",       xml: sheetXml(xRows,       { widths: [6, 24, 16, 12, 12, 12, 12, 18] }) },
-      { name: "Gaps",           xml: sheetXml(summaryRows, { widths: [6, 24, 52, 52, 12, 12, 12, 16, 20, 20] }) },
+      { name: "Gaps",           xml: sheetXml(summaryRows, { widths: [6, 24, 52, 36, 52, 12, 12, 12, 16, 20, 20] }) },
       { name: "Who was there",  xml: sheetXml(whoRows,     { widths: [18, 14, 18, 10] }) }
     ];
     return buildWorkbook(sheets, stylesXml);

@@ -251,7 +251,7 @@ async function api(req, res, pathname, query) {
       DB.groups.push({
         id: g.id, room_code: body.code, label: g.label || g.id,
         problem_statement: g.problem_statement || '', rationale: g.rationale || null,
-        proposal: g.proposal || null,
+        proposal: g.proposal || null, stat: g.stat || null,
         color_index: i, sort_order: i, created_at: new Date().toISOString()
       });
       for (const r of (g.source_ids || [])) {

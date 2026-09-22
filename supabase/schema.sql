@@ -138,6 +138,7 @@ create index if not exists solutions_group_idx on public.solutions(room_code, gr
 alter table public.participants add column if not exists setting   text;
 alter table public.concerns     add column if not exists situation text;
 alter table public.groups       add column if not exists proposal  text;
+alter table public.groups       add column if not exists stat      text;   -- the survey number for this gap
 alter table public.solutions    add column if not exists kind      text not null default 'idea';
 alter table public.solutions    add column if not exists reason    text;
 alter table public.solutions    add column if not exists outcome   text;
@@ -408,7 +409,7 @@ begin
 
   for v_group in select * from jsonb_array_elements(p_groups)
   loop
-    insert into public.groups(id, room_code, label, problem_statement, rationale, proposal, color_index, sort_order)
+    insert into public.groups(id, room_code, label, problem_statement, rationale, proposal, stat, color_index, sort_order)
     values (
       v_group->>'id',
       p_room,
@@ -416,6 +417,7 @@ begin
       coalesce(v_group->>'problem_statement', ''),
       v_group->>'rationale',
       v_group->>'proposal',
+      v_group->>'stat',
       v_idx,
       v_idx
     );

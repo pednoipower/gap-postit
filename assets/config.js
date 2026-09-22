@@ -163,23 +163,34 @@ window.CONFIG = {
      maxGroups is only used by the after-the-day AI grouping step.
      ------------------------------------------------------------------------ */
   maxGroups: 6,
-  // >>> PLACEHOLDERS. These three are illustrative — replace them with the gaps
-  //     and proposals drawn from your own evidence before the day. <<<
+  // The four gaps below come from the pre-survey of the 16 pilot hospitals
+  // (PreSurvey25.9.69.pdf, Sept 2026): `stat` is the survey number shown on
+  // the piece, `proposal` is the survey's own development proposal for that
+  // gap. See docs/2026-09-22-gaps-from-presurvey.md for the mapping.
   seedThemes: [
     {
-      label:    "ส่งต่อช้า",
-      problem:  "ผู้ป่วยถูกส่งต่อมาทีม palliative ในช่วงวันท้าย ๆ ของชีวิต",
-      proposal: "พยาบาล palliative เข้าร่วมราวด์หน่วยไตเทียมทุกสัปดาห์"
+      label:    "คัดกรองยังขึ้นกับตัวบุคคล",
+      problem:  "การคัดกรองผู้ป่วยเข้าสู่ CKM ยังขึ้นกับแต่ละทีมและแต่ละคน ผู้ป่วยจึงเข้าถึงช้า หรือไม่ได้เข้าเลย",
+      stat:     "มีระบบคัดกรองชัดเจนและใช้ประจำ 2 จาก 16 รพ.",
+      proposal: "กำหนดเกณฑ์คัดกรอง กลุ่มเป้าหมาย ผู้รับผิดชอบ และแบบบันทึกผลคัดกรอง ที่ใช้เหมือนกันทุกจุด"
     },
     {
-      label:    "ครอบครัวไม่รู้ทางเลือก",
-      problem:  "ครอบครัวไม่เคยได้ยินว่าการหยุดฟอกไตเป็นทางเลือกหนึ่ง",
-      proposal: "ประชุมครอบครัวร่วมสองทีมภายใน 3 เดือนแรกของการฟอกไต"
+      label:    "ส่งปรึกษารายกรณี ไม่มี pathway ร่วม",
+      problem:  "ช่องทาง consult มีเกือบทุกแห่ง แต่ยังส่งปรึกษาเป็นรายกรณี ไม่มี pathway และไม่ได้ทบทวนผู้ป่วยร่วมกันระหว่างสองทีม",
+      stat:     "มี pathway ชัดเจน 5 จาก 16 รพ. · บูรณาการระดับ 3–4 เพียง 7 จาก 16",
+      proposal: "written pathway จาก CKD clinic ถึงทีม PC พร้อมผู้ประสานงาน และ case review ร่วมเป็นประจำ"
     },
     {
-      label:    "นอกเวลาไม่รู้จะโทรหาใคร",
-      problem:  "หลังเวลาราชการไม่มีใครรู้ว่าจะติดต่อทีมไหน",
-      proposal: "เบอร์เดียวสำหรับสองทีม มีเวรรับสาย 24 ชั่วโมง"
+      label:    "ACP มาช้า และทำเฉพาะ CKM",
+      problem:  "ACP ส่วนใหญ่ทำเฉพาะผู้ป่วยที่เลือก CKM และเริ่มหลังอาการทรุด ผู้ป่วยที่เลือก HD, PD หรือ KT แทบไม่ได้คุย",
+      stat:     "ทำ ACP ครบทุกทางเลือก 1 จาก 16 รพ. — ทั้งที่มีเอกสารลงนามแล้ว 13 จาก 16",
+      proposal: "เริ่ม ACP ก่อนตัดสินใจ KRT กับผู้ป่วย ESKD ทุกทางเลือก ใช้เอกสารมาตรฐาน ลงนาม และทบทวนเมื่ออาการเปลี่ยน"
+    },
+    {
+      label:    "ส่งต่อแต่โรค ไม่ส่งเป้าหมายการดูแล",
+      problem:  "ข้อมูลที่ส่งต่อไป ER และชุมชนเน้นวินิจฉัยและการรักษา แต่มักไม่มีเป้าหมายการดูแล แผนระยะท้าย และผลประเมินอาการ",
+      stat:     "ส่งเป้าหมายการดูแล 10 จาก 16 · แผนระยะท้าย 9 · ผลประเมินอาการ 6",
+      proposal: "EMR alert และ minimum data set สำหรับส่งต่อ ที่มีอาการ เป้าหมายการดูแล แผนฉุกเฉิน และ feedback กลับมา"
     }
   ],
 
