@@ -49,9 +49,11 @@ fill-in-the-blank, all four required:
 
 — in what situation, who, does or doesn't do what, because of what reason or
 missing resource. The sentence assembles itself on the phone as they type.
-*Situation* is free text with the plainest possible hint — *where, when,
-what is going on* — so people describe rather than classify. Context is
-coded afterwards with `docs/2026-09-22-context-codebook.md`.
+*Situation / condition* is free text, prompted with *ลองระบุเงื่อนไขที่ทำให้
+ช่องว่างนี้เกิดขึ้น* and three cues — time or step · task or activity ·
+resources (staff, time, budget, information, equipment) — so people describe
+rather than classify. Context is coded afterwards with
+`docs/2026-09-22-context-codebook.md`.
 People from hospitals where it already works fill the mirror image
 (*[gap] ไม่เกิดที่ รพ. ของเรา เพราะเมื่อ… ใคร จะ… เนื่องจาก…*).
 
