@@ -104,7 +104,8 @@
       return req(rest() + "/participants", {
         method: "POST",
         headers: headers({ "Prefer": "return=minimal,resolution=ignore-duplicates" }),
-        body: JSON.stringify({ id: p.id, room_code: code, role: p.role, discipline: p.discipline })
+        body: JSON.stringify({ id: p.id, room_code: code, role: p.role, discipline: p.discipline,
+                               setting: p.setting || null })
       });
     },
 

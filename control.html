@@ -29,10 +29,16 @@
 
     <div class="panel">
       <h2>Before you start</h2>
-      <p class="why">Run a dry run, then clear it out so the real session starts clean.
-        A dated backup is saved automatically before anything is removed.</p>
-      <button class="btn small ghost" id="resetBtn"
-        style="border-color:#E4B8B3;color:#8C2E25">Clear this room</button>
+      <p class="why"><b>1.</b> Load the gaps from <code class="inline">config.js</code> into the room —
+        the projector's "gaps" slide, the gap slides and the phones all read them from here.
+        <b>2.</b> Run a dry run. <b>3.</b> Clear the room so the real session starts clean;
+        a dated backup is saved before anything is removed.</p>
+      <div class="row">
+        <button class="btn small" id="loadGaps">Load the expected gaps</button>
+        <span style="font-size:13.5px;color:var(--text-dim)" id="gapsNote"></span>
+      </div>
+      <div id="loadMsg"></div>
+      <button class="btn small ghost" id="resetBtn" style="margin-top:12px;border-color:#E4B8B3;color:#8C2E25">Clear this room</button>
       <div id="resetMsg"></div>
     </div>
 
@@ -51,44 +57,41 @@
 
     <div class="panel">
       <h2>Slides</h2>
-      <p class="why">The projector follows whatever you pick here.</p>
+      <p class="why">The projector and every phone follow whatever you pick here. A gap slide
+        collects <b>blind</b> — the projector shows only a count — until you press <b>Reveal</b>,
+        which closes that gap and shows what would help and what we'd need, side by side.</p>
       <div class="slide-list" id="slideList"></div>
       <div class="row" style="margin-top:12px">
         <button class="btn small ghost" id="prev">← Back</button>
         <button class="btn small" id="next">Next →</button>
+        <button class="btn small hidden" id="reveal" style="background:#2E9E6B">Reveal this gap</button>
+        <button class="btn small ghost hidden" id="unreveal">Collect again (blind)</button>
       </div>
     </div>
 
-    <div class="panel" id="spotPanel">
-      <h2>Spotlight one problem</h2>
-      <p class="why">Pulls every phone in the room onto the same gap. Use it when
-        the open board is spreading people too thin, or to work through the
-        problems one at a time. Turn it off to let people roam again.</p>
-      <div class="slide-list" id="spotList"></div>
-      <button class="btn small ghost" id="spotOff" style="margin-top:10px">Let people choose freely</button>
-    </div>
-
     <div class="panel">
-      <h2>1. Export what people wrote</h2>
-      <p class="why">The <b>.txt</b> is the concerns in the form the AI needs — but
-        the prompt in step 2 already has it built in, so you only need this if you
-        want the file on its own. The <b>.xlsx</b> is for you and your colleagues —
-        it is colour-coded by problem group and by discipline.</p>
+      <h2>After the day — 1. Export everything</h2>
+      <p class="why">The <b>.xlsx</b> is the dataset: one sheet each for concerns,
+        what-would-help / what-we'd-need (with their how and why), own ideas, a
+        crosstab by gap × team × role, and who was there. Every row carries team,
+        role, setting and the anonymous phone id. The <b>.txt</b> files are for AI
+        or for reading.</p>
       <div class="row">
         <button class="btn small" id="cpTxt">Copy .txt (for the AI)</button>
         <button class="btn small ghost" id="dlTxt">Download .txt</button>
         <button class="btn small ghost" id="dlXlsx">Download .xlsx (for you)</button>
         <button class="btn small ghost" id="dlJson">Download .json (backup)</button>
-        <button class="btn small ghost" id="dlSol">Solutions .txt</button>
+        <button class="btn small ghost" id="dlSol">Reactions & ideas .txt</button>
       </div>
       <div id="expMsg"></div>
     </div>
 
     <div class="panel">
-      <h2>2. The prompt to give your AI</h2>
-      <p class="why">Everything is in here already — the instructions <i>and</i> every
-        concern in the room, kept up to date as notes arrive. Copy it, paste it
-        into Claude or ChatGPT, nothing to attach.</p>
+      <h2>After the day — 2. Group the concerns against the gaps</h2>
+      <p class="why">This is analysis, not something for the room. The prompt carries the
+        instructions <i>and</i> every concern; it asks the AI to sort them into the
+        gaps you loaded (and to add a group only if something fits none). Copy,
+        paste into Claude or ChatGPT, nothing to attach.</p>
       <div class="row">
         <button class="btn small" id="copyPrompt">Copy prompt + concerns</button>
         <button class="btn small ghost" id="copyPromptOnly">Prompt only</button>
@@ -98,7 +101,7 @@
     </div>
 
     <div class="panel">
-      <h2>3. Bring the grouped problems back</h2>
+      <h2>After the day — 3. Bring the grouping back</h2>
       <p class="why">Paste what the AI gave you. Before anything is saved, every
         note it refers to is checked against what was actually said in this room.
         If it invented one, nothing is imported and you'll be told which.</p>
@@ -117,6 +120,7 @@
 </div>
 
 <script src="assets/config.js"></script>
+<script src="assets/slides.js"></script>
 <script src="assets/export.js"></script>
 <script src="assets/store-supabase.js"></script>
 <script src="assets/store-local.js"></script>
@@ -128,24 +132,8 @@
   const $ = id => document.getElementById(id);
   let token = null, slides = [];
 
-  /* The slide list here has to match the projector's. Both are built from the
-     same config, so adding a question adds a slide in both places. */
-  function buildSlideList() {
-    const out = [
-      { key: "title",  label: "Title, QR code and room code" },
-      { key: "who",    label: "Who's in the room" }
-    ];
-    cfg.prompts.forEach(p => out.push({
-      key: "prompt:" + p.id, promptId: p.id, phase: "concerns",
-      label: "Question: " + p.title
-    }));
-    out.push({ key: "gather",   phase: "gather",    label: "What you've told us (the totals)" });
-    out.push({ key: "problems", phase: "problems",  label: "The gaps, in your words" });
-    out.push({ key: "solve",    phase: "solutions", label: "Closing the gaps (brainstorm)" });
-    out.push({ key: "closing",  phase: "closing",   label: "Closing slide" });
-    return out;
-  }
-  slides = buildSlideList();
+  /* One sequence, shared with the projector (assets/slides.js). */
+  slides = Slides.build(cfg);
 
   function msg(host, kind, html) {
     $(host).innerHTML = html ? `<div class="note-line ${kind}">${html}</div>` : "";
@@ -187,15 +175,19 @@
     if (!room) return;
     renderPrompt();
 
-    const voices = new Set(st.concerns.map(c => c.participant_id).filter(Boolean));
+    const voices = new Set(st.concerns.concat(st.solutions).map(c => c.participant_id).filter(Boolean));
+    const kind = k => st.solutions.filter(x => x.kind === k).length;
     $("stats").innerHTML = [
       ["in the room", (st.participants || []).length],
-      ["concerns", st.concerns.length],
       ["people who wrote", voices.size],
-      ["problem groups", (st.groups || []).length],
-      ["solutions", st.solutions.length],
-      ["queued on phones", "—"]
+      ["concerns", st.concerns.length],
+      ["would help", kind("facilitator")],
+      ["we'd need", kind("barrier")],
+      ["own ideas", kind("idea")]
     ].map(([k, v]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
+    $("gapsNote").textContent = (st.groups || []).length
+      ? `${st.groups.length} gaps loaded: ${st.groups.map(g => g.id).join(", ")}`
+      : "no gaps loaded yet";
 
     $("boardToggle").setAttribute("aria-pressed", String(!!room.board_open));
     $("boardLbl").textContent = room.board_open ? "Board is OPEN" : "Board is closed";
@@ -206,57 +198,65 @@
       const b = document.createElement("button");
       b.className = "slide-btn";
       b.setAttribute("aria-current", String(i === cur));
-      const count = s.promptId
-        ? st.concerns.filter(c => c.prompt_id === s.promptId).length
-        : s.key === "solve" ? st.solutions.length : null;
+      const count = s.promptId ? st.concerns.filter(c => c.prompt_id === s.promptId).length
+        : s.gapId ? st.solutions.filter(x => x.group_id === s.gapId && x.kind !== "idea").length
+        : s.key === "solve" ? st.solutions.filter(x => x.kind === "idea").length : null;
       b.innerHTML = `<span class="n">${i + 1}</span><span>${escapeHtml(s.label)}</span>` +
         (count !== null ? `<span class="meta">${count} note${count===1?"":"s"}</span>` : "");
       b.addEventListener("click", () => goTo(i));
       $("slideList").appendChild(b);
     });
 
-    const groups = st.groups || [];
-    $("spotPanel").classList.toggle("hidden", groups.length === 0);
-    $("spotList").replaceChildren();
-    groups.forEach(g => {
-      const b = document.createElement("button");
-      b.className = "slide-btn";
-      b.setAttribute("aria-current", String(room.spotlight_group === g.id));
-      const n = st.solutions.filter(s => s.group_id === g.id).length;
-      b.innerHTML = `<span class="n">${escapeHtml(g.id)}</span>
-        <span>${escapeHtml(g.problem_statement || g.label)}</span>
-        <span class="meta">${n} idea${n===1?"":"s"}</span>`;
-      b.addEventListener("click", async () => {
-        await Store.control(token, { spotlight: g.id, slide: slides.findIndex(s => s.key === "solve"),
-                                     phase: "solutions" });
-      });
-      $("spotList").appendChild(b);
-    });
+    const onGap = !!(slides[cur] && slides[cur].gapId);
+    $("reveal").classList.toggle("hidden", !(onGap && room.phase === "react"));
+    $("unreveal").classList.toggle("hidden", !(onGap && room.phase === "reveal"));
   }
 
   /* Moving to a slide also sets the phase and the active question, so the
      phones in the room follow along without you touching anything else. */
   async function goTo(i) {
-    const s = slides[Math.max(0, Math.min(slides.length - 1, i))];
-    const changes = { slide: slides.indexOf(s) };
-    if (s.phase) changes.phase = s.phase;
-    if (s.promptId) changes.prompt = s.promptId;
-    else if (s.phase && s.phase !== "solutions") changes.prompt = null;
-    if (s.key !== "solve") changes.spotlight = null;
-    // opening a question opens the board; everything else closes it
-    changes.open = !!s.promptId || s.key === "solve";
-    await Store.control(token, changes);
+    await Store.control(token, Slides.changesFor(slides, i));
     await refreshNow();
   }
+
+  /* Reveal: close the gap and switch the projector to the two columns.
+     Anything written after this moment could have been shaped by what is on
+     screen, which is why the board closes at the same time. */
+  $("reveal").addEventListener("click", async () => {
+    await Store.control(token, { phase: "reveal", open: false });
+    await refreshNow();
+  });
+  $("unreveal").addEventListener("click", async () => {
+    await Store.control(token, { phase: "react", open: true });
+    await refreshNow();
+  });
+
+  /* Load the gaps from config into the room. Replaces whatever gaps are
+     there, so it warns if notes are already attached to them. */
+  $("loadGaps").addEventListener("click", async () => {
+    const seeds = cfg.seedThemes || [];
+    if (!seeds.length) return msg("loadMsg", "bad", "No gaps in config.js — fill in seedThemes first.");
+    const st = Store.state;
+    if (st.solutions.length &&
+        !confirm(`There are already ${st.solutions.length} notes attached to gaps in this room. Reloading keeps the notes but re-writes the gaps G1… in config order. Continue?`)) return;
+    const groups = seeds.map((tm, i) => ({
+      id: "G" + (i + 1), label: tm.label, problem_statement: tm.problem || tm.label,
+      proposal: tm.proposal || "", rationale: "Loaded from config.js", source_ids: []
+    }));
+    msg("loadMsg", "", "Loading…");
+    try {
+      const res = await Store.importGroups(token, groups);
+      const r = Array.isArray(res) ? res[0] : res;
+      if (r && r.ok === false) return msg("loadMsg", "bad", escapeHtml(r.message || r.error));
+      msg("loadMsg", "ok", `Loaded ${groups.length} gaps: ${groups.map(g => g.id + " " + g.label).join(" · ")}`);
+      await refreshNow();
+    } catch (e) { msg("loadMsg", "bad", escapeHtml(e.message)); }
+  });
 
   $("next").addEventListener("click", () => goTo((Store.state.room.current_slide | 0) + 1));
   $("prev").addEventListener("click", () => goTo((Store.state.room.current_slide | 0) - 1));
   $("boardToggle").addEventListener("click", async () => {
     await Store.control(token, { open: !Store.state.room.board_open });
-    await refreshNow();
-  });
-  $("spotOff").addEventListener("click", async () => {
-    await Store.control(token, { spotlight: null });
     await refreshNow();
   });
 

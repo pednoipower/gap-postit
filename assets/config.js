@@ -41,8 +41,8 @@ window.CONFIG = {
   /* --------------------------------------------------------------------------
      4. THE WORKSHOP ITSELF
      ------------------------------------------------------------------------ */
-  workshopTitle:    "The Missing Piece",
-  workshopSubtitle: "Finding the gaps between nephrology and palliative care",
+  workshopTitle:    "ชิ้นส่วนที่หายไป",
+  workshopSubtitle: "ตามหาช่องว่างระหว่างทีมโรคไตและทีมประคับประคอง",
 
   // The web address participants type in, shown under the QR code.
   // Keep it SHORT — people will be squinting at it from the back row.
@@ -59,15 +59,15 @@ window.CONFIG = {
      Add or remove entries freely.
      ------------------------------------------------------------------------ */
   disciplines: [
-    { id: "nephro",     label: "Nephrology",       short: "Nephro" },
-    { id: "palliative", label: "Palliative Care",  short: "Pall"   }
+    { id: "nephro",     label: "ทีมโรคไต",          short: "ไต" },
+    { id: "palliative", label: "ทีมประคับประคอง",   short: "ประคับประคอง" }
   ],
 
   roles: [
-    { id: "doctor",    label: "Doctor"           },
-    { id: "nurse",     label: "Nurse"            },
-    { id: "allied",    label: "Allied Health"    },
-    { id: "other",     label: "Other"            }
+    { id: "doctor",    label: "แพทย์"            },
+    { id: "nurse",     label: "พยาบาล"           },
+    { id: "allied",    label: "สหวิชาชีพ"         },
+    { id: "other",     label: "อื่น ๆ"            }
   ],
 
   /* --------------------------------------------------------------------------
@@ -79,22 +79,32 @@ window.CONFIG = {
   prompts: [
     {
       id: "p1",
-      title: "Where do patients fall through the cracks?",
-      subtitle: "Think of a real patient. What went wrong at the handover?",
-      hint: "e.g. Nobody told the family dialysis could be stopped"
-    },
-    {
-      id: "p2",
-      title: "What do you wish the other team understood?",
-      subtitle: "The thing you have explained a hundred times and it still doesn't land",
-      hint: "e.g. Referral doesn't mean I'm giving up on the patient"
-    },
-    {
-      id: "p3",
-      title: "What stops you from asking for help?",
-      subtitle: "Be honest — nothing here is attributed to you",
-      hint: "e.g. I don't know who to call after 5pm"
+      title: "นึกถึงผู้ป่วยจริงหนึ่งราย — เขาหลุดจากรอยต่อระหว่างสองทีมเราตรงไหน?",
+      subtitle: "ไม่ต้องระบุชื่อ เขียนสิ่งที่เกิดขึ้นจริง",
+      hint: "เช่น ไม่มีใครบอกครอบครัวว่าหยุดฟอกไตได้"
     }
+  ],
+
+  /* Situations a participant can tap to say WHEN the gap happens most.
+     Optional on the phone; leave the list empty to hide it. */
+  situations: [
+    { id: "start",     label: "เริ่มฟอกไต" },
+    { id: "deterior",  label: "อาการทรุดลง" },
+    { id: "afterhrs",  label: "นอกเวลาราชการ" },
+    { id: "discharge", label: "จำหน่าย–ส่งต่อ" },
+    { id: "family",    label: "คุยกับครอบครัว" },
+    { id: "other",     label: "อื่น ๆ" }
+  ],
+
+  /* Where the participant mainly works. Asked once at join, so every note
+     can be read by setting as well as by team and role. Keep every option
+     big enough (10+ people) that nobody is identifiable from it. */
+  settings: [
+    { id: "dialysis", label: "หน่วยไตเทียม" },
+    { id: "ward",     label: "หอผู้ป่วยใน" },
+    { id: "opd",      label: "ผู้ป่วยนอก" },
+    { id: "community",label: "ชุมชน–เยี่ยมบ้าน" },
+    { id: "other",    label: "อื่น ๆ" }
   ],
 
   /* --------------------------------------------------------------------------
@@ -121,9 +131,12 @@ window.CONFIG = {
   /* --------------------------------------------------------------------------
      9. LANGUAGE
      --------------------------------------------------------------------------
-     Set to "th" for Thai, "en" for English, "both" for bilingual labels.
+     What participants and the projector see. "th" for Thai, "en" for English,
+     "both" for Thai with English after a slash. The control panel, grouping
+     board and health check are always in English — they are yours, not the
+     room's.
      ------------------------------------------------------------------------ */
-  language: "en",
+  language: "th",
 
   /* --------------------------------------------------------------------------
      10. WHAT LANGUAGE THE AI SHOULD WRITE THE PROBLEM STATEMENTS IN
@@ -135,22 +148,44 @@ window.CONFIG = {
   aiOutputLanguage: "Thai",
 
   /* --------------------------------------------------------------------------
-     11. HOW MANY PROBLEM GROUPS, AND WHICH ONES YOU ALREADY EXPECT
+     11. THE GAPS, AND WHAT THE PROGRAM PROPOSES TO DO ABOUT EACH
      --------------------------------------------------------------------------
-     maxGroups   The most problem groups a room can work with. The AI is asked
-                 to stay within it; if it doesn't, the import offers to keep the
-                 biggest ones and merge the rest into "Other".
+     In the 45-minute format the gaps are decided BEFORE the day, from the
+     evidence, and loaded into the room with one button on the control panel.
+     Each gap has:
+       label     2-4 words, shown on the pieces and the phones
+       problem   one sentence naming what is missing
+       proposal  the ONE concrete thing the program might do about it. This is
+                 what the room reacts to: "what here would help this work, and
+                 how?" / "what would get in the way, and why?"
+     Order matters: it is the order the gaps are worked through on the day.
 
-     seedThemes  Gaps you already expect from the evidence. The AI is told to
-                 use these where they fit (and only add new ones if it must),
-                 and the manual grouping board (group.html) starts with these
-                 columns ready. Leave the list empty to start from nothing.
-                 `problem` is the one-sentence problem statement; `label` is the
-                 2-4 word name that shows on the pieces.
+     maxGroups is only used by the after-the-day AI grouping step.
      ------------------------------------------------------------------------ */
   maxGroups: 6,
+  // >>> PLACEHOLDERS. These three are illustrative — replace them with the gaps
+  //     and proposals drawn from your own evidence before the day. <<<
   seedThemes: [
-    // { label: "Late referral",   problem: "Palliative care is brought in only in the final days." },
-    // { label: "After-hours gap", problem: "Nobody knows who to call after 5pm." }
-  ]
+    {
+      label:    "ส่งต่อช้า",
+      problem:  "ผู้ป่วยถูกส่งต่อมาทีม palliative ในช่วงวันท้าย ๆ ของชีวิต",
+      proposal: "พยาบาล palliative เข้าร่วมราวด์หน่วยไตเทียมทุกสัปดาห์"
+    },
+    {
+      label:    "ครอบครัวไม่รู้ทางเลือก",
+      problem:  "ครอบครัวไม่เคยได้ยินว่าการหยุดฟอกไตเป็นทางเลือกหนึ่ง",
+      proposal: "ประชุมครอบครัวร่วมสองทีมภายใน 3 เดือนแรกของการฟอกไต"
+    },
+    {
+      label:    "นอกเวลาไม่รู้จะโทรหาใคร",
+      problem:  "หลังเวลาราชการไม่มีใครรู้ว่าจะติดต่อทีมไหน",
+      proposal: "เบอร์เดียวสำหรับสองทีม มีเวรรับสาย 24 ชั่วโมง"
+    }
+  ],
+
+  /* An optional link (e.g. a Google Form) shown as a QR code on the closing
+     slide, for people willing to be interviewed later. Kept completely
+     separate from the notes, so nothing anyone wrote can be traced to them.
+     Leave as "" to hide it. */
+  signupUrl: ""
 };

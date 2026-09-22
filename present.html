@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Missing Piece — presenter</title>
+<title>ชิ้นส่วนที่หายไป — projector</title>
 <link rel="stylesheet" href="assets/theme.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
 <style>
@@ -87,6 +87,27 @@
     background:#C94A3F; color:#fff; border-radius:100px;
     padding:9px 18px; font-size:15px; font-weight:650;
   }
+
+  /* ---- react slide: blind while collecting, two columns once revealed ---- */
+  .react-blind { display:grid; grid-template-columns: 1.05fr .95fr; gap:3vw; height:100%; align-items:center; }
+  .react-blind .piece { position:relative; height:78%; }
+  .react-blind .count { text-align:center; }
+  .react-blind .count .n { font-size:clamp(70px,11vw,220px); font-weight:800; line-height:1; letter-spacing:-.04em; }
+  .react-blind .count .l { font-size:clamp(16px,1.8vw,30px); color:#9BA6BC; margin-top:1vh; }
+  .react-blind .count .split { display:flex; gap:3vw; justify-content:center; margin-top:2.4vh; font-size:clamp(14px,1.4vw,24px); color:#7D879C; }
+  .react-blind .count .split b { font-size:1.5em; display:block; }
+  .react-reveal { display:grid; grid-template-columns: .72fr 1fr 1fr; gap:2vw; height:100%; }
+  .react-reveal .piece { position:relative; align-self:center; height:70%; }
+  .react-reveal .col { display:flex; flex-direction:column; min-height:0; }
+  .react-reveal .col h3 { margin:0 0 1vh; font-size:clamp(16px,1.7vw,30px); font-weight:750; display:flex; align-items:baseline; gap:.6em; }
+  .react-reveal .col h3 span { font-size:.7em; color:#8A94A8; font-weight:600; }
+  .react-reveal .col .board { position:relative; flex:1; }
+  .react-reveal .col.helps h3 { color:#8FCFA8; }
+  .react-reveal .col.needs h3 { color:#E5CE7A; }
+  .signup { display:flex; align-items:center; gap:2vw; justify-content:center; margin-top:4vh; }
+  .signup .qr { background:#fff; border-radius:16px; padding:12px; width:clamp(110px,12vw,200px); }
+  .signup .qr svg { display:block; width:100%; height:auto; }
+  .signup .l { font-size:clamp(14px,1.5vw,26px); color:#9BA6BC; max-width:26ch; text-align:left; }
 </style>
 </head>
 <body class="present">
@@ -96,15 +117,17 @@
   <button id="tFull">Full screen</button>
 </div>
 
-<div id="offline" class="offline-flag hidden">Lost connection — retrying</div>
+<div id="offline" class="offline-flag hidden">ขาดการเชื่อมต่อ — กำลังลองใหม่</div>
 
 <!-- slides are created by script so the sequence follows your config -->
 <div id="slides"></div>
 
 <div class="corner-code" id="cornerCode"></div>
-<div class="livecount" id="liveCount"><span class="pip"></span><span>0 in the room</span></div>
+<div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
 <script src="assets/config.js"></script>
+<script src="assets/strings.js"></script>
+<script src="assets/slides.js"></script>
 <script src="assets/qrcode.js"></script>
 <script src="assets/jigsaw.js"></script>
 <script src="assets/wordcloud.js"></script>
@@ -117,31 +140,29 @@
   const cfg = window.CONFIG;
   const $ = id => document.getElementById(id);
   const NS = "http://www.w3.org/2000/svg";
+  const t = window.T.t;
 
-  const root = document.documentElement.style;
-  if (cfg.colors.nephro)     root.setProperty("--nephro", cfg.colors.nephro.base);
-  if (cfg.colors.palliative) root.setProperty("--pall",   cfg.colors.palliative.base);
+  $("tView").textContent = t("pj_word_cloud");
+  $("tFull").textContent = t("pj_fullscreen");
 
   /* ------------------------------------------------------------------------
-     THE SLIDE SEQUENCE
-     Built from config, so adding a question adds a slide automatically.
+     THE SLIDE SEQUENCE — shared with the control panel (assets/slides.js).
+     Here each slide also gets its builder.
      ---------------------------------------------------------------------- */
-  const SLIDES = [
-    { key: "title",  build: buildTitle },
-    { key: "who",    build: buildWho }
-  ];
-  cfg.prompts.forEach(p => SLIDES.push({ key: "prompt:" + p.id, prompt: p, phase: "concerns", build: buildPrompt }));
-  SLIDES.push({ key: "gather",   phase: "gather",    build: buildGather });
-  SLIDES.push({ key: "problems", phase: "problems",  build: buildProblems });
-  SLIDES.push({ key: "solve",    phase: "solutions", build: buildSolve });
-  SLIDES.push({ key: "closing",  phase: "closing",   build: buildClosing });
+  const SLIDES = Slides.build(cfg);
+  const BUILDERS = { title: buildTitle, who: buildWho, evidence: buildEvidence, solve: buildSolve, closing: buildClosing };
+  SLIDES.forEach(s => {
+    s.build = s.key.startsWith("prompt:") ? buildPrompt
+            : s.key.startsWith("react:")  ? buildReact
+            : BUILDERS[s.key];
+    if (s.promptId) s.prompt = (cfg.prompts || []).find(p => p.id === s.promptId);
+  });
   window.SLIDES = SLIDES;
 
   let current = -1, viewMode = "wall";
   const els = [];
-
-  SLIDES.forEach((s, i) => {
-    const d = document.createElement("div");
+  SLIDES.forEach(s => {
+    const d = document.createElement("section");
     d.className = "slide";
     d.dataset.key = s.key;
     $("slides").appendChild(d);
@@ -153,21 +174,23 @@
     if (i === current) { refreshSlide(); return; }
     current = i;
     els.forEach((e, n) => e.classList.toggle("live", n === i));
-    // the title slide already shows the code enormously; no need to repeat it
     $("cornerCode").style.display = SLIDES[i].key === "title" ? "none" : "";
     els[i].replaceChildren();
     SLIDES[i].build(els[i], SLIDES[i]);
     refreshSlide();
   }
 
-  /* ---- slide 1: title, QR, room code ---- */
+  const gapById = id => (Store.state.groups || []).find(g => g.id === id);
+  const gapIndex = id => (Store.state.groups || []).findIndex(g => g.id === id);
+
+  /* ---- slide: title, QR, room code ---- */
   function buildTitle(el) {
     el.innerHTML = `
       <div class="title-grid">
         <div>
           <h1>${escapeHtml(cfg.workshopTitle)}</h1>
           <p class="sub" style="max-width:24ch">${escapeHtml(cfg.workshopSubtitle)}</p>
-          <div class="joined"><b id="joinN">0</b><span>in the room</span></div>
+          <div class="joined"><b id="joinN">0</b><span>${escapeHtml(t("pj_in_room"))}</span></div>
         </div>
         <div>
           <div class="qr-card" id="qrBox"></div>
@@ -177,19 +200,15 @@
           </div>
         </div>
       </div>`;
-    try {
-      $("qrBox").innerHTML = QRCode.toSVG(cfg.joinUrl, { level: "M", quietZone: 1 });
-    } catch (e) {
-      $("qrBox").innerHTML =
-        `<div style="color:#8C2E25;font-size:15px;padding:12px">Could not draw the QR code: ${escapeHtml(e.message)}</div>`;
-    }
+    try { $("qrBox").innerHTML = QRCode.toSVG(cfg.joinUrl, { level: "M", quietZone: 1 }); }
+    catch (e) { $("qrBox").innerHTML = `<div style="color:#8C2E25;font-size:15px;padding:12px">QR: ${escapeHtml(e.message)}</div>`; }
   }
 
-  /* ---- slide 2: who is in the room ---- */
+  /* ---- slide: who is in the room ---- */
   function buildWho(el) {
     el.innerHTML = `
-      <div class="slide-head"><h2>Who's in the room</h2>
-        <p class="sub">Two halves of the same problem</p></div>
+      <div class="slide-head"><h2>${escapeHtml(t("pj_who"))}</h2>
+        <p class="sub">${escapeHtml(t("pj_who_sub"))}</p></div>
       <div class="slide-body"><div class="who-grid" id="whoGrid"></div></div>`;
   }
   function fillWho() {
@@ -204,7 +223,7 @@
       const c = (cfg.colors[d.id] || cfg.colors.fallback);
       const roles = cfg.roles.map(r => {
         const n = mine.filter(p => p.role === r.id).length;
-        return n ? `<span>${n} ${escapeHtml(r.label.toLowerCase())}</span>` : "";
+        return n ? `<span>${escapeHtml(r.label)} ${n}</span>` : "";
       }).filter(Boolean).join("");
       col.innerHTML =
         `<div class="n" style="color:${c.base}">${mine.length}</div>
@@ -214,7 +233,7 @@
     }
   }
 
-  /* ---- prompt slides: the live board ---- */
+  /* ---- slide: a question, with the live wall ---- */
   function buildPrompt(el, slide) {
     el.innerHTML = `
       <div class="slide-head">
@@ -224,61 +243,50 @@
       <div class="slide-body"><div class="board" id="board"></div></div>`;
   }
 
-  /* ---- the "now we hand it to the AI" pause ---- */
-  function buildGather(el) {
+  /* ---- slide: the gaps from the evidence, as pieces ---- */
+  function buildEvidence(el) {
     el.innerHTML = `
-      <div class="slide-head"><h2>What you've told us</h2></div>
-      <div class="slide-body">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:3vw;align-content:center;height:100%">
-          <div class="who-col"><div class="n" id="gTotal">0</div><div class="l">concerns raised</div></div>
-          <div class="who-col"><div class="n" id="gNeph" style="color:${cfg.colors.nephro.base}">0</div><div class="l">from nephrology</div></div>
-          <div class="who-col"><div class="n" id="gPall" style="color:${cfg.colors.palliative.base}">0</div><div class="l">from palliative care</div></div>
-          <div class="who-col"><div class="n" id="gVoices">0</div><div class="l">people contributed</div></div>
-        </div>
-      </div>`;
-  }
-
-  /* ---- the problem statements the AI grouped ---- */
-  function buildProblems(el) {
-    el.innerHTML = `
-      <div class="slide-head"><h2>The gaps, in your words</h2>
-        <p class="sub">Every one of these came from what you wrote</p></div>
+      <div class="slide-head"><h2>${escapeHtml(t("pj_evidence"))}</h2>
+        <p class="sub">${escapeHtml(t("pj_evidence_sub"))}</p></div>
       <div class="slide-body" style="overflow:hidden"><div class="problems" id="problemList"></div></div>`;
   }
-  const GROUP_PALETTE = ["#7FB3D5","#E9A06B","#8FCFA8","#C59BD1","#E5CE7A","#84C5C5","#E39A9A","#A9A3D8"];
-  function groupColor(i) { return GROUP_PALETTE[i % GROUP_PALETTE.length]; }
 
-  /* One grouped problem as a jigsaw piece. Drawn at a nominal size and scaled
-     by the browser, so the same piece works as a small tile on the problems
-     slide and as the big spotlight piece on the brainstorm slide. */
+  const GROUP_PALETTE = ["#7FB3D5","#E9A06B","#8FCFA8","#C59BD1","#E5CE7A","#84C5C5","#E39A9A","#A9A3D8"];
+  function groupColor(i) { return GROUP_PALETTE[Math.max(0, i) % GROUP_PALETTE.length]; }
+
+  /* One gap as a jigsaw piece: label, problem, the proposal, and counts.
+     Drawn at a nominal size and scaled by the browser. */
   function problemPiece(g, i, opts) {
     opts = opts || {};
-    const W = 440, H = opts.tall ? 300 : 250;
+    const W = 440, H = opts.tall ? 320 : 260;
     const st = Store.state;
-    const cs = st.concerns.filter(c => c.group_id === g.id);
-    const ss = st.solutions.filter(x => x.group_id === g.id);
-    const neph = cs.filter(c => c.discipline === "nephro").length;
-    const pall = cs.filter(c => c.discipline === "palliative").length;
+    const rs = st.solutions.filter(x => x.group_id === g.id);
+    const helps = rs.filter(x => x.kind === "facilitator").length;
+    const needs = rs.filter(x => x.kind === "barrier").length;
+    const ideas = rs.filter(x => x.kind === "idea").length;
     const accent = groupColor(i);
     const { svg } = Jigsaw.problemSVG({ width: W, height: H, accent });
-    const NS = "http://www.w3.org/2000/svg";
     const txt = (str, x, y, size, fill, weight, anchor) => {
-      const t = document.createElementNS(NS, "text");
-      t.setAttribute("x", x); t.setAttribute("y", y);
-      t.setAttribute("font-size", size); t.setAttribute("fill", fill);
-      t.setAttribute("font-weight", weight || 600);
-      if (anchor) t.setAttribute("text-anchor", anchor);
-      t.setAttribute("font-family", 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif');
-      t.textContent = str; svg.appendChild(t);
+      const e = document.createElementNS(NS, "text");
+      e.setAttribute("x", x); e.setAttribute("y", y);
+      e.setAttribute("font-size", size); e.setAttribute("fill", fill);
+      e.setAttribute("font-weight", weight || 600);
+      if (anchor) e.setAttribute("text-anchor", anchor);
+      e.setAttribute("font-family", 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif');
+      e.textContent = str; svg.appendChild(e);
     };
-    txt(g.id, W * 0.13, H * 0.2, 15, accent, 800);
-    txt(ss.length + " idea" + (ss.length === 1 ? "" : "s"), W * 0.87, H * 0.2, 15, "#8A94A8", 600, "end");
+    txt(g.id + "  " + (g.label || ""), W * 0.13, H * 0.19, 15, accent, 800);
+    const counts = opts.blind ? "" : `${helps} · ${needs}` + (ideas ? ` · ${ideas}` : "");
+    if (counts) txt(counts, W * 0.87, H * 0.19, 14, "#8A94A8", 600, "end");
     Jigsaw.layoutText(svg, g.problem_statement || g.label,
-      { x: W * 0.13, y: H * 0.25, w: W * 0.74, h: H * 0.48 },
-      { size: opts.tall ? 24 : 20, min: 11, fill: "#fff", weight: "700" });
-    // footer sits above the bottom notch, which bites 13% into the piece
-    txt(`${cs.length} concern${cs.length===1?"":"s"} · ${neph} nephrology · ${pall} palliative care`,
-        W * 0.13, H * 0.8, 12.5, "#8A94A8", 500);
+      { x: W * 0.13, y: H * 0.24, w: W * 0.74, h: H * 0.28 },
+      { size: opts.tall ? 22 : 19, min: 11, fill: "#fff", weight: "700" });
+    if (g.proposal) {
+      txt(t("pj_proposal"), W * 0.13, H * 0.6, 11.5, accent, 700);
+      Jigsaw.layoutText(svg, g.proposal,
+        { x: W * 0.13, y: H * 0.62, w: W * 0.74, h: H * 0.22 },
+        { size: opts.tall ? 17 : 15, min: 10, fill: "#D6DCE8", weight: "600" });
+    }
     return svg;
   }
 
@@ -288,8 +296,7 @@
     const groups = Store.state.groups || [];
     if (!groups.length) {
       host.className = "problems";
-      host.innerHTML = `<p class="sub" style="text-align:center">
-        Waiting for the grouped problems to be brought back in…</p>`;
+      host.innerHTML = `<p class="sub" style="text-align:center">${escapeHtml(t("pj_waiting_gaps"))}</p>`;
       return;
     }
     host.className = "problems pieces";
@@ -298,83 +305,112 @@
     groups.forEach((g, i) => {
       const cell = document.createElement("div");
       cell.className = "problem-piece";
-      cell.appendChild(problemPiece(g, i));
+      cell.appendChild(problemPiece(g, i, { blind: true }));
       host.appendChild(cell);
     });
   }
 
-  /* ---- solution board: open, or focused on one problem ---- */
-  function buildSolve(el) {
+  /* ---- slide: one gap — blind while collecting, revealed on command ---- */
+  function buildReact(el, slide) {
     el.innerHTML = `
-      <div class="slide-head"><h2 id="solveH">Closing the gaps</h2>
-        <p class="sub" id="solveSub">Pick a gap on your phone and add your idea</p></div>
-      <div class="slide-body"><div id="solveBody" style="height:100%;position:relative"></div></div>`;
-    solveLayout = null;
+      <div class="slide-head"><h2 id="reactH"></h2><p class="sub" id="reactSub"></p></div>
+      <div class="slide-body"><div id="reactBody" style="height:100%;position:relative"></div></div>`;
+    reactLayout = null;
   }
-  let solveLayout = null;   // "wall" or "spot:<group id>", so we only rebuild on change
+  let reactLayout = null;
 
-  /* With no spotlight the brainstorm is a plain post-it wall. With one, the
-     grouped problem sits on the left as a jigsaw piece and the ideas for it
-     pile up as post-its on the right — pieces only once something is grouped. */
-  function layoutSolve(spotGroup, idx) {
-    const body = $("solveBody");
-    if (!body) return;
-    const want = spotGroup ? "spot:" + spotGroup.id : "wall";
-    if (solveLayout === want) return;
-    solveLayout = want;
-    if (!spotGroup) {
-      body.innerHTML = `<div class="board" id="board"></div>`;
+  function fillReact(slide) {
+    const st = Store.state, g = gapById(slide.gapId), i = gapIndex(slide.gapId);
+    const revealed = st.room && st.room.phase === "reveal";
+    setText("reactH", g ? g.label : slide.gapId);
+    setText("reactSub", g ? (revealed ? (g.proposal || "") : t("pj_blind_sub")) : t("pj_waiting_gaps"));
+    if (!g) return;
+    const rs = st.solutions.filter(x => x.group_id === g.id && x.kind !== "idea");
+    const want = (revealed ? "reveal" : "blind") + ":" + g.id;
+    const body = $("reactBody");
+    if (reactLayout !== want) {
+      reactLayout = want;
+      if (!revealed) {
+        body.innerHTML = `<div class="react-blind">
+          <div class="piece" id="reactPiece"></div>
+          <div class="count"><div class="n" id="rN">0</div><div class="l">${escapeHtml(t("pj_answers"))}</div>
+            <div class="split" id="rSplit"></div></div></div>`;
+      } else {
+        body.innerHTML = `<div class="react-reveal">
+          <div class="piece" id="reactPiece"></div>
+          <div class="col helps"><h3>${escapeHtml(t("pj_helps"))} <span id="hN"></span></h3><div class="board" id="boardHelps"></div></div>
+          <div class="col needs"><h3>${escapeHtml(t("pj_needs"))} <span id="bN"></span></h3><div class="board" id="boardNeeds"></div></div></div>`;
+      }
+      $("reactPiece").appendChild(problemPiece(g, i, { tall: true, blind: !revealed }));
+    }
+    if (!revealed) {
+      setText("rN", rs.length);
+      $("rSplit").innerHTML = cfg.disciplines.map(d => {
+        const n = rs.filter(x => x.discipline === d.id).length;
+        return `<div style="color:${(cfg.colors[d.id]||cfg.colors.fallback).base}"><b>${n}</b>${escapeHtml(d.label)}</div>`;
+      }).join("");
     } else {
-      body.innerHTML = `<div class="spotlight-wrap">
-        <div class="spot-problem" id="spotProblem"></div>
-        <div class="spot-solutions board" id="board"></div></div>`;
-      $("spotProblem").appendChild(problemPiece(spotGroup, idx, { tall: true }));
+      const helps = rs.filter(x => x.kind === "facilitator"), needs = rs.filter(x => x.kind === "barrier");
+      setText("hN", helps.length); setText("bN", needs.length);
+      renderBoard(helps, "facilitator", $("boardHelps"));
+      renderBoard(needs, "barrier", $("boardNeeds"));
     }
   }
 
+  /* ---- slide: their own ideas ---- */
+  function buildSolve(el) {
+    el.innerHTML = `
+      <div class="slide-head"><h2>${escapeHtml(t("pj_ideas"))}</h2>
+        <p class="sub">${escapeHtml(t("pj_ideas_sub"))}</p></div>
+      <div class="slide-body"><div class="board" id="board"></div></div>`;
+  }
+
+  /* ---- slide: closing ---- */
   function buildClosing(el) {
     el.innerHTML = `
       <div class="closing">
         <div>
-          <div class="big">Neither of us had<br>the whole picture</div>
+          <div class="big">${escapeHtml(t("pj_closing"))}</div>
           <div class="sub" id="closeStats"></div>
+          ${cfg.signupUrl ? `<div class="signup"><div class="qr" id="signupQr"></div>
+             <div class="l">${escapeHtml(t("pj_signup"))}</div></div>` : ""}
         </div>
       </div>`;
+    if (cfg.signupUrl) {
+      try { $("signupQr").innerHTML = QRCode.toSVG(cfg.signupUrl, { level: "M", quietZone: 1 }); } catch (e) {}
+    }
   }
 
   /* ------------------------------------------------------------------------
-     THE BOARD
-     Notes are laid out on a loose grid with a little jitter and tilt so it
-     feels like paper on a wall rather than a spreadsheet. Beyond what fits,
-     the newest are shown and a counter says how many more there are — a
-     projector full of 3-pixel text helps nobody.
+     THE BOARD — post-its on a loose grid. A note may carry a second line
+     (its how / why), drawn smaller beneath the main text.
      ---------------------------------------------------------------------- */
-  function renderBoard(notes, kind) {
-    const board = $("board");
+  function noteText(n, kind) {
+    if (kind === "idea") return { main: n.body + (n.outcome ? " → " + n.outcome : ""), sub: n.reason || "" };
+    return { main: n.body, sub: n.reason || "" };
+  }
+
+  function renderBoard(notes, kind, host) {
+    const board = host || $("board");
     if (!board) return;
     const W = board.clientWidth, H = board.clientHeight;
     if (W < 50 || H < 50) return;
 
-    if (viewMode === "cloud") {
+    if (viewMode === "cloud" && !host) {
       WordCloud.render(board, notes, { max: 130 });
       if (notes.length) {
         const chip = document.createElement("div");
         chip.className = "more-chip";
-        chip.textContent = notes.length + " note" + (notes.length === 1 ? "" : "s");
+        chip.textContent = notes.length;
         board.appendChild(chip);
       }
       return;
     }
 
-    /* How many can we show and still be readable from the back row?
-       The hard floor is a minimum note width. Without it, a narrow screen (an
-       older 4:3 projector, say) packs in so many columns that every other word
-       has to be hyphenated to fit. Better to show fewer notes properly and be
-       honest about how many are not on screen. */
     const MIN_NOTE_W = 168;
     const target = Math.max(1, notes.length);
     let cols = Math.ceil(Math.sqrt(target * (W / H) * 1.25));
-    cols = Math.min(Math.max(cols, 2), 11, Math.max(2, Math.floor(W / MIN_NOTE_W)));
+    cols = Math.min(Math.max(cols, host ? 1 : 2), 11, Math.max(host ? 1 : 2, Math.floor(W / MIN_NOTE_W)));
     let rows = Math.ceil(target / cols);
     const maxRows = Math.max(1, Math.floor(H / 104));
     let capacity = cols * Math.min(rows, maxRows);
@@ -383,49 +419,44 @@
     const shown = notes.slice(-capacity);
     const hidden = notes.length - shown.length;
 
-    /* Cap the piece size so a full board stays readable, but let a nearly empty
-       board use bigger pieces — the first three answers of a round should not
-       look lost on a wall-sized screen. */
     const capW = notes.length <= 8 ? 430 : notes.length <= 24 ? 330 : 300;
     const capH = notes.length <= 8 ? 270 : notes.length <= 24 ? 210 : 190;
     const cw = W / cols, ch = H / rows;
     const pw = Math.min(cw * 0.86, capW), ph = Math.min(ch * 0.82, capH);
-
-    /* Pieces have a maximum sensible size, so with only a handful of notes the
-       cells would otherwise be enormous and the board would look half empty.
-       Shrink the grid to the pieces and centre the whole block instead. */
     const cellW = Math.min(cw, pw / 0.86);
     const cellH = Math.min(ch, ph / 0.82);
     const originX = (W - cols * cellW) / 2;
     const originY = (H - Math.ceil(shown.length / cols) * cellH) / 2;
-
-    /* A post-it has no tab, so the only overhang is the drawing's own small
-       shadow margin. */
-    let overhang = 10;
 
     board.replaceChildren();
     shown.forEach((n, i) => {
       const r = Math.floor(i / cols), c = i % cols;
       const holder = document.createElement("div");
       holder.className = "note-piece";
-      const tilt = (hash(n.id) % 700) / 100 - 3.5;      // steady per note
+      const tilt = (hash(n.id) % 700) / 100 - 3.5;
       holder.style.setProperty("--tilt", tilt + "deg");
-      holder.style.left = (originX + c * cellW + (cellW - pw) / 2 - overhang) + "px";
-      holder.style.top  = (originY + r * cellH + (cellH - ph) / 2 - overhang) + "px";
-      holder.style.animationDelay = Math.min(i * 12, 500) + "ms";
-
-      /* Before grouping, every note is a plain post-it — the jigsaw shapes
-         are saved for the grouped view, where fitting together means something. */
-      // an idea carries the id of the gap it answers, in that gap's colour
-      const gi = kind === "solution" ? (Store.state.groups || []).findIndex(g => g.id === n.group_id) : -1;
+      const gi = (kind !== "concern") ? gapIndex(n.group_id) : -1;
       const { svg, ink, pad } = Jigsaw.postitSVG({
         discipline: n.discipline, role: n.role, width: pw, height: ph,
-        tag: gi >= 0 ? n.group_id : null, tagColor: gi >= 0 ? groupColor(gi) : null
+        tag: kind === "idea" && gi >= 0 ? n.group_id : null, tagColor: gi >= 0 ? groupColor(gi) : null
       });
-      overhang = pad;
-      Jigsaw.layoutText(svg, n.body,
-        { x: pw * 0.08, y: ph * 0.2, w: pw * 0.84, h: ph * 0.7 },
-        { size: Math.max(11, Math.round(ph/8.4)), min: 9, fill: ink, weight: "600" });
+      holder.style.left = (originX + c * cellW + (cellW - pw) / 2 - pad) + "px";
+      holder.style.top  = (originY + r * cellH + (cellH - ph) / 2 - pad) + "px";
+      holder.style.animationDelay = Math.min(i * 12, 500) + "ms";
+
+      const { main, sub } = noteText(n, kind);
+      if (sub) {
+        Jigsaw.layoutText(svg, main,
+          { x: pw * 0.08, y: ph * 0.25, w: pw * 0.84, h: ph * 0.38 },
+          { size: Math.max(11, Math.round(ph/9)), min: 9, fill: ink, weight: "700" });
+        Jigsaw.layoutText(svg, sub,
+          { x: pw * 0.08, y: ph * 0.65, w: pw * 0.84, h: ph * 0.3 },
+          { size: Math.max(10, Math.round(ph/11.5)), min: 8, fill: ink, weight: "500" });
+      } else {
+        Jigsaw.layoutText(svg, main,
+          { x: pw * 0.08, y: ph * 0.2, w: pw * 0.84, h: ph * 0.7 },
+          { size: Math.max(11, Math.round(ph/8.4)), min: 9, fill: ink, weight: "600" });
+      }
       holder.appendChild(svg);
       board.appendChild(holder);
     });
@@ -433,7 +464,7 @@
     if (hidden > 0) {
       const chip = document.createElement("div");
       chip.className = "more-chip";
-      chip.textContent = "+ " + hidden + " more";
+      chip.textContent = "+ " + hidden;
       board.appendChild(chip);
     }
   }
@@ -449,61 +480,26 @@
     const s = SLIDES[current];
     if (!s) return;
     const st = Store.state;
+    $("liveCount").lastElementChild.textContent = (st.participants || []).length + " " + t("pj_in_room");
 
-    $("liveCount").lastElementChild.textContent =
-      (st.participants || []).length + " in the room";
-
-    if (s.key === "title") {
-      const n = $("joinN");
-      if (n) n.textContent = (st.participants || []).length;
-    }
+    if (s.key === "title") { const n = $("joinN"); if (n) n.textContent = (st.participants || []).length; }
     if (s.key === "who") fillWho();
-
-    if (s.key.startsWith("prompt:")) {
-      const pid = s.prompt.id;
-      renderBoard(st.concerns.filter(c => c.prompt_id === pid), "concern");
-    }
-
-    if (s.key === "gather") {
-      const cs = st.concerns;
-      const set = new Set(cs.map(c => c.participant_id).filter(Boolean));
-      setText("gTotal", cs.length);
-      setText("gNeph", cs.filter(c => c.discipline === "nephro").length);
-      setText("gPall", cs.filter(c => c.discipline === "palliative").length);
-      /* Notes added through the app always carry an anonymous participant id.
-         Rows seeded another way might not, and "0 people contributed" under a
-         board full of notes would read as a bug to the room. */
-      const lbl = document.querySelector("#gVoices + .l");
-      if (set.size === 0 && cs.length > 0) {
-        setText("gVoices", (st.participants || []).length);
-        if (lbl) lbl.textContent = "people in the room";
-      } else {
-        setText("gVoices", set.size);
-        if (lbl) lbl.textContent = "people contributed";
-      }
-    }
-
-    if (s.key === "problems") fillProblems();
-
-    if (s.key === "solve") {
-      const spot = st.room && st.room.spotlight_group;
-      const g = (st.groups || []).find(g => g.id === spot);
-      // the spotlight piece carries the full statement; keep the heading short
-      setText("solveH", g ? "Closing gap " + g.id + (g.label ? " — " + g.label : "") : "Closing the gaps");
-      setText("solveSub", g
-        ? "Everyone on this one — add your idea"
-        : "Pick a gap on your phone and add your idea");
-      layoutSolve(g || null, (st.groups || []).indexOf(g));
-      const list = g
-        ? st.solutions.filter(s2 => s2.group_id === g.id)
-        : st.solutions;
-      renderBoard(list, "solution");
-    }
-
+    if (s.key.startsWith("prompt:")) renderBoard(st.concerns.filter(c => c.prompt_id === s.prompt.id), "concern");
+    if (s.key === "evidence") fillProblems();
+    if (s.key.startsWith("react:")) fillReact(s);
+    if (s.key === "solve") renderBoard(st.solutions.filter(x => x.kind === "idea"), "idea");
     if (s.key === "closing") {
       const el = $("closeStats");
-      if (el) el.textContent =
-        `${st.concerns.length} concerns · ${(st.groups||[]).length} shared problems · ${st.solutions.length} ideas to close them`;
+      if (el) {
+        const f = st.solutions.filter(x => x.kind === "facilitator").length;
+        const b = st.solutions.filter(x => x.kind === "barrier").length;
+        const i = st.solutions.filter(x => x.kind === "idea").length;
+        const both = (st.groups || []).filter(g => {
+          const ds = new Set(st.solutions.filter(x => x.group_id === g.id).map(x => x.discipline));
+          return ds.size >= 2;
+        }).length;
+        el.textContent = t("pj_stats", { c: st.concerns.length, f, b, i, g: both });
+      }
     }
   }
 
@@ -516,71 +512,38 @@
   /* ---- toolbar ---- */
   $("tView").addEventListener("click", () => {
     viewMode = viewMode === "wall" ? "cloud" : "wall";
-    $("tView").textContent = viewMode === "wall" ? "Word cloud" : "Post-it wall";
+    $("tView").textContent = viewMode === "wall" ? t("pj_word_cloud") : t("pj_wall");
     $("tView").setAttribute("aria-pressed", String(viewMode === "cloud"));
     refreshSlide();
   });
   $("tFull").addEventListener("click", () => {
-    document.fullscreenElement ? document.exitFullscreen()
-                               : document.documentElement.requestFullscreen();
+    document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
   });
 
-  /* Arrow keys work too, so you can drive from a clicker if the control panel
-     is not to hand.
-
-     They drive the ROOM, not just this screen. If they only changed this
-     screen, the control panel would still highlight the old slide, the phones
-     would not follow, the board would not open, and the next poll would snap
-     the projector straight back. So the same rules the control panel uses
-     apply here: pick a slide, set the phase and question, open the board on a
-     question slide, close it everywhere else.
-
-     That needs the control password. We reuse the one the control panel
-     remembered in this browser, or ask once and remember it ourselves. */
+  /* ---- arrow keys drive the ROOM, not just this screen (see slides.js) ---- */
   const TOKEN_KEY = "missingpiece.token";
   let driveToken = null;
-
   function askForToken() {
-    let t = null;
-    try { t = localStorage.getItem(TOKEN_KEY); } catch {}
-    if (!t) {
-      t = prompt("To drive the slides from this screen, enter the control password.\n" +
-                 "(Or leave this blank and use the control panel instead.)");
-      if (t) t = t.trim();
-    }
-    return t || null;
+    let tk = null;
+    try { tk = localStorage.getItem(TOKEN_KEY); } catch {}
+    if (!tk) { tk = prompt("Control password (or leave blank and use the control panel):"); if (tk) tk = tk.trim(); }
+    return tk || null;
   }
-
   async function driveTo(i) {
     i = Math.max(0, Math.min(SLIDES.length - 1, i));
     if (i === current) return;
     if (!driveToken) driveToken = askForToken();
     if (!driveToken) return;
-
-    const s = SLIDES[i];
-    const changes = { slide: i };
-    if (s.phase) changes.phase = s.phase;
-    if (s.prompt) changes.prompt = s.prompt.id;
-    else if (s.phase && s.phase !== "solutions") changes.prompt = null;
-    if (s.key !== "solve") changes.spotlight = null;
-    changes.open = !!s.prompt || s.key === "solve";
-
-    show(i);                                   // move now; the poll confirms it
+    show(i);
     try {
-      await Store.control(driveToken, changes);
+      await Store.control(driveToken, Slides.changesFor(SLIDES, i));
       try { localStorage.setItem(TOKEN_KEY, driveToken); } catch {}
     } catch (e) {
-      if (/token/i.test(e.message || "")) {
-        driveToken = null;
-        try { localStorage.removeItem(TOKEN_KEY); } catch {}
-        alert("That password doesn't match the one in the database. Try again.");
-      } else {
-        alert("Couldn't move the room: " + (e.message || e));
-      }
-      if (Store.state.room) show(Store.state.room.current_slide | 0);   // snap back
+      if (/token/i.test(e.message || "")) { driveToken = null; try { localStorage.removeItem(TOKEN_KEY); } catch {} alert("Wrong password."); }
+      else alert("Couldn't move the room: " + (e.message || e));
+      if (Store.state.room) show(Store.state.room.current_slide | 0);
     }
   }
-
   addEventListener("keydown", e => {
     if (e.key === "ArrowRight" || e.key === "PageDown") driveTo(current + 1);
     if (e.key === "ArrowLeft"  || e.key === "PageUp")   driveTo(current - 1);
@@ -589,10 +552,7 @@
   });
 
   let resizeT;
-  addEventListener("resize", () => {
-    clearTimeout(resizeT);
-    resizeT = setTimeout(refreshSlide, 180);
-  });
+  addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(() => { reactLayout = null; refreshSlide(); }, 180); });
 
   $("cornerCode").innerHTML =
     `<span>${escapeHtml(cfg.joinUrl.replace(/^https?:\/\//, ""))}</span><b>${escapeHtml(cfg.roomCode)}</b>`;
@@ -611,17 +571,15 @@
         refreshSlide();
       });
       await Store.startWatching({ intervalMs: 1200 });
-      // participant counts change slowly; fetch them on a gentler timer
       setInterval(async () => {
-        try { Store.state.participants = await Store.listParticipants(); refreshSlide(); }
-        catch (e) {}
+        try { Store.state.participants = await Store.listParticipants(); refreshSlide(); } catch (e) {}
       }, 5000);
       Store.state.participants = await Store.listParticipants();
       show(Store.state.room ? (Store.state.room.current_slide | 0) : 0);
     } catch (e) {
       document.body.innerHTML =
         `<div style="display:grid;place-items:center;height:100vh;text-align:center;padding:40px">
-          <div><div style="font-size:30px;font-weight:700;margin-bottom:14px">Can't reach the workshop data</div>
+          <div><div style="font-size:30px;font-weight:700;margin-bottom:14px">เชื่อมต่อข้อมูลไม่ได้</div>
           <div style="color:#9BA6BC;font-size:18px;max-width:60ch;line-height:1.5">${escapeHtml(e.message || String(e))}</div></div>
         </div>`;
     }

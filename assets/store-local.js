@@ -57,7 +57,8 @@
 
     async join(code, p) {
       return req("/join", { method: "POST",
-        body: JSON.stringify({ code, id: p.id, role: p.role, discipline: p.discipline }) });
+        body: JSON.stringify({ code, id: p.id, role: p.role, discipline: p.discipline,
+                               setting: p.setting || null }) });
     },
 
     async insert(table, payload) {

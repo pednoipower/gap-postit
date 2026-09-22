@@ -87,8 +87,8 @@
     <p class="why" style="margin:0 0 12px">Drag a note into a group, or tap notes to select
       several and press <b>Send selected here</b> on a group. Name each group and write
       the one-sentence problem — that is what the room will see on the pieces.
-      Groups with no notes are dropped on save. Your draft is kept in this browser
-      until you save or reload.</p>
+      Groups with no name and no notes are dropped on save. Your draft is kept in this
+      browser until you save or reload.</p>
 
     <div class="board-wrap">
       <div class="tray" id="tray">
@@ -160,19 +160,19 @@
 
     if (draft && draft.columns && draft.columns.length &&
         confirm("You have an unsaved draft on this computer. Continue with it?\n\n(Cancel loads what is in the room instead.)")) {
-      columns = draft.columns.map(c => ({ label: c.label, problem: c.problem,
+      columns = draft.columns.map(c => ({ label: c.label, problem: c.problem, proposal: c.proposal || "",
                                           refs: (c.refs || []).filter(r => known.has(r)) }));
       setStatus("draft restored");
     } else if (gs && gs.length) {
       columns = gs.map(g => ({
-        label: g.label, problem: g.problem_statement,
+        label: g.label, problem: g.problem_statement, proposal: g.proposal || "",
         refs: concerns.filter(c => c.group_id === g.id).map(c => c.ref)
       }));
       setStatus(`loaded ${gs.length} groups from the room`);
     } else {
-      columns = (cfg.seedThemes || []).map(t => ({ label: t.label, problem: t.problem || "", refs: [] }));
+      columns = (cfg.seedThemes || []).map(t => ({ label: t.label, problem: t.problem || "", proposal: t.proposal || "", refs: [] }));
       setStatus(columns.length ? "started from the expected themes" : "starting from nothing");
-      if (!columns.length) columns.push({ label: "", problem: "", refs: [] });
+      if (!columns.length) columns.push({ label: "", problem: "", proposal: "", refs: [] });
     }
     selected.clear();
     render();
@@ -276,10 +276,13 @@
           <button class="del" title="Remove this group (notes go back to the tray)">×</button>
         </div>
         <textarea class="text" placeholder="One sentence: what is missing between the two teams?">${escapeHtml(col.problem)}</textarea>
+        <textarea class="text" placeholder="Proposal: the one thing the program would do about it">${escapeHtml(col.proposal || "")}</textarea>
         <div class="drop"></div>
         <button class="btn small ghost sendhere hidden">Send selected here</button>`;
       d.querySelector("input").addEventListener("input", e => { col.label = e.target.value; saveDraft(); });
-      d.querySelector("textarea").addEventListener("input", e => { col.problem = e.target.value; saveDraft(); });
+      const tas = d.querySelectorAll("textarea");
+      tas[0].addEventListener("input", e => { col.problem = e.target.value; saveDraft(); });
+      tas[1].addEventListener("input", e => { col.proposal = e.target.value; saveDraft(); });
       d.querySelector(".del").addEventListener("click", () => {
         if (col.refs.length && !confirm(`Remove "${col.label || "G" + (i + 1)}"? Its ${col.refs.length} notes go back to the tray.`)) return;
         columns.splice(i, 1); saveDraft(); render();
@@ -295,7 +298,7 @@
   }
 
   $("addCol").addEventListener("click", () => {
-    columns.push({ label: "", problem: "", refs: [] });
+    columns.push({ label: "", problem: "", proposal: "", refs: [] });
     saveDraft(); render();
     const inputs = document.querySelectorAll(".col input");
     if (inputs.length) inputs[inputs.length - 1].focus();
@@ -309,9 +312,11 @@
 
   /* ---- save: same guarded import the AI path uses ---- */
   $("save").addEventListener("click", async () => {
-    const live = columns.filter(c => c.refs.length);
+    // a gap keeps its place even with no concerns sorted into it yet — the
+    // room's reactions and ideas are attached to it by number
+    const live = columns.filter(c => c.refs.length || c.label.trim());
     const problems = [];
-    if (!live.length) problems.push("No group has any notes in it yet.");
+    if (!live.length) problems.push("There are no groups to save.");
     live.forEach((c, i) => { if (!c.label.trim()) problems.push(`Group ${i + 1} has no name.`); });
     if (problems.length) return msg("saveMsg", "bad", problems.map(escapeHtml).join("<br>"));
 
@@ -327,6 +332,7 @@
       id: "G" + (i + 1),
       label: c.label.trim(),
       problem_statement: (c.problem || "").trim() || c.label.trim(),
+      proposal: (c.proposal || "").trim(),
       rationale: "Grouped by hand on the grouping board",
       source_ids: c.refs
     }));

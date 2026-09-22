@@ -171,7 +171,8 @@ async function api(req, res, pathname, query) {
     if (!DB.participants.some(p => p.id === body.id)) {
       DB.participants.push({
         id: body.id, room_code: body.code, role: body.role,
-        discipline: body.discipline, joined_at: new Date().toISOString()
+        discipline: body.discipline, setting: body.setting || null,
+        joined_at: new Date().toISOString()
       });
       save();
     }
@@ -188,6 +189,10 @@ async function api(req, res, pathname, query) {
     if (!room.board_open) return send(res, 400, { error: 'the board is closed' });
     if (!payload.body || payload.body.length > 400)
       return send(res, 400, { error: 'note is empty or too long' });
+    if ((payload.reason || '').length > 400 || (payload.outcome || '').length > 400)
+      return send(res, 400, { error: 'note is too long' });
+    if (table === 'solutions' && !['idea', 'facilitator', 'barrier'].includes(payload.kind || 'idea'))
+      return send(res, 400, { error: 'unknown kind' });
 
     const list = DB[table];
     // same id arriving twice means a phone retried after losing signal
@@ -201,6 +206,7 @@ async function api(req, res, pathname, query) {
       ref: nextRef(payload.room_code, table === 'concerns' ? 'concern' : 'solution',
                    table === 'concerns' ? 'C' : 'S'),
       group_id: payload.group_id || null,
+      kind: table === 'solutions' ? (payload.kind || 'idea') : undefined,
       created_at: new Date().toISOString()
     });
     list.push(row);
@@ -245,6 +251,7 @@ async function api(req, res, pathname, query) {
       DB.groups.push({
         id: g.id, room_code: body.code, label: g.label || g.id,
         problem_statement: g.problem_statement || '', rationale: g.rationale || null,
+        proposal: g.proposal || null,
         color_index: i, sort_order: i, created_at: new Date().toISOString()
       });
       for (const r of (g.source_ids || [])) {

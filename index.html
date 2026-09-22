@@ -20,27 +20,30 @@
 
   <div class="card">
     <label class="field">
-      <span class="lbl">Which team are you part of?</span>
+      <span class="lbl" id="lblTeam"></span>
       <div class="choices two" id="disciplines"></div>
     </label>
 
-    <label class="field" style="margin-bottom:6px">
-      <span class="lbl">And your role?</span>
+    <label class="field">
+      <span class="lbl" id="lblRole"></span>
       <div class="choices wrap-auto" id="roles"></div>
+    </label>
+
+    <label class="field hidden" style="margin-bottom:6px" id="settingField">
+      <span class="lbl" id="lblSetting"></span>
+      <div class="choices wrap-auto" id="settings"></div>
     </label>
   </div>
 
-  <p class="hint center" style="margin:0 0 6px">
-    Nothing you write is linked to your name.<br>
-    We only record your team and role.
-  </p>
+  <p class="hint center" style="margin:0 0 6px" id="anonNote"></p>
 
   <div class="sticky-foot">
-    <button class="btn" id="go" disabled>Choose both to continue</button>
+    <button class="btn" id="go" disabled></button>
   </div>
 </div>
 
 <script src="assets/config.js"></script>
+<script src="assets/strings.js"></script>
 <script src="assets/store-supabase.js"></script>
 <script src="assets/store-local.js"></script>
 <script src="assets/store.js"></script>
@@ -49,8 +52,13 @@
   "use strict";
   const cfg = window.CONFIG;
   const $ = id => document.getElementById(id);
+  const t = window.T.t;
 
-  document.title = "Join — " + cfg.workshopTitle;
+  document.title = cfg.workshopTitle;
+  $("lblTeam").textContent = t("join_team");
+  $("lblRole").textContent = t("join_role");
+  $("lblSetting").textContent = t("join_setting");
+  $("anonNote").textContent = t("join_anon");
   $("title").textContent = cfg.workshopTitle;
   $("subtitle").textContent = cfg.workshopSubtitle;
 
@@ -59,7 +67,8 @@
   if (cfg.colors.nephro)     { root.setProperty("--nephro", cfg.colors.nephro.base); }
   if (cfg.colors.palliative) { root.setProperty("--pall",   cfg.colors.palliative.base); }
 
-  const picked = { discipline: null, role: null };
+  const askSetting = (cfg.settings || []).length > 0;
+  const picked = { discipline: null, role: null, setting: null };
 
   function buildChoices(host, items, key, withDot) {
     host.replaceChildren();
@@ -87,13 +96,18 @@
 
   buildChoices($("disciplines"), cfg.disciplines, "discipline", true);
   buildChoices($("roles"), cfg.roles, "role", false);
+  if (askSetting) {
+    buildChoices($("settings"), cfg.settings, "setting", false);
+    $("settingField").classList.remove("hidden");
+  }
 
   function refresh() {
-    const ready = picked.discipline && picked.role;
+    const ready = picked.discipline && picked.role && (!askSetting || picked.setting);
     $("go").disabled = !ready || !window.__connected;
-    $("go").textContent = !window.__connected ? "Connecting…"
-      : ready ? "I'm in — let's go" : "Choose both to continue";
+    $("go").textContent = !window.__connected ? t("join_connecting")
+      : ready ? t("join_go") : t("join_pick");
   }
+  refresh();
 
   function status(kind, text) {
     $("statusBox").innerHTML =
@@ -107,41 +121,39 @@
   })();
 
   (async function connect() {
-    status("warn", "Connecting…");
+    status("warn", t("join_connecting"));
     try {
       const backend = await Store.init();
       window.__connected = true;
       if (saved && saved.room === cfg.roomCode) {
-        status("ok", "Welcome back — taking you to the board");
+        status("ok", t("join_welcome"));
         location.replace("board.html");
         return;
       }
-      status("ok", "Connected. Room " + cfg.roomCode +
-             (backend === "local" ? " (on the local network)" : ""));
+      status("ok", t("join_connected") + " " + cfg.roomCode +
+             (backend === "local" ? " (local)" : ""));
       refresh();
     } catch (e) {
       window.__connected = false;
-      status("bad", e.bothFailed
-        ? "Can't reach the workshop. Check you're on the right wifi, then pull down to refresh."
-        : "Can't connect: " + (e.message || e));
+      status("bad", e.bothFailed ? t("join_fail") : t("join_fail") + " (" + (e.message || e) + ")");
       refresh();
     }
   })();
 
   $("go").addEventListener("click", async () => {
     $("go").disabled = true;
-    $("go").textContent = "Joining…";
+    $("go").textContent = t("join_joining");
     try {
-      const id = await Store.join(picked.role, picked.discipline);
+      const id = await Store.join(picked.role, picked.discipline, picked.setting);
       localStorage.setItem("missingpiece.me", JSON.stringify({
-        id, role: picked.role, discipline: picked.discipline, room: cfg.roomCode
+        id, role: picked.role, discipline: picked.discipline, setting: picked.setting, room: cfg.roomCode
       }));
       location.href = "board.html";
     } catch (e) {
       // Joining is only bookkeeping — never block someone from taking part
       localStorage.setItem("missingpiece.me", JSON.stringify({
         id: Store.uuid(), role: picked.role, discipline: picked.discipline,
-        room: cfg.roomCode, unregistered: true
+        setting: picked.setting, room: cfg.roomCode, unregistered: true
       }));
       location.href = "board.html";
     }

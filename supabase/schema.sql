@@ -8,7 +8,8 @@
 --   4. Paste this entire file in and press Run
 --   5. Scroll to the bottom of this file for the one line you must customise
 --
--- It is safe to run this more than once. Nothing is deleted.
+-- It is safe to run this more than once. Nothing is deleted. Re-running it is
+-- also how you upgrade an existing database when this file gains columns.
 -- ============================================================================
 
 
@@ -118,6 +119,29 @@ create table if not exists public.solutions (
 );
 create index if not exists solutions_room_idx  on public.solutions(room_code, created_at);
 create index if not exists solutions_group_idx on public.solutions(room_code, group_id);
+
+
+-- ----------------------------------------------------------------------------
+-- Added for the 45-minute format. Safe on an existing database: each line
+-- does nothing if the column is already there.
+--
+--   participants.setting  where they mainly work (dialysis unit, ward, ...)
+--   concerns.situation    when the gap happens most (optional tap)
+--   groups.proposal       the one concrete thing the program proposes for
+--                         this gap — what the room reacts to
+--   solutions.kind        'facilitator' (what would help) | 'barrier' (what
+--                         would get in the way) | 'idea' (their own theory)
+--   solutions.reason      the HOW (facilitator) or WHY (barrier), or the
+--                         "because" of their own theory. Required on the phone.
+--   solutions.outcome     the "then" of their own theory
+-- ----------------------------------------------------------------------------
+alter table public.participants add column if not exists setting   text;
+alter table public.concerns     add column if not exists situation text;
+alter table public.groups       add column if not exists proposal  text;
+alter table public.solutions    add column if not exists kind      text not null default 'idea';
+alter table public.solutions    add column if not exists reason    text;
+alter table public.solutions    add column if not exists outcome   text;
+create index if not exists solutions_kind_idx on public.solutions(room_code, kind);
 
 
 -- ----------------------------------------------------------------------------
@@ -235,6 +259,9 @@ drop policy if exists add_solution on public.solutions;
 create policy add_solution on public.solutions for insert with check (
   exists (select 1 from public.rooms r where r.code = room_code and r.board_open = true)
   and char_length(body) between 1 and 400
+  and char_length(coalesce(reason,  '')) <= 400
+  and char_length(coalesce(outcome, '')) <= 400
+  and kind in ('idea', 'facilitator', 'barrier')
   and exists (select 1 from public.groups g where g.room_code = room_code and g.id = group_id)
 );
 
@@ -381,13 +408,14 @@ begin
 
   for v_group in select * from jsonb_array_elements(p_groups)
   loop
-    insert into public.groups(id, room_code, label, problem_statement, rationale, color_index, sort_order)
+    insert into public.groups(id, room_code, label, problem_statement, rationale, proposal, color_index, sort_order)
     values (
       v_group->>'id',
       p_room,
       coalesce(v_group->>'label', v_group->>'id'),
       coalesce(v_group->>'problem_statement', ''),
       v_group->>'rationale',
+      v_group->>'proposal',
       v_idx,
       v_idx
     );

@@ -1,13 +1,22 @@
-# The Missing Piece
+# The Missing Piece · ชิ้นส่วนที่หายไป
 
-A live workshop tool for 150 people. Participants voice concerns from their
-phones, the room watches them appear on the projector, an AI groups them into
-shared problems, and the room then brainstorms how to close each gap.
+A 45-minute live workshop tool for 150 people, built for one session: a
+nephrology team and a palliative care team in the same room, voicing where
+patients fall through the gap between them and reacting to what a program
+might do about it. Participants use their phones (in Thai); the room watches
+the projector; you drive it from a laptop.
 
-While people are writing, every note is a plain post-it on a wall. The
-jigsaw only appears once the AI has grouped them: each shared problem becomes
-a **piece with notches** — something missing — and the ideas for closing it
-gather round it. Colour is discipline: nephrology against palliative care.
+Two things come out of it: a room that has seen the other team describe the
+same problems — and a dataset. For each gap the evidence points to, what
+people say would **help, and how**, what would **get in the way, and why**,
+and their own **if / then / because** ideas; every note tagged by team, role
+and setting, ready for barrier–facilitator or realist-style analysis.
+
+While people are writing, notes are plain post-its. The jigsaw appears only
+for the gaps themselves — a **piece with notches** — with the ideas gathering
+round it. Colour is discipline.
+
+See `docs/2026-09-22-run-of-show-45min.md` for the minute-by-minute script.
 
 ---
 
@@ -20,7 +29,7 @@ gather round it. Colour is discipline: nephrology against palliative care.
 | `present.html` | the projector |
 | `control.html` | you, on a laptop or phone |
 | `health.html` | you, the day before |
-| `group.html` | you, only if the AI grouping fails or needs fixing |
+| `group.html` | you, after the day, to group concerns by hand |
 
 Plus one file you edit: **`assets/config.js`**. Everything else can be left alone.
 

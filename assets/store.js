@@ -139,9 +139,9 @@
     async listParticipants(){ return this.adapter.listParticipants(cfg.roomCode); },
 
     /* ---- participants ---- */
-    async join(role, discipline) {
+    async join(role, discipline, setting) {
       const id = uuid();
-      await withRetry(() => this.adapter.join(cfg.roomCode, { id, role, discipline }));
+      await withRetry(() => this.adapter.join(cfg.roomCode, { id, role, discipline, setting: setting || null }));
       return id;
     },
 
@@ -149,18 +149,23 @@
        Note the client-generated id. If a phone sends a note, loses signal
        before hearing back, and retries, the server sees the same id twice and
        keeps only one. No duplicate post-its on the board. */
-    async addConcern({ promptId, body, role, discipline, participantId }) {
+    async addConcern({ promptId, body, situation, role, discipline, participantId }) {
       const payload = {
         id: uuid(), room_code: cfg.roomCode, prompt_id: promptId,
-        body, role, discipline, participant_id: participantId || null
+        body, situation: situation || null,
+        role, discipline, participant_id: participantId || null
       };
       return this._send("concerns", payload);
     },
 
-    async addSolution({ groupId, body, role, discipline, participantId }) {
+    /* kind: "facilitator" | "barrier" | "idea"
+       reason: the how / why (required on the phone for every kind)
+       outcome: the "then" of an idea; null for facilitators and barriers */
+    async addSolution({ groupId, kind, body, reason, outcome, role, discipline, participantId }) {
       const payload = {
         id: uuid(), room_code: cfg.roomCode, group_id: groupId,
-        body, role, discipline, participant_id: participantId || null
+        kind: kind || "idea", body, reason: reason || null, outcome: outcome || null,
+        role, discipline, participant_id: participantId || null
       };
       return this._send("solutions", payload);
     },
