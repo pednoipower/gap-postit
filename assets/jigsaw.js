@@ -171,13 +171,87 @@
   }
 
   /* ------------------------------------------------------------------------
+     A plain post-it. This is what a note looks like BEFORE it has been
+     grouped: a square of paper on a wall, nothing more. The jigsaw shapes are
+     reserved for the grouped view, where "pieces fitting together" actually
+     means something. Same colour rules as the pieces: pale discipline colour,
+     strong edge, dark text, role mark in the corner.
+     ---------------------------------------------------------------------- */
+  function postitSVG(opts) {
+    const w = opts.width || 240;
+    const h = opts.height || 150;
+    const col = colorFor(opts.discipline);
+    const pad = 10;                          // just enough for the shadow
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `${-pad} ${-pad} ${w + pad * 2} ${h + pad * 2}`);
+    svg.setAttribute("width", w + pad * 2);
+    svg.setAttribute("height", h + pad * 2);
+    svg.style.overflow = "visible";
+
+    const shadow = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    shadow.setAttribute("x", 3); shadow.setAttribute("y", 5);
+    shadow.setAttribute("width", w); shadow.setAttribute("height", h);
+    shadow.setAttribute("rx", 3);
+    shadow.setAttribute("fill", "rgba(0,0,0,.34)");
+    svg.appendChild(shadow);
+
+    const paper = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    paper.setAttribute("x", 0); paper.setAttribute("y", 0);
+    paper.setAttribute("width", w); paper.setAttribute("height", h);
+    paper.setAttribute("rx", 3);
+    paper.setAttribute("fill", tint(col.base, 0.68));
+    paper.setAttribute("stroke", col.base);
+    paper.setAttribute("stroke-width", "2.2");
+    svg.appendChild(paper);
+
+    // a strip of full colour along the top, like the glue edge of a real one
+    const strip = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    strip.setAttribute("x", 0); strip.setAttribute("y", 0);
+    strip.setAttribute("width", w); strip.setAttribute("height", Math.max(6, h * 0.07));
+    strip.setAttribute("rx", 3);
+    strip.setAttribute("fill", col.base);
+    strip.setAttribute("opacity", ".55");
+    svg.appendChild(strip);
+
+    if (opts.role && ROLE_MARK[opts.role]) {
+      const mk = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      mk.setAttribute("d", ROLE_MARK[opts.role]);
+      mk.setAttribute("transform", `translate(${w * 0.045}, ${h * 0.12}) scale(${Math.min(w,h)/150})`);
+      mk.setAttribute("stroke", col.base);
+      mk.setAttribute("stroke-width", "1.9");
+      mk.setAttribute("stroke-linecap", "round");
+      mk.setAttribute("fill", opts.role === "nurse" || opts.role === "allied" ? col.base : "none");
+      mk.setAttribute("opacity", ".75");
+      svg.appendChild(mk);
+    }
+
+    // optional tag in the top-right corner, e.g. which gap an idea answers
+    if (opts.tag) {
+      const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t.setAttribute("x", w * 0.95); t.setAttribute("y", h * 0.2);
+      t.setAttribute("text-anchor", "end");
+      t.setAttribute("font-size", Math.max(10, Math.round(h / 11)));
+      t.setAttribute("font-weight", "800");
+      t.setAttribute("font-family", "ui-sans-serif, system-ui, sans-serif");
+      t.setAttribute("fill", opts.tagColor || col.ink);
+      t.setAttribute("opacity", ".9");
+      t.textContent = opts.tag;
+      svg.appendChild(t);
+    }
+
+    return { svg, color: col, pad, fill: tint(col.base, 0.68), ink: col.ink };
+  }
+
+  /* ------------------------------------------------------------------------
      A problem statement: a big piece with a notch for every solution slot.
      Notches alternate around the edge so that, when solutions plug in, the
      two disciplines end up interlocking around the same problem.
      ---------------------------------------------------------------------- */
   function problemSVG(opts) {
     const w = opts.width || 420, h = opts.height || 260;
-    const pad = Math.max(w, h) * 0.2;
+    // every edge is a notch (inward), so only the shadow needs any margin
+    const pad = opts.pad != null ? opts.pad : 8;
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", `${-pad} ${-pad} ${w + pad*2} ${h + pad*2}`);
     svg.setAttribute("width", "100%");
@@ -222,22 +296,39 @@
     const ctx = (layoutText._ctx ||
       (layoutText._ctx = document.createElement("canvas").getContext("2d")));
 
+    /* Thai, Lao, Khmer and friends do not put spaces between words, so
+       splitting on whitespace would treat a whole Thai sentence as one word.
+       The browser's own segmenter knows where Thai words end; where it is
+       missing (very old phones) we fall back to spaces. Each token keeps its
+       trailing space so lines can simply be concatenated. */
+    const tokens = (() => {
+      const str = String(text);
+      if (typeof Intl !== "undefined" && Intl.Segmenter) {
+        const seg = new Intl.Segmenter(undefined, { granularity: "word" });
+        return Array.from(seg.segment(str), x => x.segment).filter(Boolean);
+      }
+      return str.split(/(\s+)/).filter(Boolean);
+    })();
+    const hyphenate = tok => /[A-Za-z]/.test(tok);   // Thai does not take a hyphen
+
     function wrapAt(fs) {
       ctx.font = `${opts.weight || 600} ${fs}px ${family}`;
-      const words = String(text).split(/\s+/).filter(Boolean);
       const lines = []; let line = "";
-      for (const word of words) {
-        const test = line ? line + " " + word : word;
-        if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = word; }
+      for (const tok of tokens) {
+        if (/^\s+$/.test(tok)) { if (line) line += " "; continue; }
+        const test = line + tok;
+        if (ctx.measureText(test).width > maxW && line.trim()) { lines.push(line.trimEnd()); line = tok; }
         else line = test;
       }
+      if (line.trim()) lines.push(line.trimEnd());
       // a single word longer than the piece still has to be broken somewhere
       const out = [];
-      for (let ln of (line ? lines.concat([line]) : lines)) {
+      for (let ln of lines) {
         while (ctx.measureText(ln).width > maxW && ln.length > 1) {
+          const hy = hyphenate(ln) ? "-" : "";
           let cut = ln.length;
-          while (cut > 1 && ctx.measureText(ln.slice(0, cut) + "-").width > maxW) cut--;
-          out.push(ln.slice(0, cut) + "-"); ln = ln.slice(cut);
+          while (cut > 1 && ctx.measureText(ln.slice(0, cut) + hy).width > maxW) cut--;
+          out.push(ln.slice(0, cut) + hy); ln = ln.slice(cut);
         }
         if (ln) out.push(ln);
       }
@@ -248,7 +339,7 @@
        Without this, a word like "deteriorates" gets chopped in half, which
        looks like a bug to everyone in the room. Breaking a word is the last
        resort, not the first. */
-    const words = String(text).split(/\s+/).filter(Boolean);
+    const words = tokens.map(t => t.trim()).filter(Boolean);
     const widest = fs => {
       ctx.font = `${opts.weight || 600} ${fs}px ${family}`;
       return words.reduce((m, w) => Math.max(m, ctx.measureText(w).width), 0);
@@ -283,7 +374,7 @@
     return { size, lines: lines.length };
   }
 
-  window.Jigsaw = { piecePath, noteSVG, problemSVG, layoutText, colorFor, tint, ROLE_MARK };
+  window.Jigsaw = { piecePath, noteSVG, postitSVG, problemSVG, layoutText, colorFor, tint, ROLE_MARK };
   if (typeof module !== "undefined" && module.exports)
     module.exports = { piecePath, edgePath };
 })();

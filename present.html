@@ -50,6 +50,11 @@
   /* The cards shrink as more problem groups arrive, so 8 groups still fit on
      one projected screen. You cannot scroll a projector. */
   .problems { display:grid; gap:1.6vh; height:100%; align-content:center; padding-bottom:6vh; }
+  /* grouped view: every problem is a jigsaw piece, laid out in a grid */
+  .problems.pieces { grid-template-columns: repeat(var(--cols, 2), 1fr); gap: 1vh 1vw; align-items: stretch; padding-bottom: 2vh; }
+  .problem-piece { position: relative; min-height: 0; display: grid; place-items: center; }
+  .problem-piece svg { width: 100%; height: 100%; max-height: 100%; }
+  .spot-problem svg { width: 100%; height: 100%; }
   .problems[data-n="6"] .stmt, .problems[data-n="7"] .stmt { font-size:clamp(15px,1.72vw,30px); }
   .problems[data-n="8"] .stmt, .problems[data-n="9"] .stmt,
   .problems[data-n="10"] .stmt { font-size:clamp(14px,1.5vw,26px); }
@@ -240,34 +245,61 @@
         <p class="sub">Every one of these came from what you wrote</p></div>
       <div class="slide-body" style="overflow:hidden"><div class="problems" id="problemList"></div></div>`;
   }
+  const GROUP_PALETTE = ["#7FB3D5","#E9A06B","#8FCFA8","#C59BD1","#E5CE7A","#84C5C5","#E39A9A","#A9A3D8"];
+  function groupColor(i) { return GROUP_PALETTE[i % GROUP_PALETTE.length]; }
+
+  /* One grouped problem as a jigsaw piece. Drawn at a nominal size and scaled
+     by the browser, so the same piece works as a small tile on the problems
+     slide and as the big spotlight piece on the brainstorm slide. */
+  function problemPiece(g, i, opts) {
+    opts = opts || {};
+    const W = 440, H = opts.tall ? 300 : 250;
+    const st = Store.state;
+    const cs = st.concerns.filter(c => c.group_id === g.id);
+    const ss = st.solutions.filter(x => x.group_id === g.id);
+    const neph = cs.filter(c => c.discipline === "nephro").length;
+    const pall = cs.filter(c => c.discipline === "palliative").length;
+    const accent = groupColor(i);
+    const { svg } = Jigsaw.problemSVG({ width: W, height: H, accent });
+    const NS = "http://www.w3.org/2000/svg";
+    const txt = (str, x, y, size, fill, weight, anchor) => {
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("x", x); t.setAttribute("y", y);
+      t.setAttribute("font-size", size); t.setAttribute("fill", fill);
+      t.setAttribute("font-weight", weight || 600);
+      if (anchor) t.setAttribute("text-anchor", anchor);
+      t.setAttribute("font-family", 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif');
+      t.textContent = str; svg.appendChild(t);
+    };
+    txt(g.id, W * 0.13, H * 0.2, 15, accent, 800);
+    txt(ss.length + " idea" + (ss.length === 1 ? "" : "s"), W * 0.87, H * 0.2, 15, "#8A94A8", 600, "end");
+    Jigsaw.layoutText(svg, g.problem_statement || g.label,
+      { x: W * 0.13, y: H * 0.25, w: W * 0.74, h: H * 0.48 },
+      { size: opts.tall ? 24 : 20, min: 11, fill: "#fff", weight: "700" });
+    // footer sits above the bottom notch, which bites 13% into the piece
+    txt(`${cs.length} concern${cs.length===1?"":"s"} · ${neph} nephrology · ${pall} palliative care`,
+        W * 0.13, H * 0.8, 12.5, "#8A94A8", 500);
+    return svg;
+  }
+
   function fillProblems() {
     const host = $("problemList");
     if (!host) return;
     const groups = Store.state.groups || [];
     if (!groups.length) {
+      host.className = "problems";
       host.innerHTML = `<p class="sub" style="text-align:center">
         Waiting for the grouped problems to be brought back in…</p>`;
       return;
     }
-    const palette = ["#7FB3D5","#E9A06B","#8FCFA8","#C59BD1","#E5CE7A","#84C5C5","#E39A9A","#A9A3D8"];
-    host.dataset.n = Math.min(groups.length, 10);
+    host.className = "problems pieces";
+    host.style.setProperty("--cols", groups.length <= 4 ? 2 : groups.length <= 6 ? 3 : 4);
     host.replaceChildren();
     groups.forEach((g, i) => {
-      const cs = Store.state.concerns.filter(c => c.group_id === g.id);
-      const ss = Store.state.solutions.filter(s => s.group_id === g.id);
-      const neph = cs.filter(c => c.discipline === "nephro").length;
-      const pall = cs.filter(c => c.discipline === "palliative").length;
-      const card = document.createElement("div");
-      card.className = "problem-card";
-      card.innerHTML = `
-        <div class="tag" style="background:${palette[i % palette.length]}">${escapeHtml(g.id)}</div>
-        <div>
-          <div class="stmt">${escapeHtml(g.problem_statement || g.label)}</div>
-          <div class="from">from ${cs.length} concern${cs.length===1?"":"s"}
-            — ${neph} nephrology, ${pall} palliative care</div>
-        </div>
-        <div class="counts"><b>${ss.length}</b>idea${ss.length===1?"":"s"}</div>`;
-      host.appendChild(card);
+      const cell = document.createElement("div");
+      cell.className = "problem-piece";
+      cell.appendChild(problemPiece(g, i));
+      host.appendChild(cell);
     });
   }
 
@@ -276,7 +308,28 @@
     el.innerHTML = `
       <div class="slide-head"><h2 id="solveH">Closing the gaps</h2>
         <p class="sub" id="solveSub">Pick a gap on your phone and add your idea</p></div>
-      <div class="slide-body"><div class="board" id="board"></div></div>`;
+      <div class="slide-body"><div id="solveBody" style="height:100%;position:relative"></div></div>`;
+    solveLayout = null;
+  }
+  let solveLayout = null;   // "wall" or "spot:<group id>", so we only rebuild on change
+
+  /* With no spotlight the brainstorm is a plain post-it wall. With one, the
+     grouped problem sits on the left as a jigsaw piece and the ideas for it
+     pile up as post-its on the right — pieces only once something is grouped. */
+  function layoutSolve(spotGroup, idx) {
+    const body = $("solveBody");
+    if (!body) return;
+    const want = spotGroup ? "spot:" + spotGroup.id : "wall";
+    if (solveLayout === want) return;
+    solveLayout = want;
+    if (!spotGroup) {
+      body.innerHTML = `<div class="board" id="board"></div>`;
+    } else {
+      body.innerHTML = `<div class="spotlight-wrap">
+        <div class="spot-problem" id="spotProblem"></div>
+        <div class="spot-solutions board" id="board"></div></div>`;
+      $("spotProblem").appendChild(problemPiece(spotGroup, idx, { tall: true }));
+    }
   }
 
   function buildClosing(el) {
@@ -346,10 +399,9 @@
     const originX = (W - cols * cellW) / 2;
     const originY = (H - Math.ceil(shown.length / cols) * cellH) / 2;
 
-    /* A piece's tab sticks out beyond the rectangle, so the drawing is wider
-       than the piece. Without allowing for that overhang the last column gets
-       cut off at the edge of the screen. */
-    const overhang = Math.max(pw, ph) * 0.22;
+    /* A post-it has no tab, so the only overhang is the drawing's own small
+       shadow margin. */
+    let overhang = 10;
 
     board.replaceChildren();
     shown.forEach((n, i) => {
@@ -362,17 +414,17 @@
       holder.style.top  = (originY + r * cellH + (cellH - ph) / 2 - overhang) + "px";
       holder.style.animationDelay = Math.min(i * 12, 500) + "ms";
 
-      const { svg, ink } = Jigsaw.noteSVG({
-        kind, discipline: n.discipline, role: n.role, width: pw, height: ph
+      /* Before grouping, every note is a plain post-it — the jigsaw shapes
+         are saved for the grouped view, where fitting together means something. */
+      // an idea carries the id of the gap it answers, in that gap's colour
+      const gi = kind === "solution" ? (Store.state.groups || []).findIndex(g => g.id === n.group_id) : -1;
+      const { svg, ink, pad } = Jigsaw.postitSVG({
+        discipline: n.discipline, role: n.role, width: pw, height: ph,
+        tag: gi >= 0 ? n.group_id : null, tagColor: gi >= 0 ? groupColor(gi) : null
       });
-      /* A concern has a bite taken out of its right-hand edge, so its text has
-         to stop short of that. A solution's tab sticks OUTWARDS, leaving the
-         body whole, so its text can run nearly the full width. */
-      const inset = kind === "concern"
-        ? { x: pw * 0.07, w: pw * 0.66 }
-        : { x: pw * 0.08, w: pw * 0.84 };
+      overhang = pad;
       Jigsaw.layoutText(svg, n.body,
-        { x: inset.x, y: ph*0.1, w: inset.w, h: ph*0.8 },
+        { x: pw * 0.08, y: ph * 0.2, w: pw * 0.84, h: ph * 0.7 },
         { size: Math.max(11, Math.round(ph/8.4)), min: 9, fill: ink, weight: "600" });
       holder.appendChild(svg);
       board.appendChild(holder);
@@ -436,12 +488,14 @@
     if (s.key === "solve") {
       const spot = st.room && st.room.spotlight_group;
       const g = (st.groups || []).find(g => g.id === spot);
-      setText("solveH", g ? g.problem_statement : "Closing the gaps");
+      // the spotlight piece carries the full statement; keep the heading short
+      setText("solveH", g ? "Closing gap " + g.id + (g.label ? " — " + g.label : "") : "Closing the gaps");
       setText("solveSub", g
         ? "Everyone on this one — add your idea"
         : "Pick a gap on your phone and add your idea");
-      const list = spot
-        ? st.solutions.filter(s2 => s2.group_id === spot)
+      layoutSolve(g || null, (st.groups || []).indexOf(g));
+      const list = g
+        ? st.solutions.filter(s2 => s2.group_id === g.id)
         : st.solutions;
       renderBoard(list, "solution");
     }

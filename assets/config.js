@@ -123,5 +123,14 @@ window.CONFIG = {
      --------------------------------------------------------------------------
      Set to "th" for Thai, "en" for English, "both" for bilingual labels.
      ------------------------------------------------------------------------ */
-  language: "en"
+  language: "en",
+
+  /* --------------------------------------------------------------------------
+     10. WHAT LANGUAGE THE AI SHOULD WRITE THE PROBLEM STATEMENTS IN
+     --------------------------------------------------------------------------
+     Plain English name of the language, e.g. "Thai" or "English". This goes
+     straight into the prompt you copy to the AI. Labels like C-001 and G1 stay
+     as they are whatever you put here.
+     ------------------------------------------------------------------------ */
+  aiOutputLanguage: "Thai"
 };

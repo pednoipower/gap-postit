@@ -34,6 +34,10 @@ write a problem statement for each.
    rationale — those are the most valuable groups in this workshop.
 6. Do not soften or sanitise. If people wrote that something is broken, the
    problem statement should say it is broken.
+7. LANGUAGE: write "label", "problem_statement" and "rationale" in Thai, in
+   the plain everyday register clinicians use with each other. The "id"
+   values (G1, G2 …) and every C-label stay exactly as they are, in Latin
+   characters.
 
 ## Output
 

@@ -4,9 +4,10 @@ A live workshop tool for 150 people. Participants voice concerns from their
 phones, the room watches them appear on the projector, an AI groups them into
 shared problems, and the room then brainstorms how to close each gap.
 
-Concerns are jigsaw pieces with a **notch** — something missing.
-Solutions are pieces with a **tab** — something that fills a gap.
-Colour is discipline: nephrology against palliative care.
+While people are writing, every note is a plain post-it on a wall. The
+jigsaw only appears once the AI has grouped them: each shared problem becomes
+a **piece with notches** — something missing — and the ideas for closing it
+gather round it. Colour is discipline: nephrology against palliative care.
 
 ---
 
