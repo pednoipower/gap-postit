@@ -27,8 +27,8 @@ window.CONFIG = {
      The anon key is SAFE to put here. It is designed to be public. The database
      rules in supabase/schema.sql are what actually protect your data.
      ------------------------------------------------------------------------ */
-  supabaseUrl:     "https://YOUR-PROJECT-ref.supabase.co",
-  supabaseAnonKey: "PASTE-YOUR-ANON-KEY-HERE",
+  supabaseUrl:     "https://duoolujtrbrfegpmeeat.supabase.co",
+  supabaseAnonKey: "sb_publishable_E_zhmdDIV288ngVJYIVRqg_D5bZpPak",
 
   /* --------------------------------------------------------------------------
      3. FALLBACK SERVER ADDRESS
