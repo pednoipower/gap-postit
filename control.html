@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css">
+<link rel="stylesheet" href="assets/theme.css?v=202609220559">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🎛️</text></svg>">
 </head>
 <body class="control">
@@ -53,6 +53,17 @@
       </div>
       <p class="why" style="margin:11px 0 0">While the board is closed, nobody can add anything —
         useful between rounds so people watch the screen instead of typing.</p>
+    </div>
+
+    <div class="panel">
+      <h2>On the screen now</h2>
+      <p class="why" id="nowLine"></p>
+      <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#0E1118;box-shadow:var(--shadow-1)">
+        <iframe id="preview" src="present.html" title="Projector preview"
+          style="position:absolute;inset:0;width:200%;height:200%;transform:scale(.5);transform-origin:0 0;border:0;pointer-events:none"></iframe>
+      </div>
+      <p class="why" style="margin:8px 0 0;font-size:12.5px">This is the projector page itself, live. If it does not match the big screen,
+        refresh the big screen — it is running an older copy.</p>
     </div>
 
     <div class="panel">
@@ -119,12 +130,13 @@
   </div>
 </div>
 
-<script src="assets/config.js"></script>
-<script src="assets/slides.js"></script>
-<script src="assets/export.js"></script>
-<script src="assets/store-supabase.js"></script>
-<script src="assets/store-local.js"></script>
-<script src="assets/store.js"></script>
+<script src="assets/version.js?v=202609220559"></script>
+<script src="assets/config.js?v=202609220559"></script>
+<script src="assets/slides.js?v=202609220559"></script>
+<script src="assets/export.js?v=202609220559"></script>
+<script src="assets/store-supabase.js?v=202609220559"></script>
+<script src="assets/store-local.js?v=202609220559"></script>
+<script src="assets/store.js?v=202609220559"></script>
 <script>
 (function () {
   "use strict";
@@ -159,8 +171,8 @@
       else localStorage.removeItem("missingpiece.token");
       $("lockPanel").classList.add("hidden");
       $("main").classList.remove("hidden");
-      $("backendNote").textContent = Store.backend === "local"
-        ? "running on the local network" : "connected to Supabase";
+      $("backendNote").textContent = (Store.backend === "local"
+        ? "running on the local network" : "connected to Supabase") + " · build " + (window.BUILD || "?");
       start();
     } catch (e) {
       msg("lockMsg", "bad", /token/i.test(e.message)
@@ -189,6 +201,10 @@
       ? `${st.groups.length} gaps loaded: ${st.groups.map(g => g.id).join(", ")}`
       : "no gaps loaded yet";
 
+    const curS = slides[room.current_slide | 0];
+    $("nowLine").textContent = curS
+      ? `Slide ${(room.current_slide | 0) + 1} of ${slides.length}: ${curS.label} · phase "${room.phase}" · board ${room.board_open ? "OPEN" : "closed"}`
+      : "";
     $("boardToggle").setAttribute("aria-pressed", String(!!room.board_open));
     $("boardLbl").textContent = room.board_open ? "Board is OPEN" : "Board is closed";
 

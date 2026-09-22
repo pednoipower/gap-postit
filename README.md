@@ -73,6 +73,13 @@ the folder in. There is no build step, no npm install, nothing to compile.
 
 Set `joinUrl` to the address you end up with, and redeploy.
 
+**Before every deploy, run `node tools/stamp.js`.** It stamps a build id onto
+every script and stylesheet URL so that phones and laptops which had the site
+open before the deploy fetch fresh copies instead of running old code against
+the new pages. The build id shows at the bottom of the phone page and next to
+"connected to Supabase" on the control panel — if two devices show different
+builds, one of them needs a refresh.
+
 ---
 
 ## Running the workshop
