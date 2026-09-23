@@ -45,19 +45,25 @@ the same reveal. It does three jobs at once: it teaches the form, it breaks
 the ice, and it proves every phone in the room can reach the board before
 anything matters.
 
-It was chosen for its causes, not for the laugh. What people write is
-*เกรงใจคนที่เตรียมมาพูด · ไม่มีใครได้รับมอบหมายให้คุมเวลา · วาระไม่ได้กำหนดเวลา
-ของแต่ละเรื่อง* — a deference, a job nobody was given, a rule that was never
-written. That is the same shape as the reasons behind the four real gaps,
+It was chosen for its causes, not for the laugh. The chain it produces is
+*เพราะเมื่อประชุมบ่ายสาม วาระ 8 เรื่อง มีผู้บริหารอาวุโสนั่งอยู่ด้วย · ประธาน ·
+มักจะปล่อยให้เลยเวลาโดยไม่ตัดบท · เนื่องจากเกรงใจคนอาวุโสที่เตรียมมาพูด และไม่มี
+ใครได้รับมอบหมายให้คุมเวลา* — standing conditions first, then a deference and
+a job nobody was given. Same shape as the reasons behind the four real gaps,
 which is the whole point of rehearsing on it.
 
 - 90 seconds to write. The projector shows only a count.
 - **Reveal.** Read two out loud, one of each colour. Note the meta-joke:
   we will find out in 40 minutes whether we are any better.
 - Then name the machine, pointing at the screen: *ในสถานการณ์ไหน · ใคร ·
-  มักจะทำอะไร · เนื่องจากอะไร. Look at the reasons — เกรงใจ, ไม่มีใครรับผิดชอบ,
-  ไม่มีกติกา. Nobody wrote a person's name; you all wrote the system. Those
-  are exactly the kinds of reasons we need for the next four.*
+  มักจะทำอะไร · เนื่องจากอะไร. Nobody wrote a person's name; you all wrote
+  the system.*
+- **Correct the first blank here, once, and you will not have to again.**
+  Somebody will have written *ไม่ได้กำหนดเวลา* as the situation. Point at it:
+  *ช่องแรกคือสิ่งที่จริงอยู่แล้วก่อนใครจะลงมือ — กี่โมง งานล้นแค่ไหน ใครนั่งอยู่ตรงนั้น
+  กติกาอะไรที่ใช้อยู่. ส่วน "ยังไม่มีกติกา" เป็นเหตุผล ใส่ช่องสุดท้าย.* This is the
+  single most valuable sentence you will say all session: it is what makes
+  the context codable afterwards.
 
 Its notes are stored (so you can see them arrive) but never exported, never
 counted on the closing slide, and never sent to the AI. To skip the round,
@@ -85,9 +91,12 @@ fill-in-the-blank, all four required:
 — in what situation, who, does or doesn't do what, because of what reason or
 missing resource. The sentence assembles itself on the phone as they type.
 *Situation / condition* is free text, prompted with *ลองระบุเงื่อนไขที่ทำให้
-ช่องว่างนี้เกิดขึ้น* and three cues — time or step · task or activity ·
-resources (staff, time, budget, information, equipment) — so people describe
-rather than classify. Context is coded afterwards with
+ช่องว่างนี้เกิดขึ้น* and four cues — time or step · task or activity ·
+resources (staff, time, budget, information, equipment) · people and rules
+(who is there, what indicator is in force) — so people describe rather than
+classify. The last cue is the one that reaches the POLICY/KPI and TEAM
+RELATIONSHIP rows of the codebook; without it people mostly write about how
+busy they were. Context is coded afterwards with
 `docs/2026-09-22-context-codebook.md`.
 People from hospitals where it already works fill the mirror image
 (*[gap] ไม่เกิดที่ รพ. ของเรา เพราะเมื่อ… ใคร จะ… เนื่องจาก…*).

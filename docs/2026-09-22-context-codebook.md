@@ -6,6 +6,24 @@ codebook. The AI first-pass prompt on the control panel uses the same codes;
 two human coders check a sample and resolve disagreements before anything is
 reported.
 
+## Which blank holds what
+
+The three blanks are not interchangeable, and the examples people are shown
+decide what lands in each. The test:
+
+| Blank | Holds | Test |
+|---|---|---|
+| **เพราะเมื่อ …** (สถานการณ์/เงื่อนไข) | the standing conditions — the hour, the load, the place, who is present, the rule or indicator already in force | it was **already true before anybody acted**, and it would still be true if the actor were replaced |
+| **ใคร มักจะ …** | what someone does or does not do | you could film it |
+| **เนื่องจาก …** | the reasoning, or the resource that is missing | it answers *why would a reasonable person do that here* |
+
+The failure to watch for: an **absent rule or tool** written into the first
+blank — *ไม่มีเกณฑ์, ไม่ได้กำหนดเวลา, ไม่มีช่องใน HIS*. That is the mechanism's
+missing resource, not the context, and when it sits in the first blank the
+chain usually says the same thing twice and names no condition at all. On the
+day, the practice round is where this is corrected: read one chain aloud and
+point at the first blank — *นี่คือสิ่งที่จริงอยู่แล้วก่อนใครจะลงมือ*.
+
 Each chain gets **one primary code** (the feature that most directly conditions
 the response) and any number of secondary codes.
 
