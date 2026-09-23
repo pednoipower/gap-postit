@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230750">
+<link rel="stylesheet" href="assets/theme.css?v=202609230756">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -142,18 +142,18 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609230750"></script>
-<script src="assets/config.js?v=202609230750"></script>
-<script src="assets/strings.js?v=202609230750"></script>
-<script src="assets/slides.js?v=202609230750"></script>
-<script src="assets/qrcode.js?v=202609230750"></script>
-<script src="assets/timer.js?v=202609230750"></script>
-<script src="assets/highlight.js?v=202609230750"></script>
-<script src="assets/paper.js?v=202609230750"></script>
-<script src="assets/wordcloud.js?v=202609230750"></script>
-<script src="assets/store-supabase.js?v=202609230750"></script>
-<script src="assets/store-local.js?v=202609230750"></script>
-<script src="assets/store.js?v=202609230750"></script>
+<script src="assets/version.js?v=202609230756"></script>
+<script src="assets/config.js?v=202609230756"></script>
+<script src="assets/strings.js?v=202609230756"></script>
+<script src="assets/slides.js?v=202609230756"></script>
+<script src="assets/qrcode.js?v=202609230756"></script>
+<script src="assets/timer.js?v=202609230756"></script>
+<script src="assets/highlight.js?v=202609230756"></script>
+<script src="assets/paper.js?v=202609230756"></script>
+<script src="assets/wordcloud.js?v=202609230756"></script>
+<script src="assets/store-supabase.js?v=202609230756"></script>
+<script src="assets/store-local.js?v=202609230756"></script>
+<script src="assets/store.js?v=202609230756"></script>
 <script>
 (function () {
   "use strict";
@@ -288,22 +288,16 @@
       e.setAttribute("font-family", '"Bai Jamjuree", "Sarabun", ui-sans-serif, system-ui, -apple-system, "Noto Sans Thai", sans-serif');
       e.textContent = str; svg.appendChild(e);
     };
-    /* The label is the headline (it is a full sentence now) and the survey
-       number sits under it in the accent colour. The longer problem statement
-       lives on the phone and in the export. */
+    /* The gap is the whole card: one sentence, with the words that matter
+       picked out. The numbers behind it are the facilitator's to quote out
+       loud — they are in config.js and in the export, not on the wall. */
     txt(opts.practice ? t("practice_badge") : g.id, W * 0.075, H * 0.15, 14, accent, 800);
     const counts = opts.blind ? "" : `${helps} · ${needs}` + (ideas ? ` · ${ideas}` : "");
     if (counts) txt(counts, W * 0.925, H * 0.15, 14, "#a9cdb9", 600, "end");
     Paper.layoutText(svg, g.label || g.problem_statement,
-      { x: W * 0.075, y: H * 0.24, w: W * 0.85, h: H * 0.40 },
-      { size: opts.tall ? 26 : 24, min: 13, fill: "#fff", weight: "700",
+      { x: W * 0.075, y: H * 0.22, w: W * 0.85, h: H * 0.62 },
+      { size: opts.tall ? 28 : 26, min: 14, fill: "#fff", weight: "700",
         mark: { text: Highlight.forLabel(g.label), fill: "#ec88ac" } });
-    if (g.stat) {
-      // the survey number: "this is known, and it is not just you"
-      Paper.layoutText(svg, g.stat,
-        { x: W * 0.075, y: H * 0.66, w: W * 0.85, h: H * 0.26 },
-        { size: opts.tall ? 15 : 14, min: 10, fill: accent, weight: "700" });
-    }
     return svg;
   }
 

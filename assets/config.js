@@ -170,6 +170,11 @@ window.CONFIG = {
      maxGroups is only used by the after-the-day AI grouping step.
      ------------------------------------------------------------------------ */
   maxGroups: 6,
+  // `stat` is no longer shown on any screen — not on the projector and not on
+  // the phone. It stays here and in the export so you can quote a number out
+  // loud when it helps, and so the analysis keeps the evidence each gap came
+  // from. See docs/2026-09-22-gaps-from-presurvey.md.
+  //
   // The four gaps below are the four site-level indicators with the most
   // Unmet results in the pre-survey of the 16 pilot hospitals (Sept 2026),
   // one indicator each, not merged. Each maps to one question on the survey

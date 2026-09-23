@@ -16,8 +16,10 @@ Nothing is analysed in the room.
 
 ## The day before
 
-- [ ] `config.js` → `seedThemes`: the four gaps, their survey numbers and
-      the program's proposals read correctly in Thai.
+- [ ] `config.js` → `seedThemes`: the four gaps read correctly in Thai, and
+      their `highlight` phrases appear in each label word for word. The
+      `stat` and `proposal` lines are not shown to anyone — they are for you
+      and for the export.
 - [ ] `control.html` → unlock. The gaps are written into the room for you —
       check the projector's gaps slide shows all four with their numbers.
 - [ ] `config.js` → `practice`: the warm-up gap and its own WHO list read
@@ -71,12 +73,13 @@ Its notes are stored (so you can see them arrive) but never exported, never
 counted on the closing slide, and never sent to the AI. To skip the round,
 set `practice: null` in `config.js`.
 
-## 0:07 — The four gaps from the pre-survey (2 min)
+## 0:07 — The four gaps (2 min)
 
-Slide 3. Four cards, each with its survey number in colour. *These are what
-16 hospitals told us. They have numbers. None of them is about any one
-person — and the survey can't tell us why. You can.* Phones show the same
-list.
+Slide 3. Four cards, each one sentence with its key words picked out. The
+numbers behind them are **not** on screen: they are in `config.js` and in the
+export, and they are yours to use out loud if a room needs convincing —
+*สองในสิบหกโรงพยาบาลเท่านั้นที่มีระบบคัดกรองที่ใช้ประจำ*. What the screen says
+is simply what we are here to work on. Phones show the same four.
 
 ## 0:09 — Four gaps, 7½ minutes each (30 min)
 
@@ -85,7 +88,7 @@ For each gap, three slides: **why**, two minutes of **turn and talk**, then
 projector shows the same seconds; **Pause** (or <kbd>P</kbd>) stops both at
 once, **Reset** puts the round back to 0:00.
 
-**WHY (2½ min).** The phone shows the gap and its number and first asks,
+**WHY (2½ min).** The phone shows the gap and first asks,
 about their own week rather than about the hospital's paperwork: *ยังเจอแบบนี้
 อยู่* or *ไม่ค่อยเจอ — ที่นี่มีวิธีรับมืออยู่แล้ว*. Then a
 fill-in-the-blank, all four required:
