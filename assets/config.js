@@ -214,12 +214,13 @@ window.CONFIG = {
      form with no box for it. A warm-up whose causes are a building or a
      broken machine teaches the wrong chain, however funny it is.
 
-     An unanswered message in the ward's group chat qualifies: everybody has
-     watched one scroll past, no profession is singled out, and the reasons
-     people give — ทุกคนคิดว่าคงมีคนอื่นตอบ, ไม่ได้ระบุว่าใครต้องทำอะไร, ไม่มี
-     ข้อตกลงว่าเรื่องด่วนส่งอย่างไร — are the same shape as the reasons behind
-     the four real gaps. It also has an honest opposite: some teams really do
-     answer, and they can say why.
+     Urgent work announced today to start tomorrow qualifies: everybody in
+     Thai healthcare has lived it, no profession is singled out, and what it
+     surfaces is how work is organised — how instructions travel, who turns
+     them into tasks, whether responsibility is named, and whether there is a
+     trusted way to ask. The reasons people give are the same shape as the
+     reasons behind the four real gaps. It also has an honest opposite: some
+     teams do absorb a same-day change cleanly, and they can say why.
 
      Its notes are stored (that is the point — you can see them arrive) but
      they are left out of every export, of the closing counts and of the AI
@@ -229,19 +230,19 @@ window.CONFIG = {
      ------------------------------------------------------------------------ */
   practice: {
     id:      "G0",
-    label:   "ข้อความสำคัญในกลุ่มงานมักไม่มีคนตอบ",
-    problem: "รอบซ้อม — เรื่องใกล้ตัวที่ทุกคนเคยเจอ",
-    /* The WHO list has the same shape as the clinical one — the person doing
-       the task, the people on the receiving end, someone senior, whoever
-       happens to be on duty, the system — so the warm-up rehearses the real
-       list as well as the real sentence. */
+    label:   "งานด่วนมักแจ้งวันนี้และให้เริ่มพรุ่งนี้",
+    problem: "รอบซ้อม — เรื่องคุ้น ๆ ในระบบสุขภาพไทย",
+    /* The WHO list has the same shape as the clinical one — someone senior,
+       whoever passes the work on, the people who have to do it, a
+       coordinator, the system — so the warm-up rehearses the real list as
+       well as the real sentence. */
     actors: [
-      { id: "p_sender", label: "คนส่งข้อความ" },
-      { id: "p_member", label: "คนในกลุ่ม" },
-      { id: "p_chief",  label: "หัวหน้า/ผู้รับผิดชอบ" },
-      { id: "p_onduty", label: "คนที่อยู่เวรตอนนั้น" },
-      { id: "p_system", label: "ระบบ/ผู้บริหาร รพ." },
-      { id: "p_other",  label: "อื่น ๆ" }
+      { id: "p_chair",   label: "ผู้บริหาร/หัวหน้า" },
+      { id: "p_speaker", label: "คนส่งเรื่อง" },
+      { id: "p_member",  label: "คนทำงานหน้างาน" },
+      { id: "p_sec",     label: "ผู้ประสานงาน" },
+      { id: "p_system",  label: "ระบบ/ผู้บริหาร รพ." },
+      { id: "p_other",   label: "อื่น ๆ" }
     ]
   },
 

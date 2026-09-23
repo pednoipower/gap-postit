@@ -67,9 +67,9 @@
                         en: "“The nephrologist usually doesn't assess who CKM would suit, when the Wednesday clinic has 80 patients and one doctor, because there are no agreed criteria and no box to record it in the HIS.”" },
     worked_works:     { th: "“โรงพยาบาลยังไม่มีระบบคัดกรองผู้ป่วยที่เหมาะกับ CKM — <b>ไม่ค่อยเจอในงานของเรา</b>: <b>พยาบาลไต มักจะ</b> ชวนคุยเรื่องทางเลือกตั้งแต่ stage 4 <b>ตอนที่</b> คลินิกไตวันอังคารมีพยาบาล PC มาร่วมทุกสัปดาห์ <b>เพราะ</b> มีช่องในแบบฟอร์ม และหัวหน้าติดตามทุกเดือน”",
                         en: "“The renal nurse opens the options conversation at stage 4, when the Tuesday clinic has the PC nurse sitting in, because there's a box on the form and the head checks monthly.”" },
-    worked_cause_p:   { th: "“ข้อความสำคัญในกลุ่มงานมักไม่มีคนตอบ — <b>ยังเจอในงานของเรา</b>: <b>คนในกลุ่ม มักจะ</b> อ่านแล้วไม่ได้ตอบ <b>ตอนที่</b> มีข้อความยาวส่งมาตอนเย็นก่อนวันหยุด โดยไม่ได้ระบุว่าใครต้องทำอะไร <b>เพราะ</b> ทุกคนคิดว่าคงมีคนอื่นตอบ และไม่แน่ใจว่าข้อความนั้นต้องการคำตอบหรือไม่”",
+    worked_cause_p:   { th: "“งานด่วนมักแจ้งวันนี้และให้เริ่มพรุ่งนี้ — <b>ยังเจอในงานของเรา</b>: <b>คนทำงานหน้างาน มักจะ</b> ทำไปก่อนทั้งที่ยังไม่แน่ใจว่าต้องทำอย่างไร <b>ตอนที่</b> มีข้อความส่งต่อกันหลายทอดตอนเย็น และให้เริ่มใช้เช้าวันถัดไป <b>เพราะ</b> ไม่มีคนสรุปว่างานเปลี่ยนตรงไหน ใครต้องทำ และถ้าสงสัยให้ถามใคร”",
                         en: "“The 3pm meeting with eight items and a senior director in the room: the chair lets it run over, because nobody wants to cut off a senior who prepared, and nobody was given the job of keeping time.”" },
-    worked_works_p:   { th: "“ข้อความสำคัญในกลุ่มงานมักไม่มีคนตอบ — <b>ไม่ค่อยเจอในงานของเรา</b>: <b>คนส่งข้อความ มักจะ</b> ระบุชื่อคนที่ต้องตอบและเวลาที่ต้องการคำตอบ <b>ตอนที่</b> ส่งเรื่องด่วนในกลุ่มงานช่วงเวรบ่าย <b>เพราะ</b> ทีมตกลงวิธีส่งเรื่องด่วนไว้แล้ว และทุกคนตอบรับด้วยคำสั้น ๆ”",
+    worked_works_p:   { th: "“งานด่วนมักแจ้งวันนี้และให้เริ่มพรุ่งนี้ — <b>ไม่ค่อยเจอในงานของเรา</b>: <b>ผู้ประสานงาน มักจะ</b> สรุปสิ่งที่ต้องทำ ผู้รับผิดชอบ และช่องทางถามกลับ <b>ตอนที่</b> มีเรื่องใหม่ที่ต้องเริ่มใช้ภายในวันถัดไป <b>เพราะ</b> ทีมตกลงไว้ชัดว่าใครรับเรื่อง ใครแปลงเป็นงาน และใครยืนยันก่อนเริ่มใช้”",
                         en: "“…rarely happens on Monday mornings when everyone is due on the ward at nine: the secretary warns at two minutes and closes the item, because the rule was agreed beforehand and the boss keeps it.”" },
     situ_nudge:       { th: "ช่วยเล่าให้เห็นภาพอีกนิดได้ไหม — เกิดเมื่อไร ที่ไหน และตอนนั้นมีใครอยู่บ้าง", en: "Could you make it a bit more concrete — when, where, who was there?" },
 
@@ -83,13 +83,13 @@
     // practice round
     practice_badge:   { th: "รอบซ้อม",                                       en: "Practice round" },
     practice_note:    { th: "รอบซ้อม — ใช้ประโยคเดียวกับรอบจริง แต่ไม่นำคำตอบไปรวมกับรอบจริง", en: "Practice — the same sentence as the real rounds, and it is not kept as data" },
-    situ_hint_p:      { th: "เช่น ข้อความยาวส่งมาตอนเย็นก่อนวันหยุด โดยไม่ได้ระบุชื่อคนรับ", en: "e.g. a 3pm meeting, eight items, a senior director in the room" },
-    situ_hint_works_p:{ th: "เช่น ส่งเรื่องด่วนในกลุ่มงานช่วงเวรบ่าย ขณะที่ผู้รับผิดชอบอยู่ครบ",    en: "e.g. Monday morning, when everyone has to be on the ward at nine" },
-    does_hint_p:      { th: "เช่น อ่านแล้วไม่ได้ตอบ",                       en: "e.g. lets it run past time without cutting in" },
-    does_works_hint_p:{ th: "เช่น ระบุชื่อคนที่ต้องตอบและเวลาที่ต้องการคำตอบ",                en: "e.g. warns at two minutes left, then closes the item" },
-    because_hint_p:   { th: "เช่น ทุกคนคิดว่าคงมีคนอื่นตอบ และไม่แน่ใจว่าต้องตอบหรือไม่", en: "e.g. too polite to stop a senior who prepared, and nobody was given the job of keeping time" },
-    because_works_hint_p:{ th: "เช่น ทีมตกลงวิธีส่งเรื่องด่วนไว้แล้ว และทุกคนตอบรับด้วยคำสั้น ๆ",  en: "e.g. the rule was agreed beforehand and the boss keeps it" },
-    practice_lead:    { th: "เรื่องใกล้ตัวที่ทุกคนเคยเจอ — ลองเติมให้เป็นประโยคเดียว", en: "Something everyone here has met. Complete the sentence." },
+    situ_hint_p:      { th: "เช่น มีข้อความส่งต่อกันหลายทอดตอนเย็น และให้เริ่มใช้เช้าวันถัดไป", en: "e.g. a 3pm meeting, eight items, a senior director in the room" },
+    situ_hint_works_p:{ th: "เช่น มีเรื่องใหม่ที่ต้องเริ่มใช้ภายในวันถัดไป และมีผู้ประสานงานรับเรื่องชัดเจน",    en: "e.g. Monday morning, when everyone has to be on the ward at nine" },
+    does_hint_p:      { th: "เช่น ทำไปก่อนทั้งที่ยังไม่แน่ใจว่าต้องทำอย่างไร",                       en: "e.g. lets it run past time without cutting in" },
+    does_works_hint_p:{ th: "เช่น สรุปสิ่งที่ต้องทำ ผู้รับผิดชอบ และช่องทางถามกลับ",                en: "e.g. warns at two minutes left, then closes the item" },
+    because_hint_p:   { th: "เช่น ไม่มีคนสรุปว่างานเปลี่ยนตรงไหน ใครต้องทำ และถ้าสงสัยให้ถามใคร", en: "e.g. too polite to stop a senior who prepared, and nobody was given the job of keeping time" },
+    because_works_hint_p:{ th: "เช่น ทีมตกลงไว้ชัดว่าใครรับเรื่อง ใครแปลงเป็นงาน และใครยืนยันก่อนเริ่มใช้",  en: "e.g. the rule was agreed beforehand and the boss keeps it" },
+    practice_lead:    { th: "เรื่องคุ้น ๆ ในระบบสุขภาพไทย — ลองเติมให้ครบเป็นประโยคเดียว", en: "Something everyone here has met. Complete the sentence." },
 
     // HOW round
     how_title:        { th: "แล้วเราจะทำอะไร",                        en: "How would we fix it?" },

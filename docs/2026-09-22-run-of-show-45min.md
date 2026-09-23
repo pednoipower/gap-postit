@@ -36,20 +36,21 @@ where they mainly work. Say out loud: *nothing is linked to your name.*
 **Say it while they are still finding seats:** *sit next to somebody from the
 other team.* Everything after this depends on it, and it is free.
 
-## 0:03 — Practice round: the message nobody answers (4 min)
+## 0:03 — Practice round: today's notice, tomorrow's deadline (4 min)
 
-Slide 3. A gap nobody can be blamed for and everybody in this room has
-watched scroll past — *ข้อความสำคัญในกลุ่มงานมักไม่มีคนตอบ* — run through
-exactly the machinery of the real rounds: the same sentence, the same blind
-collection, the same reveal. It does three jobs at once: it teaches the form, it breaks
+Slide 3. A gap nobody can be blamed for and everybody in Thai healthcare has
+lived — *งานด่วนมักแจ้งวันนี้และให้เริ่มพรุ่งนี้* — run through exactly the
+machinery of the real rounds: the same sentence, the same blind collection,
+the same reveal. It does three jobs at once: it teaches the form, it breaks
 the ice, and it proves every phone in the room can reach the board before
 anything matters.
 
 It was chosen for its causes, not for the laugh. The chain it produces is
-*คนในกลุ่ม · มักจะอ่านแล้วไม่ได้ตอบ · ตอนที่มีข้อความยาวส่งมาตอนเย็นก่อนวันหยุด
-โดยไม่ได้ระบุว่าใครต้องทำอะไร · เพราะทุกคนคิดว่าคงมีคนอื่นตอบ และไม่แน่ใจว่า
-ข้อความนั้นต้องการคำตอบหรือไม่* — a job nobody was given and an agreement
-nobody made, under conditions anyone in the room can picture. Same shape as the reasons behind the four real gaps,
+*คนทำงานหน้างาน · มักจะทำไปก่อนทั้งที่ยังไม่แน่ใจว่าต้องทำอย่างไร · ตอนที่มี
+ข้อความส่งต่อกันหลายทอดตอนเย็น และให้เริ่มใช้เช้าวันถัดไป · เพราะไม่มีคนสรุปว่า
+งานเปลี่ยนตรงไหน ใครต้องทำ และถ้าสงสัยให้ถามใคร* — instructions travelling
+down a chain with nobody named to turn them into tasks, which is the same
+shape as the reasons behind the four real gaps. Same shape as the reasons behind the four real gaps,
 which is the whole point of rehearsing on it.
 
 - 90 seconds to write. The projector shows only a count.
