@@ -29,7 +29,10 @@ Chulalongkorn work; the mapping and the two places this tool departs from it
 are in `docs/2026-09-23-chula-nuvo-mapping.md`. The typefaces are served from
 `assets/fonts/`, because nothing here may depend on the venue's wifi.
 
-See `docs/2026-09-22-run-of-show-45min.md` for the minute-by-minute script.
+**`docs/manual.md` is how to run it** — links, the day before, the 18 slides,
+what to say, what to do when something breaks, and what to download
+afterwards. `docs/2026-09-22-run-of-show-45min.md` is the longer
+minute-by-minute script behind it.
 
 ---
 

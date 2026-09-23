@@ -5,3 +5,6 @@ server/workshop-data.json
 
 # survey results and other source documents stay off the public repo
 *.pdf
+
+# room backups taken before clearing: real answers, never in the repo
+backups/
