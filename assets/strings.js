@@ -144,8 +144,10 @@
     // projector
     pj_practice:      { th: "รอบซ้อม — ตอบในมือถือ แล้วเปิดพร้อมกันเมื่อหมดเวลา",   en: "Practice round — answer on your phone, revealed together" },
     pj_practice_rev:  { th: "รอบซ้อม — นี่คือคำตอบจากทั้งห้อง",         en: "Practice round — this is what the room's answers look like" },
+    // pj_talk: no longer on the talk slide — the gap is its title and the
+    // instruction sits in the middle. Kept for an older cached page.
     pj_talk:          { th: "หันไปคุยกับคนจากอีกทีม",                          en: "Turn to someone from the other team" },
-    pj_talk_sub:      { th: "คุยกับคนข้าง ๆ",                      en: "Talk to the person next to you" },
+    pj_talk_sub:      { th: "ลองชวนคนข้าง ๆ คุย",                      en: "Talk to the person next to you" },
     pj_talk_cue1:     { th: "ที่โรงพยาบาลของคุณเป็นแบบเดียวกันไหม",                      en: "Is it the same where you work?" },
     pj_talk_cue2:     { th: "อีกทีมเห็นอะไรที่ทีมเราไม่เห็น",                       en: "What does the other team see that we don't?" },
     pj_talk_over:     { th: "หมดเวลา — มองที่จอ",                             en: "Time's up — look up" },
