@@ -14,8 +14,14 @@ analysis.
 
 Everything on screen is paper: the gaps are cards, the notes are post-its,
 with the causes and the solutions gathering round each gap. Nothing
-interlocks. Colour is discipline — Canopy Green for nephrology, Blossom Pink
-for palliative care — and a small mark in the corner is role.
+interlocks.
+
+**Colour says what a note is** — gold for a gap people still meet, green for
+a place where it works already or a thing that already exists. **Shape says
+who wrote it**: the palliative team's paper has a folded corner. A small mark
+in the corner is role. Teams keep their colours where a team is named — the
+join screen, the who slide, the counts — but not on the notes, so the room
+reads the split it is being asked to look at.
 
 The visual design follows **Chula Nuvo**, an unofficial concept brand for
 Chulalongkorn work; the mapping and the two places this tool departs from it

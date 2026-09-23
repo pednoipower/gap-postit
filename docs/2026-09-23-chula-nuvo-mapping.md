@@ -22,13 +22,14 @@ university and uses no university emblem, and neither does this tool.
 
 ## Two deliberate departures
 
-**1. Pink is a team colour, not the single focus.** Nuvo says pink marks the
-one thing that matters, at most 15% of a layout. This board's core signal is
-which of two disciplines wrote a note, and that needs two colours of equal
-weight. Nephrology carries Canopy Green, palliative care Blossom Pink. They
-differ in lightness as well as hue, so the pair survives colour-blindness and
-a weak projector bulb, and every note also carries a role mark. Royal Gold
-stays the accent it is meant to be.
+**1. Gold carries as much of a slide as green.** Nuvo keeps Royal Gold to 5%
+of a layout. On a reveal, gold is every note describing a gap people still
+meet, which can be half the wall. It earns that: colour is what the room is
+asked to compare — still happens here against works here — and the two read
+apart at ten metres and under colour-blindness. Which team wrote a note is
+carried by the shape of the paper instead, so no third colour is needed, and
+Blossom Pink is left doing the one job Nuvo gives it: the few words picked
+out of each gap sentence.
 
 **2. The faces are served from `assets/fonts/`, not from Google.** Nuvo asks
 for the Google Fonts link. Nothing in this workshop may depend on the venue's

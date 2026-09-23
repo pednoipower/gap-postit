@@ -30,7 +30,16 @@
       Object.assign(PALETTE, c);
     }
     return PALETTE[discipline] || PALETTE.fallback ||
-           { base: "#8C8FA3", ink: "#1B1C24", glow: "#C3C6D8" };
+           { base: "#8c9792", ink: "#141a18", glow: "#d5dbd7" };
+  }
+
+  /* COLOUR says what kind of note this is, because that is the split the room
+     is being asked to look at: a gap that still happens here, against a place
+     where it does not. SHAPE says which team wrote it (see postitSVG) — two
+     signals on two channels, neither fighting the other. */
+  function kindColor(kind) {
+    const c = (window.CONFIG && window.CONFIG.kindColors) || {};
+    return c[kind] || c.fallback || colorFor(null);
   }
 
   /* Doctor / nurse / allied is shown as a small mark in the corner rather than
@@ -49,7 +58,13 @@
   function postitSVG(opts) {
     const w = opts.width || 240;
     const h = opts.height || 150;
-    const col = colorFor(opts.discipline);
+    const col = opts.kind ? kindColor(opts.kind) : colorFor(opts.discipline);
+    /* One team's paper has a folded corner. It reads from the back of a room,
+       it survives a bad bulb, and it does not need a colour of its own. */
+    const fold = opts.discipline === "palliative" ? Math.max(14, Math.min(w, h) * 0.17) : 0;
+    const body = fold
+      ? `M0,0 H${w - fold} L${w},${fold} V${h} H0 Z`
+      : `M0,0 H${w} V${h} H0 Z`;
     const pad = 10;                          // just enough for the shadow
 
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -58,27 +73,34 @@
     svg.setAttribute("height", h + pad * 2);
     svg.style.overflow = "visible";
 
-    const shadow = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    shadow.setAttribute("x", 3); shadow.setAttribute("y", 5);
-    shadow.setAttribute("width", w); shadow.setAttribute("height", h);
-    shadow.setAttribute("rx", 3);
+    const shadow = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    shadow.setAttribute("d", body);
+    shadow.setAttribute("transform", "translate(3,5)");
     shadow.setAttribute("fill", "rgba(0,0,0,.34)");
     svg.appendChild(shadow);
 
-    const paper = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    paper.setAttribute("x", 0); paper.setAttribute("y", 0);
-    paper.setAttribute("width", w); paper.setAttribute("height", h);
-    paper.setAttribute("rx", 3);
+    const paper = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    paper.setAttribute("d", body);
     paper.setAttribute("fill", tint(col.base, 0.68));
     paper.setAttribute("stroke", col.base);
     paper.setAttribute("stroke-width", "2.2");
     svg.appendChild(paper);
 
+    // the turned-back corner itself, so the fold reads as paper
+    if (fold) {
+      const dog = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      dog.setAttribute("d", `M${w - fold},0 L${w},${fold} H${w - fold} Z`);
+      dog.setAttribute("fill", tint(col.base, 0.34));
+      dog.setAttribute("stroke", col.base);
+      dog.setAttribute("stroke-width", "2.2");
+      dog.setAttribute("stroke-linejoin", "round");
+      svg.appendChild(dog);
+    }
+
     // a strip of full colour along the top, like the glue edge of a real one
     const strip = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     strip.setAttribute("x", 0); strip.setAttribute("y", 0);
-    strip.setAttribute("width", w); strip.setAttribute("height", Math.max(6, h * 0.07));
-    strip.setAttribute("rx", 3);
+    strip.setAttribute("width", w - fold); strip.setAttribute("height", Math.max(6, h * 0.07));
     strip.setAttribute("fill", col.base);
     strip.setAttribute("opacity", ".55");
     svg.appendChild(strip);

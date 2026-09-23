@@ -127,7 +127,9 @@ people.*
 
 The projector is blind: a count and the split by team. At 2:00, **Reveal**:
 each note reads as its sentence — causes on one side, *where it works, and
-why* on the other. Read out one cause from each colour, then one "works
+why* on the other. Gold paper is a gap people still meet, green paper is
+somewhere it does not, and a folded corner means the palliative team wrote
+it; the key is under the slide title. Read out one cause from each colour, then one "works
 here" if there is one: that is the room's proof it can be done. Do not
 discuss.
 

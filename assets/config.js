@@ -119,6 +119,21 @@ window.CONFIG = {
      Give each discipline a colour that survives a bad projector: strong,
      saturated, clearly different from each other.
      ------------------------------------------------------------------------ */
+  /* WHAT A NOTE'S COLOUR MEANS.
+     Green: this already works here, or already exists here.
+     Gold:  this is the gap as people meet it, or a thing that would be new.
+     Which team wrote it is carried by the SHAPE of the paper instead — the
+     palliative team's notes have a folded corner. */
+  kindColors: {
+    cause:    { base: "#c9a227", ink: "#3a2f06" },   // ยังเจอในงานของเรา
+    works:    { base: "#2e6e52", ink: "#0f2a23" },   // ไม่ค่อยเจอ — ทำได้อยู่แล้ว
+    asset:    { base: "#2e6e52", ink: "#0f2a23" },   // มีอยู่แล้วที่นี่
+    idea:     { base: "#c9a227", ink: "#3a2f06" },   // สิ่งใหม่ที่ควรเริ่มทำ
+    fallback: { base: "#8c9792", ink: "#141a18" }
+  },
+
+  /* Team colours. Used where a TEAM is named — the join screen, the who
+     slide, the counts — not on the notes themselves. */
   colors: {
     // Chula Nuvo: Canopy Green and Blossom Pink. They differ in lightness as
     // well as hue, so the two teams stay apart for colour-blind readers and

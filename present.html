@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230803">
+<link rel="stylesheet" href="assets/theme.css?v=202609230807">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -91,6 +91,15 @@
     margin-top:4vh; font-variant-numeric:tabular-nums; }
   .talk .clock.over { color:var(--gold-300); font-size:clamp(30px,4vw,74px); }
   .talk .clock.held { opacity:.45; }
+  /* what the colours and the folded corner mean, small, bottom of the slide */
+  .key { display:flex; gap:2vw; align-items:center; flex-wrap:wrap; margin-top:.9vh;
+         font-size:clamp(11px,1.05vw,17px); color:var(--green-200); }
+  .key span { display:flex; align-items:center; gap:.5em; }
+  .key i { display:inline-block; width:1.15em; height:1.15em; border-radius:2px; font-style:normal; }
+  .key i.fold { position:relative; overflow:hidden; }
+  .key i.fold::after { content:""; position:absolute; top:0; right:0; border-width:0.42em;
+    border-style:solid; border-color:var(--ink) var(--ink) transparent transparent; }
+
   .talk .gap-line { font-size:clamp(13px,1.2vw,22px); color:var(--green-200); margin-bottom:2.5vh; }
 
   .closing { display:grid; place-items:center; height:100%; text-align:center; }
@@ -142,18 +151,18 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609230803"></script>
-<script src="assets/config.js?v=202609230803"></script>
-<script src="assets/strings.js?v=202609230803"></script>
-<script src="assets/slides.js?v=202609230803"></script>
-<script src="assets/qrcode.js?v=202609230803"></script>
-<script src="assets/timer.js?v=202609230803"></script>
-<script src="assets/highlight.js?v=202609230803"></script>
-<script src="assets/paper.js?v=202609230803"></script>
-<script src="assets/wordcloud.js?v=202609230803"></script>
-<script src="assets/store-supabase.js?v=202609230803"></script>
-<script src="assets/store-local.js?v=202609230803"></script>
-<script src="assets/store.js?v=202609230803"></script>
+<script src="assets/version.js?v=202609230807"></script>
+<script src="assets/config.js?v=202609230807"></script>
+<script src="assets/strings.js?v=202609230807"></script>
+<script src="assets/slides.js?v=202609230807"></script>
+<script src="assets/qrcode.js?v=202609230807"></script>
+<script src="assets/timer.js?v=202609230807"></script>
+<script src="assets/highlight.js?v=202609230807"></script>
+<script src="assets/paper.js?v=202609230807"></script>
+<script src="assets/wordcloud.js?v=202609230807"></script>
+<script src="assets/store-supabase.js?v=202609230807"></script>
+<script src="assets/store-local.js?v=202609230807"></script>
+<script src="assets/store.js?v=202609230807"></script>
 <script>
 (function () {
   "use strict";
@@ -337,7 +346,8 @@
   /* ---- slide: one gap, WHY or HOW — blind while collecting, revealed on command ---- */
   function buildGap(el, slide) {
     el.innerHTML = `
-      <div class="slide-head"><h2 id="gapH"></h2><p class="sub" id="gapSub"></p></div>
+      <div class="slide-head"><h2 id="gapH"></h2><p class="sub" id="gapSub"></p>
+        <div class="key" id="gapKey"></div></div>
       <div class="slide-body"><div id="gapBody" style="height:100%;position:relative"></div></div>`;
     gapLayout = null;
   }
@@ -396,11 +406,24 @@
       if (!isOverall) $("gapPiece").appendChild(problemPiece(g, i, { blind: true, practice: isPractice }));
       else $("gapPiece").innerHTML = `<div style="color:var(--green-200);font-size:clamp(16px,1.8vw,30px);line-height:1.5;padding:2vw">${escapeHtml(t("overall_sub"))}</div>`;
     }
+    /* The key only matters once there are notes to read. */
+    const key = $("gapKey");
+    if (key) {
+      const kc = (cfg.kindColors || {});
+      const swatch = (c, label) =>
+        `<span><i style="background:${(kc[c]||{}).base || "#8c9792"}"></i>${escapeHtml(label)}</span>`;
+      key.innerHTML = revealed || !isWhy
+        ? swatch(isWhy ? "cause" : "idea",  t(isWhy ? "pj_key_cause" : "pj_key_idea")) +
+          swatch(isWhy ? "works" : "asset", t(isWhy ? "pj_key_works" : "pj_key_asset")) +
+          `<span><i class="fold" style="background:#d5dbd7"></i>${escapeHtml(t("pj_key_fold"))}</span>`
+        : "";
+    }
+
     if (!revealed) {
       setText("rN", live.length);
       $("rSplit").innerHTML = cfg.disciplines.map(d => {
         const n = live.filter(x => x.discipline === d.id).length;
-        return `<div style="color:${(cfg.colors[d.id]||cfg.colors.fallback).base}"><b style="display:block;font-size:1.5em">${n}</b>${escapeHtml(d.label)}</div>`;
+        return `<div style="color:var(--green-200)"><b style="display:block;font-size:1.5em;color:#fff">${n}</b>${escapeHtml(d.label)}</div>`;
       }).join("");
     }
     if ($("boardCauses")) { setText("cN", causes.length); renderBoard(causes, "cause", $("boardCauses")); }
@@ -541,7 +564,7 @@
       const tilt = (hash(n.id) % 700) / 100 - 3.5;
       holder.style.setProperty("--tilt", tilt + "deg");
       const { svg, ink, pad } = Paper.postitSVG({
-        discipline: n.discipline, role: n.role, width: pw, height: ph
+        kind: n.kind, discipline: n.discipline, role: n.role, width: pw, height: ph
       });
       holder.style.left = (originX + c * cellW + (cellW - pw) / 2 - pad) + "px";
       holder.style.top  = (originY + r * cellH + (cellH - ph) / 2 - pad) + "px";
