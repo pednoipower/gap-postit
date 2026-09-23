@@ -57,7 +57,8 @@ down a chain with nobody named to turn them into tasks, which is the same
 shape as the reasons behind the four real gaps. Same shape as the reasons behind the four real gaps,
 which is the whole point of rehearsing on it.
 
-- 90 seconds to write. The projector shows only a count.
+- 90 seconds to write. The projector shows only a count. The warm-up's notes
+  are grey: this round is not kept, and the room can see that.
 - **Reveal.** Read two out loud, one of each colour. Note the meta-joke:
   we will find out in 40 minutes whether we are any better.
 - Then name the machine, pointing at the screen: *ในสถานการณ์ไหน · ใคร ·
@@ -127,9 +128,11 @@ people.*
 
 The projector is blind: a count and the split by team. At 2:00, **Reveal**:
 each note reads as its sentence — causes on one side, *where it works, and
-why* on the other. Gold paper is a gap people still meet, green paper is
+why* on the other. Gold paper is a gap people still meet, pink paper is
 somewhere it does not, and a folded corner means the palliative team wrote
-it; the key is under the slide title. Read out one cause from each colour, then one "works
+it; the key is under the slide title. **Click any note to read it full
+screen** — the wall shows how much came back, not what it says. Click again,
+or press any key, to close it. Read out one cause from each colour, then one "works
 here" if there is one: that is the room's proof it can be done. Do not
 discuss.
 

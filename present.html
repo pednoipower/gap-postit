@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230807">
+<link rel="stylesheet" href="assets/theme.css?v=202609230813">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -112,24 +112,36 @@
     padding:9px 18px; font-size:15px; font-weight:650;
   }
 
+  /* ---- one note, opened to be read ------------------------------------
+     A wall of post-its is a picture of how much came back, not something
+     anybody at the back can read. Click one and it fills the screen. ---- */
+  .reader { position:fixed; inset:0; z-index:40; display:grid; place-items:center;
+            background:rgba(9,20,17,.72); padding:6vh 6vw; cursor:pointer; }
+  .reader-card { position:relative; max-width:76vw; max-height:80vh; overflow:auto;
+                 border-radius:0 var(--r-leaf) 0 var(--r-leaf); padding:5vh 5vw;
+                 border:3px solid var(--edge); box-shadow:var(--shadow-3); }
+  .reader-card.fold { border-top-right-radius:0; }
+  .reader-who { font-size:clamp(14px,1.4vw,24px); font-weight:600; opacity:.75; margin-bottom:2vh; }
+  .reader-main { font-size:clamp(24px,3.1vw,58px); font-weight:700; line-height:1.5; }
+  .reader-sub  { font-size:clamp(18px,2.2vw,40px); line-height:1.5; margin-top:2.5vh; opacity:.85; }
+  .reader-close { margin-top:3vh; font-size:clamp(12px,1.1vw,18px); opacity:.6; }
+
   /* ---- react slide: blind while collecting, two columns once revealed ---- */
-  .react-blind { display:grid; grid-template-columns: 1.05fr .95fr; gap:3vw; height:100%; align-items:center; }
-  .react-blind .piece { position:relative; height:78%; }
+  .react-blind { display:grid; place-items:center; height:100%; }
   .react-blind .count { text-align:center; }
   .react-blind .count .n { font-size:clamp(70px,11vw,220px); font-weight:800; line-height:1; letter-spacing:-.04em; }
   .react-blind .count .l { font-size:clamp(16px,1.8vw,30px); color:var(--green-200); margin-top:1vh; }
   .react-blind .count .split { display:flex; gap:3vw; justify-content:center; margin-top:2.4vh; font-size:clamp(14px,1.4vw,24px); color:var(--green-200); }
   .react-blind .count .split b { font-size:1.5em; display:block; }
-  .react-reveal { display:grid; grid-template-columns: .72fr 1fr 1fr; gap:2vw; height:100%; }
-  .react-reveal .piece { position:relative; align-self:center; height:70%; }
+  .react-reveal { display:grid; grid-template-columns: 1fr 1fr; gap:3vw; height:100%; }
   .react-reveal .col { display:flex; flex-direction:column; min-height:0; }
   .react-reveal .col h3 { margin:0 0 1vh; font-size:clamp(16px,1.7vw,30px); font-weight:750; display:flex; align-items:baseline; gap:.6em; }
   .react-reveal .col h3 span { font-size:.7em; color:var(--green-200); font-weight:600; }
   .react-reveal .col .board { position:relative; flex:1; }
-  .react-reveal.two { grid-template-columns: .72fr 2fr; }
+
   .react-reveal .col.causes h3 { color:var(--gold-300); }
   .react-reveal .col.works h3  { color:var(--pink-300); }
-  .react-reveal .col.fixes h3  { color:var(--pink-300); }
+  .react-reveal .col.fixes h3  { color:var(--green-100); }
   .signup { display:flex; align-items:center; gap:2vw; justify-content:center; margin-top:4vh; }
   .signup .qr { background:#fff; border-radius:16px; padding:12px; width:clamp(110px,12vw,200px); }
   .signup .qr svg { display:block; width:100%; height:auto; }
@@ -139,10 +151,17 @@
 <body class="present">
 
 <div class="toolbar">
-  <button id="tView" aria-pressed="false">Word cloud</button>
   <button id="tFull">Full screen</button>
 </div>
 
+<div id="reader" class="reader hidden" role="dialog" aria-modal="true" aria-label="อ่านโน้ตนี้">
+  <div class="reader-card" id="readerCard">
+    <div class="reader-who" id="readerWho"></div>
+    <div class="reader-main" id="readerMain"></div>
+    <div class="reader-sub" id="readerSub"></div>
+    <div class="reader-close" id="readerClose"></div>
+  </div>
+</div>
 <div id="offline" class="offline-flag hidden">ขาดการเชื่อมต่อ — กำลังลองใหม่</div>
 
 <!-- slides are created by script so the sequence follows your config -->
@@ -151,18 +170,17 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609230807"></script>
-<script src="assets/config.js?v=202609230807"></script>
-<script src="assets/strings.js?v=202609230807"></script>
-<script src="assets/slides.js?v=202609230807"></script>
-<script src="assets/qrcode.js?v=202609230807"></script>
-<script src="assets/timer.js?v=202609230807"></script>
-<script src="assets/highlight.js?v=202609230807"></script>
-<script src="assets/paper.js?v=202609230807"></script>
-<script src="assets/wordcloud.js?v=202609230807"></script>
-<script src="assets/store-supabase.js?v=202609230807"></script>
-<script src="assets/store-local.js?v=202609230807"></script>
-<script src="assets/store.js?v=202609230807"></script>
+<script src="assets/version.js?v=202609230813"></script>
+<script src="assets/config.js?v=202609230813"></script>
+<script src="assets/strings.js?v=202609230813"></script>
+<script src="assets/slides.js?v=202609230813"></script>
+<script src="assets/qrcode.js?v=202609230813"></script>
+<script src="assets/timer.js?v=202609230813"></script>
+<script src="assets/highlight.js?v=202609230813"></script>
+<script src="assets/paper.js?v=202609230813"></script>
+<script src="assets/store-supabase.js?v=202609230813"></script>
+<script src="assets/store-local.js?v=202609230813"></script>
+<script src="assets/store.js?v=202609230813"></script>
 <script>
 (function () {
   "use strict";
@@ -171,7 +189,6 @@
   const NS = "http://www.w3.org/2000/svg";
   const t = window.T.t;
 
-  $("tView").textContent = t("pj_word_cloud");
   $("tFull").textContent = t("pj_fullscreen");
 
   /* ------------------------------------------------------------------------
@@ -186,7 +203,7 @@
   const PRACTICE = Slides.practiceId(cfg);
   window.SLIDES = SLIDES;
 
-  let current = -1, viewMode = "wall";
+  let current = -1;
   const els = [];
   SLIDES.forEach(s => {
     const d = document.createElement("section");
@@ -364,6 +381,7 @@
     if (gapH) gapH.innerHTML = isOverall ? escapeHtml(t("pj_overall"))
                              : g ? Highlight.html(g.label, escapeHtml) : escapeHtml(slide.gapId);
     setText("gapSub", !g ? t("pj_waiting_gaps")
+      : isOverall ? t("overall_sub")
       : isPractice ? (revealed ? t("pj_practice_rev") : t("pj_practice"))
       : isWhy ? (revealed ? t("pj_why_revealed") : t("pj_why_blind"))
               : (revealed ? t("pj_how_revealed") : t("pj_how_blind")));
@@ -377,45 +395,45 @@
     const body = $("gapBody");
     if (gapLayout !== want) {
       gapLayout = want;
+      /* No card here: the gap is already the title of the slide, in full, with
+         its words picked out. The body is for what the room wrote. */
       if (isWhy && !revealed) {
         body.innerHTML = `<div class="react-blind">
-          <div class="piece" id="gapPiece"></div>
           <div class="count"><div class="n" id="rN">0</div><div class="l">${escapeHtml(t("pj_answers"))}</div>
             <div class="split" id="rSplit"></div></div></div>`;
       } else if (isWhy && revealed) {
         /* causes on one side; on the other, people from sites where this
            already works and what makes it work — the room's proof it can be done */
         body.innerHTML = `<div class="react-reveal">
-          <div class="piece" id="gapPiece"></div>
           <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div>
           <div class="col works"><h3>${escapeHtml(t("pj_works"))} <span id="wN"></span></h3><div class="board" id="boardWorks"></div></div></div>`;
       } else if (!isWhy && !revealed) {
         /* HOW, collecting: the causes just revealed stay on screen as
            context; the answers being written are only a count */
         body.innerHTML = `<div class="react-reveal">
-          <div class="piece" id="gapPiece"></div>
           <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div>
           <div class="count" style="align-self:center;text-align:center"><div class="n" id="rN" style="font-size:clamp(60px,9vw,180px);font-weight:800;line-height:1">0</div>
             <div class="l" style="color:var(--green-200);font-size:clamp(16px,1.7vw,28px)">${escapeHtml(t("pj_answers"))}</div><div class="split" id="rSplit" style="display:flex;gap:2vw;justify-content:center;margin-top:2vh;font-size:clamp(13px,1.3vw,22px);color:var(--green-200)"></div></div></div>`;
       } else {
         body.innerHTML = `<div class="react-reveal">
-          <div class="piece" id="gapPiece"></div>
           <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div>
           <div class="col fixes"><h3>${escapeHtml(t("pj_solutions"))} <span id="fN"></span></h3><div class="board" id="boardFixes"></div></div></div>`;
       }
-      if (!isOverall) $("gapPiece").appendChild(problemPiece(g, i, { blind: true, practice: isPractice }));
-      else $("gapPiece").innerHTML = `<div style="color:var(--green-200);font-size:clamp(16px,1.8vw,30px);line-height:1.5;padding:2vw">${escapeHtml(t("overall_sub"))}</div>`;
     }
+
     /* The key only matters once there are notes to read. */
     const key = $("gapKey");
     if (key) {
       const kc = (cfg.kindColors || {});
       const swatch = (c, label) =>
         `<span><i style="background:${(kc[c]||{}).base || "#8c9792"}"></i>${escapeHtml(label)}</span>`;
-      key.innerHTML = revealed || !isWhy
+      const foldKey = `<span><i class="fold" style="background:#d5dbd7"></i>${escapeHtml(t("pj_key_fold"))}</span>`;
+      key.innerHTML = isPractice
+        ? (revealed ? swatch("practice", t("pj_key_practice")) + foldKey : "")
+        : revealed || !isWhy
         ? swatch(isWhy ? "cause" : "idea",  t(isWhy ? "pj_key_cause" : "pj_key_idea")) +
           swatch(isWhy ? "works" : "asset", t(isWhy ? "pj_key_works" : "pj_key_asset")) +
-          `<span><i class="fold" style="background:#d5dbd7"></i>${escapeHtml(t("pj_key_fold"))}</span>`
+          foldKey
         : "";
     }
 
@@ -506,6 +524,29 @@
     return { main, sub: n.reason || "" };
   }
 
+  /* ---- the reader ---- */
+  let readerOpen = false;
+  function openNote(n) {
+    const kc = (cfg.kindColors || {})[n.group_id === PRACTICE ? "practice" : n.kind]
+             || { base: "#8c9792", ink: "#141a18" };
+    const card = $("readerCard");
+    card.style.background = Paper.tint(kc.base, 0.68);
+    card.style.color = kc.ink;
+    card.style.borderColor = kc.base;
+    card.classList.toggle("fold", n.discipline === "palliative");
+    const team = (cfg.disciplines || []).find(d => d.id === n.discipline);
+    const role = (cfg.roles || []).find(r => r.id === n.role);
+    $("readerWho").textContent = [team && team.label, role && role.label].filter(Boolean).join(" · ");
+    const { main, sub } = noteText(n, n.kind);
+    $("readerMain").textContent = main;
+    $("readerSub").textContent = sub || "";
+    $("readerClose").textContent = t("pj_reader_close");
+    $("reader").classList.remove("hidden");
+    readerOpen = true;
+  }
+  function closeNote() { $("reader").classList.add("hidden"); readerOpen = false; }
+  $("reader").addEventListener("click", closeNote);
+
   function renderBoard(notes, kind, host) {
     const board = host || $("board");
     if (!board) return;
@@ -521,17 +562,6 @@
         "color:var(--green-200);opacity:.55;font-size:clamp(14px,1.3vw,22px);padding:1vw";
       p.textContent = t("pj_none_yet");
       board.appendChild(p);
-      return;
-    }
-
-    if (viewMode === "cloud" && !host) {
-      WordCloud.render(board, notes, { max: 130 });
-      if (notes.length) {
-        const chip = document.createElement("div");
-        chip.className = "more-chip";
-        chip.textContent = notes.length;
-        board.appendChild(chip);
-      }
       return;
     }
 
@@ -564,11 +594,15 @@
       const tilt = (hash(n.id) % 700) / 100 - 3.5;
       holder.style.setProperty("--tilt", tilt + "deg");
       const { svg, ink, pad } = Paper.postitSVG({
-        kind: n.kind, discipline: n.discipline, role: n.role, width: pw, height: ph
+        kind: n.group_id === PRACTICE ? "practice" : n.kind,
+        discipline: n.discipline, role: n.role, width: pw, height: ph
       });
       holder.style.left = (originX + c * cellW + (cellW - pw) / 2 - pad) + "px";
       holder.style.top  = (originY + r * cellH + (cellH - ph) / 2 - pad) + "px";
       holder.style.animationDelay = Math.min(i * 12, 500) + "ms";
+      holder.style.cursor = "pointer";
+      holder.title = "คลิกเพื่ออ่าน";
+      holder.addEventListener("click", () => openNote(n));
 
       const { main, sub } = noteText(n, kind);
       if (sub) {
@@ -636,12 +670,6 @@
   }
 
   /* ---- toolbar ---- */
-  $("tView").addEventListener("click", () => {
-    viewMode = viewMode === "wall" ? "cloud" : "wall";
-    $("tView").textContent = viewMode === "wall" ? t("pj_word_cloud") : t("pj_wall");
-    $("tView").setAttribute("aria-pressed", String(viewMode === "cloud"));
-    refreshSlide();
-  });
   $("tFull").addEventListener("click", () => {
     document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
   });
@@ -671,9 +699,10 @@
     }
   }
   addEventListener("keydown", e => {
+    // whatever you press next, an open note gets out of the way first
+    if (readerOpen) { closeNote(); if (e.key === "Escape") { e.preventDefault(); return; } }
     if (e.key === "ArrowRight" || e.key === "PageDown") driveTo(current + 1);
     if (e.key === "ArrowLeft"  || e.key === "PageUp")   driveTo(current - 1);
-    if (e.key === "w") $("tView").click();
     if (e.key === "f") $("tFull").click();
   });
 

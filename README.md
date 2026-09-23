@@ -16,8 +16,9 @@ Everything on screen is paper: the gaps are cards, the notes are post-its,
 with the causes and the solutions gathering round each gap. Nothing
 interlocks.
 
-**Colour says what a note is** — gold for a gap people still meet, green for
-a place where it works already or a thing that already exists. **Shape says
+**Colour says what a note is** — gold for a gap people still meet, pink for a
+place where it works already or a new thing to do, green for something that
+already exists here, grey for the practice round, which is not kept. **Shape says
 who wrote it**: the palliative team's paper has a folded corner. A small mark
 in the corner is role. Teams keep their colours where a team is named — the
 join screen, the who slide, the counts — but not on the notes, so the room

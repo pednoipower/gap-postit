@@ -119,16 +119,22 @@ window.CONFIG = {
      Give each discipline a colour that survives a bad projector: strong,
      saturated, clearly different from each other.
      ------------------------------------------------------------------------ */
-  /* WHAT A NOTE'S COLOUR MEANS.
-     Green: this already works here, or already exists here.
-     Gold:  this is the gap as people meet it, or a thing that would be new.
-     Which team wrote it is carried by the SHAPE of the paper instead — the
-     palliative team's notes have a folded corner. */
+  /* WHAT A NOTE'S COLOUR MEANS. Each round puts exactly two colours on the
+     wall, and each matches the words above its column:
+       why round   gold = ยังเจอในงานของเรา · pink = ไม่ค่อยเจอ
+       how round   green = มีอยู่แล้วที่นี่   · pink = สิ่งใหม่ที่ควรเริ่มทำ
+     So gold is the gap as people meet it, green is what is already in place,
+     and pink is the way out — which is the one Nuvo reserves for what
+     matters. Which TEAM wrote a note is carried by the shape of the paper
+     instead: the palliative team's notes have a folded corner. */
   kindColors: {
     cause:    { base: "#c9a227", ink: "#3a2f06" },   // ยังเจอในงานของเรา
-    works:    { base: "#2e6e52", ink: "#0f2a23" },   // ไม่ค่อยเจอ — ทำได้อยู่แล้ว
+    works:    { base: "#d6457f", ink: "#4a132b" },   // ไม่ค่อยเจอ — ทำได้อยู่แล้ว
     asset:    { base: "#2e6e52", ink: "#0f2a23" },   // มีอยู่แล้วที่นี่
-    idea:     { base: "#c9a227", ink: "#3a2f06" },   // สิ่งใหม่ที่ควรเริ่มทำ
+    idea:     { base: "#d6457f", ink: "#4a132b" },   // สิ่งใหม่ที่ควรเริ่มทำ
+    // the warm-up round keeps out of the real palette: grey paper says
+    // "this one does not count" without anybody having to explain it
+    practice: { base: "#8c9792", ink: "#141a18" },
     fallback: { base: "#8c9792", ink: "#141a18" }
   },
 
