@@ -108,6 +108,7 @@ window.CONFIG = {
   submitCooldownSeconds: 3,     // stops one person flooding the board
   maxPerPersonPerPrompt: 5,     // how many notes one person can add per question
   talkSeconds:           60,    // the countdown on the "turn and talk" slide
+  sessionMinutes:        45,    // the session clock on the control panel
 
   /* --------------------------------------------------------------------------
      8. COLOURS

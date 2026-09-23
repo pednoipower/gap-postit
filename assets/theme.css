@@ -397,6 +397,13 @@ input.text:focus, textarea.text:focus { outline: none; border-color: var(--text-
 .note-line.ok  { background: #EAF6F0; border-color: #C5E5D6; color: #1D6B48; }
 .note-line.warn { background: #FDF6E3; border-color: #F0E0B0; color: #7A5C09; }
 
+/* a label that only a screen reader reads: the field beside it is already
+   obvious to anyone who can see it */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
 code.inline {
   background: var(--paper-2); padding: 2px 6px; border-radius: 4px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em;

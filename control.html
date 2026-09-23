@@ -4,8 +4,96 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230632">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🎛️</text></svg>">
+<link rel="stylesheet" href="assets/theme.css?v=202609230644">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
+<style>
+/* ============================================================================
+   THE CONSOLE
+   ----------------------------------------------------------------------------
+   You are standing in front of 150 people with a clock running. Everything you
+   need while the session is live is in the bar at the top and never scrolls
+   away: where you are, how many answers are in, how long you have been on this
+   slide, and ONE button that is always the right next thing to press.
+
+   Everything else — the slide list, the exports, the room admin — is behind a
+   tab, because needing it and needing the console never happen at once.
+   ========================================================================== */
+  .console {
+    position: sticky; top: 0; z-index: 30;
+    background: #fff; border: 1px solid var(--edge); border-radius: var(--r-md);
+    box-shadow: var(--shadow-2); padding: 15px 17px; margin-bottom: 14px;
+    display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 14px 20px;
+    align-items: center;
+  }
+  .console .where { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; flex-wrap: wrap; }
+  .step-chip {
+    font-size: 12.5px; font-weight: 700; color: var(--text-dim);
+    background: var(--paper-2); border-radius: 100px; padding: 4px 10px;
+    font-variant-numeric: tabular-nums;
+  }
+  .phase-chip {
+    font-size: 12.5px; font-weight: 700; border-radius: 100px; padding: 4px 11px;
+    background: var(--paper-2); color: var(--text-dim);
+  }
+  .phase-chip.collect { background: #FDF6E3; color: #7A5C09; }
+  .phase-chip.revealed { background: #EAF6F0; color: #1D6B48; }
+  .phase-chip.talk { background: #EAF1FA; color: #1F4E8C; }
+  .console h1 { margin: 0; font-size: 22px; font-weight: 750; letter-spacing: -.02em; line-height: 1.2; }
+  .console .sub { margin: 5px 0 0; font-size: 13.5px; color: var(--text-dim); line-height: 1.45; }
+
+  .meters { display: flex; gap: 10px; }
+  .meter {
+    background: var(--paper-2); border-radius: var(--r-sm); padding: 9px 13px;
+    min-width: 104px; text-align: center;
+  }
+  .meter b { display: block; font-size: 30px; font-weight: 750; line-height: 1.05;
+             letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .meter span { display: block; font-size: 11.5px; color: var(--text-dim); margin-top: 3px; }
+  .meter .split { display: flex; gap: 10px; justify-content: center; margin-top: 6px;
+                  font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .meter.over b { color: var(--bad); }
+  .meter.near b { color: #B07D06; }
+
+  .actions { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; }
+  .btn.primary {
+    min-width: 168px; min-height: 54px; font-size: 17px; width: auto;
+    padding: 14px 22px;
+  }
+  .btn.primary.reveal { background: var(--ok); }
+  .btn.step { min-height: 54px; min-width: 54px; width: auto; padding: 0 16px; font-size: 19px; }
+
+  /* the pill doubles as the state read-out, so there is one thing to look at
+     rather than a switch and a label that can disagree. NB: not ".board" —
+     that class belongs to the projector's note wall in theme.css. */
+  .toggle.board-state { min-height: 44px; }
+  .toggle.board-state[aria-pressed="false"] { background: #FBECEA; border-color: #F2CFCA; color: #8C2E25; }
+  .toggle.board-state[aria-pressed="false"] .pip { background: var(--bad); }
+
+  .tabs { display: flex; gap: 7px; margin-bottom: 14px; flex-wrap: wrap; }
+  .tab {
+    border: 2px solid var(--edge); background: #fff; border-radius: 100px;
+    padding: 10px 17px; min-height: 44px; font: inherit; font-weight: 650;
+    cursor: pointer; color: var(--text-dim);
+  }
+  .tab[aria-selected="true"] { background: var(--text); border-color: var(--text); color: #fff; }
+  .tab:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
+
+  .keys { font-size: 12.5px; color: var(--text-dim); margin: 10px 0 0; line-height: 1.7; }
+  kbd {
+    font: inherit; font-size: 12px; font-weight: 700; background: var(--paper-2);
+    border: 1px solid var(--edge); border-bottom-width: 2px; border-radius: 5px;
+    padding: 2px 7px; margin: 0 2px;
+  }
+  .danger { border-color: #E4B8B3; }
+  .danger h2 { color: #8C2E25; }
+
+  @media (max-width: 760px) {
+    .console { grid-template-columns: 1fr; }
+    .console h1 { font-size: 19px; }
+    .btn.primary { flex: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) { .btn:active:not(:disabled) { transform: none; } }
+</style>
 </head>
 <body class="control">
 <div class="control-wrap">
@@ -16,7 +104,9 @@
       when you set up the database. It is not stored anywhere in these files, so
       nobody who finds this page can drive your session.</p>
     <div class="row">
-      <input class="text" id="token" type="password" placeholder="control password" style="flex:1;min-width:220px">
+      <label for="token" class="visually-hidden">Control password</label>
+      <input class="text" id="token" type="password" placeholder="control password"
+             autocomplete="current-password" style="flex:1;min-width:220px">
       <button class="btn small" id="unlock">Unlock</button>
     </div>
     <label style="display:flex;gap:8px;align-items:center;margin-top:11px;font-size:13.5px;color:var(--text-dim)">
@@ -27,103 +117,157 @@
 
   <div id="main" class="hidden">
 
-    <div class="panel">
-      <h2>Before you start</h2>
-      <p class="why">The gaps in <code class="inline">config.js</code> are written into the room
-        automatically when you unlock this page — the projector's "gaps" slide, the gap slides and
-        the phones all read them from there, so there is nothing to load by hand.
-        <b>1.</b> Run a dry run. <b>2.</b> Clear the room so the real session starts clean;
-        a dated backup is saved first, and the gaps go straight back in.</p>
-      <div class="row">
-        <button class="btn small" id="loadGaps">Reload the gaps from config.js</button>
-        <span style="font-size:13.5px;color:var(--text-dim)" id="gapsNote"></span>
+    <!-- ---------- the console: always visible, never scrolls away ---------- -->
+    <header class="console">
+      <div>
+        <div class="where">
+          <span class="step-chip" id="stepChip">—</span>
+          <span class="phase-chip" id="phaseChip">—</span>
+          <span style="font-size:12.5px;color:var(--text-dim)" id="backendNote"></span>
+        </div>
+        <h1 id="slideTitle">—</h1>
+        <p class="sub" id="slideSub"></p>
       </div>
-      <div id="loadMsg"></div>
-      <button class="btn small ghost" id="resetBtn" style="margin-top:12px;border-color:#E4B8B3;color:#8C2E25">Clear this room</button>
-      <div id="resetMsg"></div>
-    </div>
+      <div>
+        <div class="meters">
+          <div class="meter">
+            <b id="roundCount" aria-live="polite">0</b>
+            <span id="roundLbl">answers</span>
+            <div class="split" id="roundSplit"></div>
+          </div>
+          <div class="meter" id="timerMeter">
+            <b id="timerVal">0:00</b>
+            <span id="timerLbl">on this slide</span>
+          </div>
+          <div class="meter" id="sessionMeter">
+            <b id="sessionVal">—</b>
+            <span id="sessionLbl">session</span>
+          </div>
+        </div>
+        <div class="actions" style="margin-top:11px">
+          <button class="btn step ghost" id="prev" aria-label="Previous slide" title="Previous slide (←)">←</button>
+          <button class="btn primary" id="primary">Next</button>
+          <button class="btn step ghost" id="next" aria-label="Next slide" title="Next slide (→)">→</button>
+          <button class="toggle board-state" id="boardToggle" aria-pressed="false" title="Open or close the board (B)">
+            <span class="pip"></span><span id="boardLbl">Board closed</span>
+          </button>
+        </div>
+        <div id="secondary" class="actions" style="margin-top:9px"></div>
+      </div>
+    </header>
 
-    <div class="panel">
-      <h2>Right now</h2>
-      <div class="stat-row" id="stats"></div>
-      <div class="row" style="margin-top:14px">
-        <button class="toggle" id="boardToggle" aria-pressed="false">
-          <span class="pip"></span><span id="boardLbl">Board is closed</span>
-        </button>
-        <span style="font-size:13.5px;color:var(--text-dim)" id="backendNote"></span>
-      </div>
-      <p class="why" style="margin:11px 0 0">While the board is closed, nobody can add anything —
-        useful between rounds so people watch the screen instead of typing.</p>
-    </div>
+    <nav class="tabs" role="tablist" aria-label="Control sections">
+      <button class="tab" role="tab" id="tabNow"    aria-selected="true"  aria-controls="panelNow">On screen</button>
+      <button class="tab" role="tab" id="tabSlides" aria-selected="false" aria-controls="panelSlides">Slides</button>
+      <button class="tab" role="tab" id="tabAfter"  aria-selected="false" aria-controls="panelAfter">After the day</button>
+      <button class="tab" role="tab" id="tabRoom"   aria-selected="false" aria-controls="panelRoom">Room</button>
+    </nav>
 
-    <div class="panel">
-      <h2>On the screen now</h2>
-      <p class="why" id="nowLine"></p>
-      <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#0E1118;box-shadow:var(--shadow-1)">
-        <iframe id="preview" src="present.html" title="Projector preview"
-          style="position:absolute;inset:0;width:200%;height:200%;transform:scale(.5);transform-origin:0 0;border:0;pointer-events:none"></iframe>
+    <!-- ---------- tab: what the room can see right now ---------- -->
+    <section id="panelNow" role="tabpanel" aria-labelledby="tabNow">
+      <div class="panel">
+        <h2>The projector, live</h2>
+        <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#0E1118;box-shadow:var(--shadow-1)">
+          <iframe id="preview" src="present.html" title="Projector preview"
+            style="position:absolute;inset:0;width:200%;height:200%;transform:scale(.5);transform-origin:0 0;border:0;pointer-events:none"></iframe>
+        </div>
+        <p class="why" style="margin:9px 0 0;font-size:12.5px">This is the projector page itself. If it does not match the big
+          screen, refresh the big screen — it is running an older copy.</p>
+        <p class="keys"><b>Without touching the mouse:</b>
+          <kbd>←</kbd><kbd>→</kbd> move a slide · <kbd>R</kbd> reveal, or collect again ·
+          <kbd>B</kbd> open or close the board</p>
       </div>
-      <p class="why" style="margin:8px 0 0;font-size:12.5px">This is the projector page itself, live. If it does not match the big screen,
-        refresh the big screen — it is running an older copy.</p>
-    </div>
 
-    <div class="panel">
-      <h2>Slides</h2>
-      <p class="why">The projector and every phone follow whatever you pick here. Each gap has
-        three slides — <b>why is this happening?</b>, a minute of <b>turn and talk</b>, then
-        <b>how would we fix it?</b> The two writing rounds collect
-        <b>blind</b> (the projector shows only a count) until you press <b>Reveal</b>, which
-        closes that round and shows the notes in both colours.</p>
-      <div class="slide-list" id="slideList"></div>
-      <div class="row" style="margin-top:12px">
-        <button class="btn small ghost" id="prev">← Back</button>
-        <button class="btn small" id="next">Next →</button>
-        <button class="btn small hidden" id="reveal" style="background:#2E9E6B">Reveal</button>
-        <button class="btn small ghost hidden" id="unreveal">Collect again (blind)</button>
+      <div class="panel">
+        <h2>The room so far</h2>
+        <div class="stat-row" id="stats"></div>
+        <p class="why" style="margin:12px 0 0">Counts leave out the practice round. While the board is closed nobody can
+          add anything — useful between rounds so people watch the screen instead of typing.</p>
       </div>
-    </div>
+    </section>
 
-    <div class="panel">
-      <h2>After the day — 1. Export everything</h2>
-      <p class="why">The <b>.xlsx</b> is the dataset: causes, what-we-would-do (existing
-        or new, each with why it would work), a crosstab by gap × team × role, the
-        gaps, and who was there. Every row carries team, role, setting and the
-        anonymous phone id. The <b>.txt</b> is the same notes grouped under each
-        gap, for reading or for an AI.</p>
-      <div class="row">
-        <button class="btn small" id="dlXlsx">Download .xlsx</button>
-        <button class="btn small ghost" id="cpTxt">Copy .txt</button>
-        <button class="btn small ghost" id="dlSol">Download .txt</button>
-        <button class="btn small ghost" id="dlJson">Download .json (backup)</button>
+    <!-- ---------- tab: the whole sequence ---------- -->
+    <section id="panelSlides" role="tabpanel" aria-labelledby="tabSlides" class="hidden">
+      <div class="panel">
+        <h2>Slides</h2>
+        <p class="why">The projector and every phone follow whatever you pick here. Each gap has
+          three slides — <b>why is this happening?</b>, a minute of <b>turn and talk</b>, then
+          <b>how would we fix it?</b> The two writing rounds collect <b>blind</b> (the projector
+          shows only a count) until you press <b>Reveal</b>, which closes that round and shows the
+          notes in both colours.</p>
+        <div class="slide-list" id="slideList"></div>
       </div>
-      <div id="expMsg"></div>
-    </div>
+    </section>
 
-    <div class="panel">
-      <h2>After the day — 2. A first-draft summary per gap</h2>
-      <p class="why">Analysis, not something for the room. The prompt carries the
-        instructions <i>and</i> every note; it asks the AI for a first-pass synthesis
-        per gap — causes, then what to do — kept separate by team, citing note
-        labels so every claim is traceable. Copy, paste into Claude or ChatGPT.
-        Treat the result as a draft to code from, not as findings.</p>
-      <div class="row">
-        <button class="btn small" id="copyPrompt">Copy prompt + notes</button>
-        <button class="btn small ghost" id="copyPromptOnly">Prompt only</button>
-        <span style="font-size:13.5px;color:var(--text-dim)" id="promptNote"></span>
+    <!-- ---------- tab: everything that happens afterwards ---------- -->
+    <section id="panelAfter" role="tabpanel" aria-labelledby="tabAfter" class="hidden">
+      <div class="panel">
+        <h2>1. Export everything</h2>
+        <p class="why">The <b>.xlsx</b> is the dataset: causes, what-we-would-do (existing
+          or new, each with why it would work), a crosstab by gap × team × role, the
+          gaps, and who was there. Every row carries team, role, setting and the
+          anonymous phone id. The <b>.txt</b> is the same notes grouped under each
+          gap, for reading or for an AI. The practice round is in none of them.</p>
+        <div class="row">
+          <button class="btn small" id="dlXlsx">Download .xlsx</button>
+          <button class="btn small ghost" id="cpTxt">Copy .txt</button>
+          <button class="btn small ghost" id="dlSol">Download .txt</button>
+          <button class="btn small ghost" id="dlJson">Download .json (backup)</button>
+        </div>
+        <div id="expMsg"></div>
       </div>
-      <textarea class="text" id="aiPrompt" readonly style="margin-top:11px;min-height:230px"></textarea>
-    </div>
+
+      <div class="panel">
+        <h2>2. A first-draft summary per gap</h2>
+        <p class="why">Analysis, not something for the room. The prompt carries the
+          instructions <i>and</i> every note; it asks the AI for a first-pass synthesis
+          per gap — causes, then what to do — kept separate by team, citing note
+          labels so every claim is traceable. Copy, paste into Claude or ChatGPT.
+          Treat the result as a draft to code from, not as findings.</p>
+        <div class="row">
+          <button class="btn small" id="copyPrompt">Copy prompt + notes</button>
+          <button class="btn small ghost" id="copyPromptOnly">Prompt only</button>
+          <span style="font-size:13.5px;color:var(--text-dim)" id="promptNote"></span>
+        </div>
+        <label for="aiPrompt" class="visually-hidden">The prompt that will be copied</label>
+        <textarea class="text" id="aiPrompt" readonly style="margin-top:11px;min-height:230px"></textarea>
+      </div>
+    </section>
+
+    <!-- ---------- tab: room admin, deliberately out of the way ---------- -->
+    <section id="panelRoom" role="tabpanel" aria-labelledby="tabRoom" class="hidden">
+      <div class="panel">
+        <h2>The gaps in this room</h2>
+        <p class="why">The gaps in <code class="inline">config.js</code> are written into the room
+          automatically when you unlock this page — the projector, the gap slides and the phones all
+          read them from there. Reload only if you have edited <code class="inline">config.js</code>
+          since.</p>
+        <div class="row">
+          <button class="btn small ghost" id="loadGaps">Reload the gaps from config.js</button>
+          <span style="font-size:13.5px;color:var(--text-dim)" id="gapsNote"></span>
+        </div>
+        <div id="loadMsg"></div>
+      </div>
+
+      <div class="panel danger">
+        <h2>Clear this room</h2>
+        <p class="why">For after the dry run: deletes every note and participant so the real session
+          starts clean. A dated backup is downloaded first, and the gaps go straight back in.</p>
+        <button class="btn small ghost" id="resetBtn" style="border-color:#E4B8B3;color:#8C2E25">Clear this room</button>
+        <div id="resetMsg"></div>
+      </div>
+    </section>
 
   </div>
 </div>
 
-<script src="assets/version.js?v=202609230632"></script>
-<script src="assets/config.js?v=202609230632"></script>
-<script src="assets/slides.js?v=202609230632"></script>
-<script src="assets/export.js?v=202609230632"></script>
-<script src="assets/store-supabase.js?v=202609230632"></script>
-<script src="assets/store-local.js?v=202609230632"></script>
-<script src="assets/store.js?v=202609230632"></script>
+<script src="assets/version.js?v=202609230644"></script>
+<script src="assets/config.js?v=202609230644"></script>
+<script src="assets/slides.js?v=202609230644"></script>
+<script src="assets/export.js?v=202609230644"></script>
+<script src="assets/store-supabase.js?v=202609230644"></script>
+<script src="assets/store-local.js?v=202609230644"></script>
+<script src="assets/store.js?v=202609230644"></script>
 <script>
 (function () {
   "use strict";
@@ -133,6 +277,15 @@
 
   /* One sequence, shared with the projector (assets/slides.js). */
   slides = Slides.build(cfg);
+  const PRACTICE = Slides.practiceId(cfg);
+
+  /* How long each kind of slide is meant to take, from the run of show. The
+     timer is not a rule — it is the thing that stops four gaps turning into
+     two, which is the failure mode of every workshop like this. */
+  const TARGET = { why: 150, talk: 60, how: 180, evidence: 120 };
+  const REVEAL_TARGET = 60;          // long enough to read two notes aloud
+  const SESSION_MINUTES = cfg.sessionMinutes || 45;
+  const SESSION_KEY = "missingpiece.session." + cfg.roomCode;
 
   function msg(host, kind, html) {
     $(host).innerHTML = html ? `<div class="note-line ${kind}">${html}</div>` : "";
@@ -159,7 +312,7 @@
       $("lockPanel").classList.add("hidden");
       $("main").classList.remove("hidden");
       $("backendNote").textContent = (Store.backend === "local"
-        ? "running on the local network" : "connected to Supabase") + " · build " + (window.BUILD || "?");
+        ? "local network" : "Supabase") + " · build " + (window.BUILD || "?");
       await refreshNow();
       await ensureGaps();
       start();
@@ -170,15 +323,170 @@
     }
   }
 
+  /* ---- tabs ---- */
+  const TABS = [["tabNow","panelNow"],["tabSlides","panelSlides"],["tabAfter","panelAfter"],["tabRoom","panelRoom"]];
+  function showTab(id) {
+    for (const [tab, panel] of TABS) {
+      const on = tab === id;
+      $(tab).setAttribute("aria-selected", String(on));
+      $(panel).classList.toggle("hidden", !on);
+    }
+    if (id === "tabAfter") renderPrompt();
+  }
+  TABS.forEach(([tab]) => $(tab).addEventListener("click", () => showTab(tab)));
+
+  /* ---- where are we, and what is the one right button? ------------------ */
+  function currentSlide() { return slides[(Store.state.room && Store.state.room.current_slide) | 0]; }
+  function isCollecting() {
+    const ph = Store.state.room ? Store.state.room.phase : "";
+    return ph === "why" || ph === "how";
+  }
+  function isRevealed() {
+    const ph = Store.state.room ? Store.state.room.phase : "";
+    return ph === "why_reveal" || ph === "how_reveal";
+  }
+
+  /* The slide's own words, not the room's internals: the facilitator should
+     read the same thing here as the room reads on the wall. */
+  function titleFor(s) {
+    if (!s) return "—";
+    if (s.key === "title")    return "Title and QR code";
+    if (s.key === "who")      return "Who's in the room";
+    if (s.key === "evidence") return "The four gaps";
+    if (s.key === "closing")  return "Closing";
+    if (s.gapId === Slides.OVERALL) return "Overall — ideas not about one gap";
+    const g = (Store.state.groups || []).find(x => x.id === s.gapId);
+    const what = s.phase === "why" ? "why is this happening?"
+               : s.phase === "talk" ? "turn and talk"
+               : "how would we fix it?";
+    return (s.gapId === PRACTICE ? "Practice round" : s.gapId) + " — " + what;
+  }
+  function subFor(s) {
+    if (!s || !s.gapId) return "";
+    const g = (Store.state.groups || []).find(x => x.id === s.gapId);
+    return g ? g.label : "";
+  }
+
+  /* ---- two clocks: this slide, and the whole session ---------------------
+     The slide clock is what stops a good first gap eating the fourth one.
+     The session clock is what tells you, at gap three, whether to shorten the
+     talk or drop the overall round — the decision nobody can make from memory
+     while standing up. */
+  const mmss = secs => Math.floor(secs / 60) + ":" + String(Math.floor(secs) % 60).padStart(2, "0");
+  let clockKey = null, clockStart = Date.now();
+
+  function sessionStart() {
+    try { return Number(localStorage.getItem(SESSION_KEY)) || null; } catch { return null; }
+  }
+  function markSessionStarted() {
+    if (sessionStart()) return;
+    try { localStorage.setItem(SESSION_KEY, String(Date.now())); } catch {}
+  }
+
+  function tickClock() {
+    const room = Store.state.room;
+    if (!room) return;
+    const s = currentSlide();
+    const secs = Math.floor((Date.now() - clockStart) / 1000);
+    const target = isRevealed() ? REVEAL_TARGET : (s ? TARGET[s.phase] : null);
+    $("timerVal").textContent = mmss(secs);
+    $("timerLbl").textContent = target ? "of " + mmss(target) : "on this slide";
+    const m = $("timerMeter");
+    m.classList.toggle("near", !!target && secs >= target * 0.8 && secs < target);
+    m.classList.toggle("over", !!target && secs >= target);
+
+    const started = sessionStart();
+    const sm = $("sessionMeter");
+    if (started) {
+      const el = Math.floor((Date.now() - started) / 1000);
+      $("sessionVal").textContent = mmss(el);
+      $("sessionLbl").textContent = "of " + SESSION_MINUTES + ":00";
+      sm.classList.toggle("near", el >= SESSION_MINUTES * 60 * 0.85 && el < SESSION_MINUTES * 60);
+      sm.classList.toggle("over", el >= SESSION_MINUTES * 60);
+    } else {
+      $("sessionVal").textContent = "—";
+      $("sessionLbl").textContent = "not started";
+    }
+  }
+  setInterval(tickClock, 500);
+
   /* ---- the live picture ---- */
   function render() {
     const st = Store.state, room = st.room;
     if (!room) return;
-    renderPrompt();
 
-    /* the warm-up round's notes are not data, so they are left out of these
-       counters — they still show as a note count on the practice slide */
-    const real = st.solutions.filter(x => x.group_id !== Slides.practiceId(cfg));
+    const s = currentSlide();
+    const cur = room.current_slide | 0;
+
+    // restart the slide clock whenever the room genuinely moves on, and start
+    // the session clock the first time it leaves the lobby
+    const key = cur + ":" + room.phase;
+    if (key !== clockKey) { clockKey = key; clockStart = Date.now(); }
+    if (room.phase !== "lobby") markSessionStarted();
+    tickClock();
+
+    /* ---- the console ---- */
+    $("stepChip").textContent = (cur + 1) + " / " + slides.length;
+    $("slideTitle").textContent = titleFor(s);
+    $("slideSub").textContent = subFor(s);
+
+    const chip = $("phaseChip");
+    chip.className = "phase-chip" +
+      (isCollecting() ? " collect" : isRevealed() ? " revealed" : s && s.phase === "talk" ? " talk" : "");
+    chip.textContent = isCollecting() ? "collecting · blind"
+                     : isRevealed()   ? "revealed"
+                     : s && s.phase === "talk" ? "talking · 1 min"
+                     : room.phase;
+
+    /* One primary button. While a round is collecting it reveals; everywhere
+       else it moves on. The two are never both the obvious thing to press. */
+    const p = $("primary");
+    if (isCollecting()) {
+      p.textContent = "Reveal";
+      p.classList.add("reveal");
+      p.onclick = doReveal;
+    } else {
+      p.textContent = "Next";
+      p.classList.remove("reveal");
+      p.onclick = () => goTo(cur + 1);
+    }
+
+    const sec = $("secondary");
+    sec.replaceChildren();
+    if (isRevealed()) {
+      const b = document.createElement("button");
+      b.className = "btn small ghost";
+      b.textContent = "Collect again (blind)";
+      b.onclick = doUnreveal;
+      sec.appendChild(b);
+    }
+
+    /* The meter answers the only question you have mid-round: is anything
+       coming in, and from both teams? */
+    const roundKinds = s && s.phase === "why" ? ["cause", "works"]
+                     : s && s.phase === "how" ? ["asset", "idea"] : null;
+    if (roundKinds && s.gapId) {
+      const live = st.solutions.filter(x => x.group_id === s.gapId && roundKinds.includes(x.kind));
+      $("roundCount").textContent = live.length;
+      $("roundLbl").textContent = "answers in";
+      $("roundSplit").innerHTML = (cfg.disciplines || []).map(d => {
+        const c = (cfg.colors[d.id] || cfg.colors.fallback).base;
+        return `<span style="color:${c}">${live.filter(x => x.discipline === d.id).length}</span>`;
+      }).join("");
+    } else {
+      $("roundCount").textContent = (st.participants || []).length;
+      $("roundLbl").textContent = "in the room";
+      $("roundSplit").innerHTML = (cfg.disciplines || []).map(d => {
+        const c = (cfg.colors[d.id] || cfg.colors.fallback).base;
+        return `<span style="color:${c}">${(st.participants || []).filter(x => x.discipline === d.id).length}</span>`;
+      }).join("");
+    }
+
+    $("boardToggle").setAttribute("aria-pressed", String(!!room.board_open));
+    $("boardLbl").textContent = room.board_open ? "Board open" : "Board closed";
+
+    /* ---- the room so far (practice round left out) ---- */
+    const real = st.solutions.filter(x => x.group_id !== PRACTICE);
     const voices = new Set(real.map(c => c.participant_id).filter(Boolean));
     const kind = k => real.filter(x => x.kind === k).length;
     $("stats").innerHTML = [
@@ -187,59 +495,66 @@
       ["causes", kind("cause")],
       ["where it works", kind("works")],
       ["already exists", kind("asset")],
-      ["new ideas", kind("idea")],
-      ["gaps loaded", (st.groups || []).filter(g => g.id !== Slides.OVERALL && g.id !== Slides.practiceId(cfg)).length]
+      ["new ideas", kind("idea")]
     ].map(([k, v]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
+
     $("gapsNote").textContent = (st.groups || []).length
-      ? `${st.groups.length} gaps loaded: ${st.groups.map(g => g.id).join(", ")}`
+      ? `${(st.groups || []).filter(g => g.id !== Slides.OVERALL && g.id !== PRACTICE).length} gaps loaded`
       : "the gaps are not in the room yet";
 
-    const curS = slides[room.current_slide | 0];
-    $("nowLine").textContent = curS
-      ? `Slide ${(room.current_slide | 0) + 1} of ${slides.length}: ${curS.label} · phase "${room.phase}" · board ${room.board_open ? "OPEN" : "closed"}`
-      : "";
-    $("boardToggle").setAttribute("aria-pressed", String(!!room.board_open));
-    $("boardLbl").textContent = room.board_open ? "Board is OPEN" : "Board is closed";
-
-    const cur = room.current_slide | 0;
+    /* ---- the slide list ---- */
     $("slideList").replaceChildren();
-    slides.forEach((s, i) => {
+    slides.forEach((sl, i) => {
       const b = document.createElement("button");
       b.className = "slide-btn";
       b.setAttribute("aria-current", String(i === cur));
-      const count = s.gapId && s.phase !== "talk"
-        ? st.solutions.filter(x => x.group_id === s.gapId && (s.phase === "why" ? (x.kind === "cause" || x.kind === "works") : (x.kind === "asset" || x.kind === "idea"))).length
+      const count = sl.gapId && sl.phase !== "talk"
+        ? st.solutions.filter(x => x.group_id === sl.gapId &&
+            (sl.phase === "why" ? (x.kind === "cause" || x.kind === "works")
+                                : (x.kind === "asset" || x.kind === "idea"))).length
         : null;
-      b.innerHTML = `<span class="n">${i + 1}</span><span>${escapeHtml(s.label)}</span>` +
-        (count !== null ? `<span class="meta">${count} note${count===1?"":"s"}</span>` : "");
+      b.innerHTML = `<span class="n">${i + 1}</span><span>${escapeHtml(sl.label)}</span>` +
+        (count !== null ? `<span class="meta">${count} note${count === 1 ? "" : "s"}</span>` : "");
       b.addEventListener("click", () => goTo(i));
       $("slideList").appendChild(b);
     });
-
-    const onGap = !!(slides[cur] && slides[cur].gapId);
-    const collecting = room.phase === "why" || room.phase === "how";
-    const revealed = room.phase === "why_reveal" || room.phase === "how_reveal";
-    $("reveal").classList.toggle("hidden", !(onGap && collecting));
-    $("unreveal").classList.toggle("hidden", !(onGap && revealed));
   }
 
-  /* Moving to a slide also sets the phase and the active question, so the
-     phones in the room follow along without you touching anything else. */
+  /* ---- driving the room ---- */
   async function goTo(i) {
     await Store.control(token, Slides.changesFor(slides, i));
     await refreshNow();
   }
+  /* Reveal closes the round at the same moment the projector changes, so
+     nothing written afterwards could have been shaped by what is on screen. */
+  async function doReveal() {
+    const ch = Slides.revealChanges(currentSlide(), true);
+    if (ch) { await Store.control(token, ch); await refreshNow(); }
+  }
+  async function doUnreveal() {
+    const ch = Slides.revealChanges(currentSlide(), false);
+    if (ch) { await Store.control(token, ch); await refreshNow(); }
+  }
+  async function toggleBoard() {
+    await Store.control(token, { open: !Store.state.room.board_open });
+    await refreshNow();
+  }
 
-  /* Reveal: close the gap and switch the projector to the two columns.
-     Anything written after this moment could have been shaped by what is on
-     screen, which is why the board closes at the same time. */
-  $("reveal").addEventListener("click", async () => {
-    const ch = Slides.revealChanges(slides[Store.state.room.current_slide | 0], true);
-    if (ch) { await Store.control(token, ch); await refreshNow(); }
-  });
-  $("unreveal").addEventListener("click", async () => {
-    const ch = Slides.revealChanges(slides[Store.state.room.current_slide | 0], false);
-    if (ch) { await Store.control(token, ch); await refreshNow(); }
+  $("next").addEventListener("click", () => goTo(((Store.state.room.current_slide | 0) + 1)));
+  $("prev").addEventListener("click", () => goTo(((Store.state.room.current_slide | 0) - 1)));
+  $("boardToggle").addEventListener("click", toggleBoard);
+
+  /* Keys, so the session can be run without looking down at a trackpad. */
+  document.addEventListener("keydown", e => {
+    if (!token) return;
+    const t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const cur = Store.state.room ? (Store.state.room.current_slide | 0) : 0;
+    if (e.key === "ArrowRight")      { e.preventDefault(); goTo(cur + 1); }
+    else if (e.key === "ArrowLeft")  { e.preventDefault(); goTo(cur - 1); }
+    else if (e.key === "r" || e.key === "R") { e.preventDefault(); isCollecting() ? doReveal() : isRevealed() ? doUnreveal() : null; }
+    else if (e.key === "b" || e.key === "B") { e.preventDefault(); toggleBoard(); }
   });
 
   /* ---- the gaps ----------------------------------------------------------
@@ -251,7 +566,7 @@
     // the warm-up gap goes in first so notes from the practice round have
     // somewhere to land; it is skipped by the exports and the closing counts
     const groups = cfg.practice ? [{
-      id: Slides.practiceId(cfg), label: cfg.practice.label,
+      id: PRACTICE, label: cfg.practice.label,
       problem_statement: cfg.practice.problem || cfg.practice.label,
       proposal: "", stat: "", rationale: "Practice round", source_ids: []
     }] : [];
@@ -291,7 +606,7 @@
       const r = Array.isArray(res) ? res[0] : res;
       if (r && r.ok === false) { msg("loadMsg", "bad", escapeHtml(r.message || r.error)); return false; }
       msg("loadMsg", "ok", (auto ? "Gaps written into the room from config.js: " : "Reloaded from config.js: ") +
-        escapeHtml(groups.filter(g => g.id !== Slides.OVERALL && g.id !== Slides.practiceId(cfg))
+        escapeHtml(groups.filter(g => g.id !== Slides.OVERALL && g.id !== PRACTICE)
           .map(g => g.id + " " + g.label).join(" · ")));
       await refreshNow();
       return true;
@@ -309,13 +624,6 @@
 
   $("loadGaps").addEventListener("click", () => loadGaps(false));
 
-  $("next").addEventListener("click", () => goTo((Store.state.room.current_slide | 0) + 1));
-  $("prev").addEventListener("click", () => goTo((Store.state.room.current_slide | 0) - 1));
-  $("boardToggle").addEventListener("click", async () => {
-    await Store.control(token, { open: !Store.state.room.board_open });
-    await refreshNow();
-  });
-
   /* ---- exports ---- */
   async function snap() { return Store.snapshot(); }
   const stamp = () => Exporter.stamp();
@@ -328,7 +636,7 @@
   $("dlXlsx").addEventListener("click", async () => {
     const s = await snap();
     Exporter.download(`${stamp()}-missing-piece.xlsx`, Exporter.toXLSX(s, cfg));
-    msg("expMsg", "ok", "Spreadsheet downloaded — four sheets, colour-coded.");
+    msg("expMsg", "ok", "Spreadsheet downloaded — five sheets, colour-coded.");
   });
   $("dlJson").addEventListener("click", async () => {
     const s = await snap();
@@ -360,7 +668,6 @@ RULES
 
 OUTPUT
 Thai prose with headings per gap (G1, G2, G3, G4, then ภาพรวม). Labels in Latin characters.`;
-
   function notesTXT() {
     const st = Store.state;
     return Exporter.toSolutionsTXT({ room: st.room, concerns: [], solutions: st.solutions,
@@ -371,10 +678,12 @@ Thai prose with headings per gap (G1, G2, G3, G4, then ภาพรวม). Labe
     return AI_PROMPT + "\n\n" + "=".repeat(74) + "\nTHE NOTES\n" + "=".repeat(74) + "\n\n" + notesTXT();
   }
 
-  /* Rewriting the textarea resets any selection, so only do it when the
-     concerns themselves have changed, not on every poll. */
+  /* Rewriting the textarea resets any selection, so only do it when the notes
+     themselves have changed, not on every poll — and only while the tab that
+     shows it is open. */
   let promptKey = null;
   function renderPrompt() {
+    if ($("panelAfter").classList.contains("hidden")) return;
     const st = Store.state;
     const key = st.solutions.length + ":" + (st.solutions.length ? st.solutions[st.solutions.length - 1].id : "");
     if (key === promptKey) return;
@@ -417,6 +726,7 @@ Thai prose with headings per gap (G1, G2, G3, G4, then ภาพรวม). Labe
       Exporter.download(`${stamp()}-missing-piece-backup-before-clear.json`,
         JSON.stringify(s, null, 2), "application/json");
       await Store.resetRoom(token);
+      try { localStorage.removeItem(SESSION_KEY); } catch {}
       // a cleared room is an empty room: put the gaps straight back, so the
       // real session starts with the four gaps already on the screen
       msg("resetMsg", "", "Cleared. Writing the gaps back in…");
@@ -438,6 +748,7 @@ Thai prose with headings per gap (G1, G2, G3, G4, then ภาพรวม). Labe
     Store._seen.concerns = new Set(concerns.map(c => c.id));
     Store._seen.solutions = new Set(solutions.map(s => s.id));
     render();
+    renderPrompt();
   }
 
   function start() {
