@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230833">
+<link rel="stylesheet" href="assets/theme.css?v=202609230841">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
 /* ============================================================================
@@ -275,15 +275,15 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609230833"></script>
-<script src="assets/config.js?v=202609230833"></script>
-<script src="assets/timer.js?v=202609230833"></script>
-<script src="assets/highlight.js?v=202609230833"></script>
-<script src="assets/slides.js?v=202609230833"></script>
-<script src="assets/export.js?v=202609230833"></script>
-<script src="assets/store-supabase.js?v=202609230833"></script>
-<script src="assets/store-local.js?v=202609230833"></script>
-<script src="assets/store.js?v=202609230833"></script>
+<script src="assets/version.js?v=202609230841"></script>
+<script src="assets/config.js?v=202609230841"></script>
+<script src="assets/timer.js?v=202609230841"></script>
+<script src="assets/highlight.js?v=202609230841"></script>
+<script src="assets/slides.js?v=202609230841"></script>
+<script src="assets/export.js?v=202609230841"></script>
+<script src="assets/store-supabase.js?v=202609230841"></script>
+<script src="assets/store-local.js?v=202609230841"></script>
+<script src="assets/store.js?v=202609230841"></script>
 <script>
 (function () {
   "use strict";
@@ -711,7 +711,7 @@
   /* ---- the AI prompt ---- */
   const AI_PROMPT = `You are helping analyse a 45-minute clinical workshop that brought together nephrology teams and palliative care teams from 16 Thai hospitals. Before the workshop, a pre-survey identified four gaps in how the two teams integrate care for end-stage kidney disease. In the room, for each gap, participants first said whether the gap exists at their own hospital and wrote WHY it happens there — or, if it does not exist there, WHAT MAKES IT WORK there (marked "works here") — then WHAT they would do about it — either something that already exists there (marked "already exists") or something new — and why it would work.
 
-Below is every note, grouped under its gap. WHY-round notes were written as one sentence with blanks — ใคร (actor) | มักจะ (response) | เมื่อ (situation/condition) | เพราะ (reason or missing resource) — so each one is already a candidate context–mechanism chain. HOW-round lines are: what — why it would work here.
+Below is every note, grouped under its gap. WHY-round notes were written as one sentence with blanks — ใคร (actor) | มักจะ (response) | เมื่อ (situation/condition) | เพราะ (reason or missing resource) — so each one is already a candidate context–mechanism chain. HOW-round lines are: what — why it would work here. In the final ภาพรวม round, which is not about any one gap, each line also carries a stance in square brackets: [promote] ส่งเสริม — keep and do more of it, [improve] ปรับปรุง — change it, [stop] ยกเลิก — stop doing it.
 
 The team is "nephro" or "palliative". Every note is anonymous.
 
@@ -720,7 +720,7 @@ For each gap, write a first-draft synthesis in Thai, in this order:
 1. สาเหตุ — group the WHY chains into 3–6 mechanisms of failure. For each: the typical situation or condition (เพราะเมื่อ), the actor (ใคร), the response (มักจะ), and the reason or missing resource (เนื่องจาก) — in participants' words. Tag each chain's situation with ONE primary context code from this list, using only what the participant wrote: WORKLOAD/TIME · PLACE/STRUCTURE · POLICY/KPI/MONEY · INFORMATION/RECORD · TEAM RELATIONSHIP · PATIENT/FAMILY · TEAM CAPACITY. Say whether nephrology, palliative care, or BOTH raised it, and cite the note labels.
 1b. ที่ทำได้แล้ว — what participants from hospitals WITHOUT this gap said makes it work there. Match each against the causes in part 1: which cause does it answer? These are the strongest clues about what a program should reproduce.
 2. สิ่งที่มีอยู่แล้ว — assets participants said already exist and would help, with the reasons they gave.
-3. สิ่งใหม่ที่เสนอ — new ideas, grouped, with the reasons participants gave for why they would work. Note where an idea answers a cause named in part 1.
+3. สิ่งใหม่ที่เสนอ — new ideas, grouped, with the reasons participants gave for why they would work. Note where an idea answers a cause named in part 1. For ภาพรวม, keep ส่งเสริม, ปรับปรุง and ยกเลิก apart: what the two teams want kept, changed and stopped are three different findings.
 4. จุดที่สองทีมมองต่างกัน — where the two teams gave different causes or different solutions for the same gap. This is the most important part; do not smooth it over.
 
 RULES

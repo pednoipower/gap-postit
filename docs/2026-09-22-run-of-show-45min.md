@@ -156,10 +156,23 @@ marked ✓. Read one existing and one new. Move on.
 
 Slides 5–16: for each gap, why → turn and talk → how.
 
-## 0:39 — Overall (3 min)
+## 0:39 — Overall: ส่งเสริม · ปรับปรุง · ยกเลิก (3 min)
 
-Slide 17. Same *how* format, for something the two teams should do that is
-not about any one gap. No seed. Reveal at 2:15.
+Slide 17. The last round asks a different question of everything the two
+teams already do together, and it is the only round that is not about one
+gap. The phone offers three stances, in this order:
+
+- **ส่งเสริม** — something we already do that should be kept and done more of
+- **ปรับปรุง** — something we already do that should be changed
+- **ยกเลิก** — something we should stop doing
+
+Then the same two boxes: what it is, and why that would work here. Say the
+third one out loud before you open the board — *ยกเลิกได้ด้วยนะ* — because a
+room will fill the first two and leave the third empty unless it is invited,
+and what a team wants to stop is usually the most useful thing it says.
+
+On the reveal, the three sit side by side in their own colours: green for
+ส่งเสริม, gold for ปรับปรุง, red for ยกเลิก. Reveal at 2:15.
 
 ## 0:42 — Close (3 min)
 

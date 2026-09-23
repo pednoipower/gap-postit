@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230833">
+<link rel="stylesheet" href="assets/theme.css?v=202609230841">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -134,6 +134,7 @@
   .react-blind .count .split { display:flex; gap:3vw; justify-content:center; margin-top:2.4vh; font-size:clamp(14px,1.4vw,24px); color:var(--green-200); }
   .react-blind .count .split b { font-size:1.5em; display:block; }
   .react-reveal { display:grid; grid-template-columns: 1fr 1fr; gap:3vw; height:100%; }
+  .react-reveal.three { grid-template-columns: 1fr 1fr 1fr; gap:2vw; }
   .react-reveal .col { display:flex; flex-direction:column; min-height:0; }
   .react-reveal .col h3 { margin:0 0 1vh; font-size:clamp(16px,1.7vw,30px); font-weight:750; display:flex; align-items:baseline; gap:.6em; }
   .react-reveal .col h3 span { font-size:.7em; color:var(--green-200); font-weight:600; }
@@ -170,17 +171,17 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609230833"></script>
-<script src="assets/config.js?v=202609230833"></script>
-<script src="assets/strings.js?v=202609230833"></script>
-<script src="assets/slides.js?v=202609230833"></script>
-<script src="assets/qrcode.js?v=202609230833"></script>
-<script src="assets/timer.js?v=202609230833"></script>
-<script src="assets/highlight.js?v=202609230833"></script>
-<script src="assets/paper.js?v=202609230833"></script>
-<script src="assets/store-supabase.js?v=202609230833"></script>
-<script src="assets/store-local.js?v=202609230833"></script>
-<script src="assets/store.js?v=202609230833"></script>
+<script src="assets/version.js?v=202609230841"></script>
+<script src="assets/config.js?v=202609230841"></script>
+<script src="assets/strings.js?v=202609230841"></script>
+<script src="assets/slides.js?v=202609230841"></script>
+<script src="assets/qrcode.js?v=202609230841"></script>
+<script src="assets/timer.js?v=202609230841"></script>
+<script src="assets/highlight.js?v=202609230841"></script>
+<script src="assets/paper.js?v=202609230841"></script>
+<script src="assets/store-supabase.js?v=202609230841"></script>
+<script src="assets/store-local.js?v=202609230841"></script>
+<script src="assets/store.js?v=202609230841"></script>
 <script>
 (function () {
   "use strict";
@@ -413,6 +414,17 @@
         body.innerHTML = `<div class="react-reveal">
           <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div>
           <div class="col works"><h3>${escapeHtml(t("pj_works"))} <span id="wN"></span></h3><div class="board" id="boardWorks"></div></div></div>`;
+      } else if (isOverall && !revealed) {
+        /* nothing carried over from a why round here: just the count */
+        body.innerHTML = `<div class="react-blind">
+          <div class="count"><div class="n" id="rN">0</div><div class="l">${escapeHtml(t("pj_answers"))}</div>
+            <div class="split" id="rSplit"></div></div></div>`;
+      } else if (isOverall) {
+        /* what the two teams would promote, improve and stop, side by side */
+        body.innerHTML = `<div class="react-reveal three">
+          <div class="col"><h3 style="color:${(cfg.kindColors.ov_promote||{}).base}">${escapeHtml(t("pj_ov_promote"))} <span id="pN"></span></h3><div class="board" id="boardPromote"></div></div>
+          <div class="col"><h3 style="color:${(cfg.kindColors.ov_improve||{}).base}">${escapeHtml(t("pj_ov_improve"))} <span id="iN"></span></h3><div class="board" id="boardImprove"></div></div>
+          <div class="col"><h3 style="color:${(cfg.kindColors.ov_stop||{}).base}">${escapeHtml(t("pj_ov_stop"))} <span id="sN"></span></h3><div class="board" id="boardStop"></div></div></div>`;
       } else if (!isWhy && !revealed) {
         /* HOW, collecting: the causes just revealed stay on screen as
            context; the answers being written are only a count */
@@ -434,7 +446,10 @@
       const swatch = (c, label) =>
         `<span><i style="background:${(kc[c]||{}).base || "#8c9792"}"></i>${escapeHtml(label)}</span>`;
       const foldKey = `<span><i class="fold" style="background:#d5dbd7"></i>${escapeHtml(t("pj_key_fold"))}</span>`;
-      key.innerHTML = isPractice
+      key.innerHTML = isOverall
+        ? (revealed ? swatch("ov_promote", t("pj_key_promote")) + swatch("ov_improve", t("pj_key_improve")) +
+                      swatch("ov_stop", t("pj_key_stop")) + foldKey : "")
+        : isPractice
         ? (revealed ? swatch("practice", t("pj_key_practice")) + foldKey : "")
         : revealed || !isWhy
         ? swatch(isWhy ? "cause" : "idea",  t(isWhy ? "pj_key_cause" : "pj_key_idea")) +
@@ -449,6 +464,12 @@
         const n = live.filter(x => x.discipline === d.id).length;
         return `<div style="color:var(--green-200)"><b style="display:block;font-size:1.5em;color:#fff">${n}</b>${escapeHtml(d.label)}</div>`;
       }).join("");
+    }
+    if ($("boardPromote")) {
+      const by = o => all.filter(x => x.outcome === o);
+      setText("pN", by("promote").length); renderBoard(by("promote"), "fix", $("boardPromote"));
+      setText("iN", by("improve").length); renderBoard(by("improve"), "fix", $("boardImprove"));
+      setText("sN", by("stop").length);    renderBoard(by("stop"),    "fix", $("boardStop"));
     }
     if ($("boardCauses")) { setText("cN", causes.length); renderBoard(causes, "cause", $("boardCauses")); }
     if ($("boardWorks"))  { setText("wN", works.length);  renderBoard(works, "works", $("boardWorks")); }
@@ -532,7 +553,8 @@
   /* ---- the reader ---- */
   let readerOpen = false;
   function openNote(n) {
-    const kc = (cfg.kindColors || {})[n.group_id === PRACTICE ? "practice" : n.kind]
+    const kc = (cfg.kindColors || {})[
+                 n.group_id === PRACTICE ? "practice" : n.outcome ? "ov_" + n.outcome : n.kind]
              || { base: "#8c9792", ink: "#141a18" };
     const card = $("readerCard");
     card.style.background = Paper.tint(kc.base, 0.68);
@@ -599,7 +621,7 @@
       const tilt = (hash(n.id) % 700) / 100 - 3.5;
       holder.style.setProperty("--tilt", tilt + "deg");
       const { svg, ink, pad } = Paper.postitSVG({
-        kind: n.group_id === PRACTICE ? "practice" : n.kind,
+        kind: n.group_id === PRACTICE ? "practice" : n.outcome ? "ov_" + n.outcome : n.kind,
         discipline: n.discipline, role: n.role, width: pw, height: ph
       });
       holder.style.left = (originX + c * cellW + (cellW - pw) / 2 - pad) + "px";

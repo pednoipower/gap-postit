@@ -147,6 +147,10 @@ window.CONFIG = {
     works:    { base: "#d6457f", ink: "#4a132b" },   // ไม่ค่อยเจอ — ทำได้อยู่แล้ว
     asset:    { base: "#2e6e52", ink: "#0f2a23" },   // มีอยู่แล้วที่นี่
     idea:     { base: "#d6457f", ink: "#4a132b" },   // สิ่งใหม่ที่ควรเริ่มทำ
+    // the overall round asks what to do with what we already do
+    ov_promote: { base: "#2e6e52", ink: "#0f2a23" },
+    ov_improve: { base: "#c9a227", ink: "#3a2f06" },
+    ov_stop:    { base: "#c0392b", ink: "#3d1310" },
     // the warm-up round keeps out of the real palette: grey paper says
     // "this one does not count" without anybody having to explain it
     practice: { base: "#8c9792", ink: "#141a18" },

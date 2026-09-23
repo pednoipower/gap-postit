@@ -5,15 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230833">
+<link rel="stylesheet" href="assets/theme.css?v=202609230841">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .stat-line { font-size: 14px; color: var(--gold-700); font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
   .stat-line.practice { color: var(--text-dim); font-weight: 600; }
   .stance { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .stance .choice { text-align: center; padding: 14px 10px; line-height: 1.3; }
+  .stance.three { grid-template-columns: repeat(3, 1fr); }
   .stance .choice[data-stance="asset"][aria-pressed="true"] { --pick: var(--green-500); }
   .stance .choice[data-stance="idea"][aria-pressed="true"]  { --pick: var(--primary); }
+  .stance .choice[data-stance="promote"][aria-pressed="true"] { --pick: var(--green-500); }
+  .stance .choice[data-stance="improve"][aria-pressed="true"] { --pick: var(--gold-700); }
+  .stance .choice[data-stance="stop"][aria-pressed="true"]    { --pick: var(--bad); }
   .stance .choice[data-stance="cause"][aria-pressed="true"] { --pick: var(--gold-700); }
   .stance .choice[data-stance="works"][aria-pressed="true"] { --pick: var(--green-500); }
   .field textarea.note { min-height: 84px; }
@@ -129,10 +133,7 @@
   <div class="card hidden" id="howCard">
     <label class="field">
       <span class="lbl" id="stanceLbl"></span>
-      <div class="stance">
-        <button type="button" class="choice" data-stance="asset" aria-pressed="false" id="stAsset"></button>
-        <button type="button" class="choice" data-stance="idea"  aria-pressed="false" id="stIdea"></button>
-      </div>
+      <div class="stance" id="stanceRow"></div>
     </label>
     <div id="howFields" class="hidden">
       <label class="field">
@@ -158,13 +159,13 @@
   <p class="hint center" style="opacity:.5;font-size:11px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609230833"></script>
-<script src="assets/config.js?v=202609230833"></script>
-<script src="assets/highlight.js?v=202609230833"></script>
-<script src="assets/strings.js?v=202609230833"></script>
-<script src="assets/store-supabase.js?v=202609230833"></script>
-<script src="assets/store-local.js?v=202609230833"></script>
-<script src="assets/store.js?v=202609230833"></script>
+<script src="assets/version.js?v=202609230841"></script>
+<script src="assets/config.js?v=202609230841"></script>
+<script src="assets/highlight.js?v=202609230841"></script>
+<script src="assets/strings.js?v=202609230841"></script>
+<script src="assets/store-supabase.js?v=202609230841"></script>
+<script src="assets/store-local.js?v=202609230841"></script>
+<script src="assets/store.js?v=202609230841"></script>
 <script>
 (function () {
   "use strict";
@@ -286,9 +287,7 @@
       host.appendChild(b);
     }
   }
-  $("stanceLbl").textContent = t("how_pick");
-  $("stAsset").textContent = t("how_asset");
-  $("stIdea").textContent = t("how_new");
+
 
   /* Feedback goes next to the send button, where the person is looking.
      Connection problems also go at the top, where they stay visible. */
@@ -358,18 +357,48 @@
     });
   }
 
-  /* ---- how: pick what kind of thing you are proposing ---- */
-  $("stAsset").addEventListener("click", () => setStance("asset"));
-  $("stIdea").addEventListener("click", () => setStance("idea"));
+  /* ---- how: pick what kind of thing you are proposing --------------------
+     A gap asks: does this already exist here, or would it be new? The overall
+     round asks a different question — of everything the two teams already do,
+     what should be promoted, improved, or stopped — so it offers those three
+     instead. Its answers are stored as ideas with the stance in `outcome`,
+     which needs no change to the database. */
+  const OV_STANCES = [
+    { id: "promote", label: "ov_promote", what: "ov_what_promote", why: "ov_why_promote" },
+    { id: "improve", label: "ov_improve", what: "ov_what_improve", why: "ov_why_improve" },
+    { id: "stop",    label: "ov_stop",    what: "ov_what_stop",    why: "ov_why_stop" }
+  ];
+  const GAP_STANCES = [
+    { id: "asset", label: "how_asset", what: "how_what_hint_a", why: "how_why_hint_a" },
+    { id: "idea",  label: "how_new",   what: "how_what_hint_n", why: "how_why_hint_n" }
+  ];
+  const stanceList = () => (room && room.spotlight_group === OVERALL) ? OV_STANCES : GAP_STANCES;
+
+  function renderStances() {
+    const list = stanceList();
+    const row = $("stanceRow");
+    row.classList.toggle("three", list.length === 3);
+    row.replaceChildren();
+    for (const st of list) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "choice";
+      b.dataset.stance = st.id;
+      b.setAttribute("aria-pressed", String(stance === st.id));
+      b.textContent = t(st.label);
+      b.addEventListener("click", () => setStance(st.id));
+      row.appendChild(b);
+    }
+  }
+
   function setStance(s) {
     stance = s;
-    $("stAsset").setAttribute("aria-pressed", String(s === "asset"));
-    $("stIdea").setAttribute("aria-pressed", String(s === "idea"));
+    const list = stanceList(), hit = list.find(x => x.id === s) || list[0];
+    [...$("stanceRow").children].forEach(b => b.setAttribute("aria-pressed", String(b.dataset.stance === s)));
     $("howFields").classList.remove("hidden");
     $("hWhatLbl").textContent = t("how_what");
     $("hWhyLbl").textContent = t("how_why");
-    $("hWhat").placeholder = t(s === "asset" ? "how_what_hint_a" : "how_what_hint_n");
-    $("hWhy").placeholder  = t(s === "asset" ? "how_why_hint_a"  : "how_why_hint_n");
+    $("hWhat").placeholder = t(hit.what);
+    $("hWhy").placeholder  = t(hit.why);
     refreshSend();
     $("hWhat").focus({ preventScroll: true });
   }
@@ -438,13 +467,14 @@
     for (const n of list) {
       const d = document.createElement("div");
       d.className = "mine-item" + (n.queued ? " pending" : "");
-      const kc = (cfg.kindColors || {})[n.kind];
+      const kc = (cfg.kindColors || {})[n.outcome ? "ov_" + n.outcome : n.kind];
       d.style.setProperty("--pick", (kc && kc.base) || myColor);
       const r = document.createElement("span"); r.className = "ref"; r.textContent = n.queued ? "…" : "✓";
       const tx = document.createElement("span");
+      const stanceWord = n.outcome ? t("ov_" + n.outcome) + " · " : "";
       tx.textContent = n.context
         ? `${actorLabel(n.actor)}${t("conn_does")}${n.body} ${t("conn_when")}${n.context} ${t("conn_because")}${n.reason}`
-        : (n.reason ? `${n.body} — ${n.reason}` : n.body);
+        : (n.reason ? `${stanceWord}${n.body} — ${n.reason}` : stanceWord + n.body);
       d.append(r, tx);
       $("mineList").appendChild(d);
     }
@@ -470,7 +500,7 @@
       lastKey = key;
       ["wWhen","wBody","wWhy","hWhat","hWhy"].forEach(id => $(id).value = "");
       stance = null; site = null; actor = null;
-      $("stAsset").setAttribute("aria-pressed", "false"); $("stIdea").setAttribute("aria-pressed", "false");
+      [...$("stanceRow").children].forEach(b => b.setAttribute("aria-pressed", "false"));
       $("stHas").setAttribute("aria-pressed", "false"); $("stHasnot").setAttribute("aria-pressed", "false");
       $("howFields").classList.add("hidden"); $("whyFields").classList.add("hidden");
     }
@@ -496,6 +526,8 @@
       $("whyStat").textContent = isPractice() ? t("practice_note") : "";
       $("whyStat").classList.toggle("practice", isPractice());
     } else if (m === "how") {
+      $("stanceLbl").textContent = t(isOverall ? "ov_pick" : "how_pick");
+      renderStances();
       if (isOverall) $("promptTitle").textContent = t("overall_title");
       else $("promptTitle").innerHTML = g ? Highlight.html(g.label, escapeHtml) : "";
       $("promptSub").textContent = isOverall ? t("overall_sub") : t("how_title");
@@ -535,12 +567,16 @@
     const m = mode(), f = fields();
     if (m === "wait") return;
     sending = true; refreshSend();
-    const kind = m === "why" ? site : stance;             // cause|works or asset|idea
-    const entry = { kind, body: f.body, reason: f.reason || null, context: f.context || null,
+    /* In the overall round the three stances ride in `outcome` and the note
+       itself is an idea, so nothing in the database had to change. */
+    const isOv = room.spotlight_group === OVERALL;
+    const kind = m === "why" ? site : (isOv ? "idea" : stance);
+    const outcome = (m === "how" && isOv) ? stance : null;
+    const entry = { kind, outcome, body: f.body, reason: f.reason || null, context: f.context || null,
                     actor: m === "why" ? actor : null, groupId: room.spotlight_group, queued: false };
     try {
       const res = await Store.addSolution({ groupId: entry.groupId, kind, body: f.body, reason: f.reason || null,
-        outcome: null, actor: entry.actor, context: entry.context,
+        outcome, actor: entry.actor, context: entry.context,
         role: me.role, discipline: me.discipline, participantId: me.id });
       if (res.ok) {
         entry.queued = !!res.queued;

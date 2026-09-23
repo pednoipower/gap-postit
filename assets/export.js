@@ -266,6 +266,9 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
     const settingOf = row => { const p = pById[row.participant_id]; return p ? labelFor(cfg.settings || [], p.setting) : ""; };
     const when = iso => (iso || "").replace("T", " ").slice(0, 19);
     const KIND = { cause: "Cause (gap exists here)", works: "Works here (no gap)", asset: "Already exists", idea: "New idea", facilitator: "Would help", barrier: "Obstacle" };
+    /* The overall round asks a different question of the same note: promote
+       what we do, improve it, or stop it. The stance rides in `outcome`. */
+    const STANCE = { promote: "ส่งเสริม (promote)", improve: "ปรับปรุง (improve)", stop: "ยกเลิก (stop)" };
 
     /* Sheet 1 — why: causes where the gap exists, and what makes it work where it doesn't */
     const causeRows = [[
@@ -287,7 +290,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
 
     /* Sheet 2 — what we would do: existing assets and new ideas, each with why it would work */
     const fixRows = [[
-      H("Ref"), H("Gap"), H("Gap label"), H("Type"), H("What"), H("Why it would work here"),
+      H("Ref"), H("Gap"), H("Gap label"), H("Type"), H("ภาพรวม: stance"), H("What"), H("Why it would work here"),
       H("Role"), H("Discipline"), H("Setting"), H("Phone id"), H("Time")
     ]];
     for (const r of snap.solutions.filter(x => x.kind === "asset" || x.kind === "idea")) {
@@ -295,6 +298,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
       fixRows.push([
         { v: r.ref, s: styleIndex.mono }, { v: r.group_id, s: gs }, { v: g.label || "", s: gs },
         { v: KIND[r.kind] || r.kind || "", s: gs },
+        { v: STANCE[r.outcome] || "", s: gs },
         { v: r.body, s: gs }, { v: r.reason || "", s: gs },
         { v: labelFor(cfg.roles, r.role), s: gs },
         { v: labelFor(cfg.disciplines, r.discipline), s: discStyle(r.discipline) },
@@ -354,7 +358,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
 
     const sheets = [
       { name: "Why",            xml: sheetXml(causeRows,   { widths: [9, 6, 30, 20, 16, 40, 40, 46, 12, 16, 16, 38, 20] }) },
-      { name: "What we would do", xml: sheetXml(fixRows,   { widths: [9, 6, 30, 14, 52, 52, 12, 16, 16, 38, 20] }) },
+      { name: "What we would do", xml: sheetXml(fixRows,   { widths: [9, 6, 30, 14, 18, 52, 52, 12, 16, 16, 38, 20] }) },
       { name: "Crosstab",       xml: sheetXml(xRows,       { widths: [6, 30, 16, 12, 10, 12, 14, 10] }) },
       { name: "Gaps",           xml: sheetXml(summaryRows, { widths: [6, 30, 52, 36, 52, 10, 14, 10, 20, 20] }) },
       { name: "Who was there",  xml: sheetXml(whoRows,     { widths: [18, 14, 18, 10] }) }
@@ -410,6 +414,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
     L.push("");
     L.push("WHY lines: LABEL | team | role | ใคร (actor) | มักจะ (response) | เมื่อ (situation) | เพราะ (reason)");
     L.push("HOW lines: LABEL | team | role | what — why it would work here");
+    L.push("In the ภาพรวม round each line also carries a stance: [promote] ส่งเสริม, [improve] ปรับปรุง, [stop] ยกเลิก.");
     L.push("");
     for (const g of (snap.groups || [])) {
       const rs = snap.solutions.filter(x => x.group_id === g.id);
@@ -431,7 +436,8 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
       a.forEach(x => L.push(`  ${x.ref} | ${x.discipline} | ${x.role} | ${clean(x.body)} — ${clean(x.reason)}`));
       L.push("");
       L.push("NEW IDEAS (" + i.length + "):");
-      i.forEach(x => L.push(`  ${x.ref} | ${x.discipline} | ${x.role} | ${clean(x.body)} — ${clean(x.reason)}`));
+      i.forEach(x => L.push(`  ${x.ref} | ${x.discipline} | ${x.role} | ` +
+        (x.outcome ? `[${x.outcome}] ` : "") + `${clean(x.body)} — ${clean(x.reason)}`));
       L.push("");
     }
     return L.join("\n");
