@@ -48,9 +48,11 @@ window.CONFIG = {
   // Keep it SHORT — people will be squinting at it from the back row.
   joinUrl: "https://pednoipower.github.io/gap-postit/",
 
-  // The room code. 4 letters, no vowels (so it can never spell anything rude,
-  // and so O/0 and I/1 confusion is impossible).
-  roomCode: "PZKT",
+  // The room code. It is shown on the projector beside the join link and is
+  // stored with every note; nobody has to type it, because the QR code and
+  // the link carry it. Upper case here and upper case in the database — the
+  // lookup matches exactly.
+  roomCode: "CANDO",
 
   /* --------------------------------------------------------------------------
      5. WHO IS IN THE ROOM
@@ -107,7 +109,7 @@ window.CONFIG = {
   maxCharacters:         200,   // longest a single post-it can be
   submitCooldownSeconds: 3,     // stops one person flooding the board
   maxPerPersonPerPrompt: 5,     // how many notes one person can add per question
-  talkSeconds:           60,    // the countdown on the "turn and talk" slide
+  talkSeconds:          120,    // the countdown on the "turn and talk" slide
   sessionMinutes:        45,    // the session clock on the control panel
 
   /* --------------------------------------------------------------------------

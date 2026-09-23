@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230728">
+<link rel="stylesheet" href="assets/theme.css?v=202609230738">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
 /* ============================================================================
@@ -79,6 +79,12 @@
   .tab[aria-selected="true"] { background: var(--heading); border-color: var(--heading); color: #fff; }
   .tab:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
 
+  .next-line { margin: 7px 0 0; font-size: 13px; color: var(--text-dim); }
+  .next-line b { color: var(--heading); font-weight: 600; }
+  .btn.tiny { min-height: 38px; font-size: 13.5px; padding: 8px 14px; width: auto; }
+  .clock-note { font-size: 12.5px; color: var(--gold-700); font-weight: 600; }
+  .meter.held b { opacity: .5; }
+
   .keys { font-size: 12.5px; color: var(--text-dim); margin: 10px 0 0; line-height: 1.7; }
   kbd {
     font: inherit; font-size: 12px; font-weight: 700; background: var(--paper-2);
@@ -128,6 +134,7 @@
         </div>
         <h1 id="slideTitle">—</h1>
         <p class="sub" id="slideSub"></p>
+        <p class="next-line" id="nextLine"></p>
       </div>
       <div>
         <div class="meters">
@@ -153,6 +160,11 @@
             <span class="pip"></span><span id="boardLbl">Board closed</span>
           </button>
         </div>
+        <div class="actions" style="margin-top:9px">
+          <button class="btn tiny ghost" id="holdBtn" title="Pause or restart the clock (P)">Pause</button>
+          <button class="btn tiny ghost" id="zeroBtn" title="Back to 0:00">Reset</button>
+          <span class="clock-note" id="clockNote"></span>
+        </div>
         <div id="secondary" class="actions" style="margin-top:9px"></div>
       </div>
     </header>
@@ -176,7 +188,7 @@
           screen, refresh the big screen — it is running an older copy.</p>
         <p class="keys"><b>Without touching the mouse:</b>
           <kbd>←</kbd><kbd>→</kbd> move a slide · <kbd>R</kbd> reveal, or collect again ·
-          <kbd>B</kbd> open or close the board</p>
+          <kbd>B</kbd> open or close the board · <kbd>P</kbd> pause the clock</p>
       </div>
 
       <div class="panel">
@@ -262,13 +274,14 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609230728"></script>
-<script src="assets/config.js?v=202609230728"></script>
-<script src="assets/slides.js?v=202609230728"></script>
-<script src="assets/export.js?v=202609230728"></script>
-<script src="assets/store-supabase.js?v=202609230728"></script>
-<script src="assets/store-local.js?v=202609230728"></script>
-<script src="assets/store.js?v=202609230728"></script>
+<script src="assets/version.js?v=202609230738"></script>
+<script src="assets/config.js?v=202609230738"></script>
+<script src="assets/timer.js?v=202609230738"></script>
+<script src="assets/slides.js?v=202609230738"></script>
+<script src="assets/export.js?v=202609230738"></script>
+<script src="assets/store-supabase.js?v=202609230738"></script>
+<script src="assets/store-local.js?v=202609230738"></script>
+<script src="assets/store.js?v=202609230738"></script>
 <script>
 (function () {
   "use strict";
@@ -283,7 +296,7 @@
   /* How long each kind of slide is meant to take, from the run of show. The
      timer is not a rule — it is the thing that stops four gaps turning into
      two, which is the failure mode of every workshop like this. */
-  const TARGET = { why: 150, talk: 60, how: 180, evidence: 120 };
+  const TARGET = { why: 150, talk: (cfg.talkSeconds || 120), how: 180, evidence: 120 };
   const REVEAL_TARGET = 60;          // long enough to read two notes aloud
   const SESSION_MINUTES = cfg.sessionMinutes || 45;
   const SESSION_KEY = "missingpiece.session." + cfg.roomCode;
@@ -368,13 +381,12 @@
     return g ? g.label : "";
   }
 
-  /* ---- two clocks: this slide, and the whole session ---------------------
-     The slide clock is what stops a good first gap eating the fourth one.
-     The session clock is what tells you, at gap three, whether to shorten the
-     talk or drop the overall round — the decision nobody can make from memory
-     while standing up. */
-  const mmss = secs => Math.floor(secs / 60) + ":" + String(Math.floor(secs) % 60).padStart(2, "0");
-  let clockKey = null, clockStart = Date.now();
+  /* ---- two clocks: this round, and the whole session ---------------------
+     The round clock lives in the room (assets/timer.js), so pausing it here
+     pauses the countdown on the projector at the same moment. The session
+     clock is this laptop's own: it answers "are we going to make it", which
+     is a question for the facilitator, not for the room. */
+  const mmss = secs => Timer.mmss(secs);
 
   function sessionStart() {
     try { return Number(localStorage.getItem(SESSION_KEY)) || null; } catch { return null; }
@@ -388,13 +400,17 @@
     const room = Store.state.room;
     if (!room) return;
     const s = currentSlide();
-    const secs = Math.floor((Date.now() - clockStart) / 1000);
+    const secs = Math.floor(Timer.elapsed(room) / 1000);
     const target = isRevealed() ? REVEAL_TARGET : (s ? TARGET[s.phase] : null);
     $("timerVal").textContent = mmss(secs);
     $("timerLbl").textContent = target ? "of " + mmss(target) : "on this slide";
     const m = $("timerMeter");
-    m.classList.toggle("near", !!target && secs >= target * 0.8 && secs < target);
-    m.classList.toggle("over", !!target && secs >= target);
+    const held = Timer.held(room);
+    m.classList.toggle("near", !held && !!target && secs >= target * 0.8 && secs < target);
+    m.classList.toggle("over", !held && !!target && secs >= target);
+    m.classList.toggle("held", held);
+    $("holdBtn").textContent = held ? "Start" : "Pause";
+    $("clockNote").textContent = held ? "paused — the screen is paused too" : "";
 
     const started = sessionStart();
     const sm = $("sessionMeter");
@@ -411,6 +427,22 @@
   }
   setInterval(tickClock, 500);
 
+  /* Pause / restart / back to zero. Each writes the clock's state into the
+     room, so nothing depends on which laptop is driving. */
+  async function holdToggle() {
+    const room = Store.state.room; if (!room) return;
+    const held = Timer.held(room);
+    const value = held ? Timer.runFrom(Timer.elapsed(room)) : Timer.holdAt(Timer.elapsed(room));
+    await Store.control(token, { prompt: value });
+    await refreshNow();
+  }
+  async function clockToZero() {
+    await Store.control(token, { prompt: Timer.fromZero() });
+    await refreshNow();
+  }
+  $("holdBtn").addEventListener("click", holdToggle);
+  $("zeroBtn").addEventListener("click", clockToZero);
+
   /* ---- the live picture ---- */
   function render() {
     const st = Store.state, room = st.room;
@@ -419,10 +451,8 @@
     const s = currentSlide();
     const cur = room.current_slide | 0;
 
-    // restart the slide clock whenever the room genuinely moves on, and start
-    // the session clock the first time it leaves the lobby
-    const key = cur + ":" + room.phase;
-    if (key !== clockKey) { clockKey = key; clockStart = Date.now(); }
+    // the round clock restarts itself when the room moves (assets/timer.js);
+    // the session clock starts the first time the room leaves the lobby
     if (room.phase !== "lobby") markSessionStarted();
     tickClock();
 
@@ -431,12 +461,20 @@
     $("slideTitle").textContent = titleFor(s);
     $("slideSub").textContent = subFor(s);
 
+    /* What Next will do. Knowing it is the difference between "press Next and
+       find out" and running the room. */
+    const nx = slides[cur + 1];
+    $("nextLine").innerHTML = nx
+      ? "ถัดไป · next: <b>" + escapeHtml(titleFor(nx)) + "</b>" +
+        (subFor(nx) && !titleFor(nx).includes(subFor(nx)) ? " — " + escapeHtml(subFor(nx)) : "")
+      : "last slide";
+
     const chip = $("phaseChip");
     chip.className = "phase-chip" +
       (isCollecting() ? " collect" : isRevealed() ? " revealed" : s && s.phase === "talk" ? " talk" : "");
     chip.textContent = isCollecting() ? "collecting · blind"
                      : isRevealed()   ? "revealed"
-                     : s && s.phase === "talk" ? "talking · 1 min"
+                     : s && s.phase === "talk" ? "talking · " + Math.round((cfg.talkSeconds || 120) / 60) + " min"
                      : room.phase;
 
     /* One primary button. While a round is collecting it reveals; everywhere
@@ -556,6 +594,7 @@
     else if (e.key === "ArrowLeft")  { e.preventDefault(); goTo(cur - 1); }
     else if (e.key === "r" || e.key === "R") { e.preventDefault(); isCollecting() ? doReveal() : isRevealed() ? doUnreveal() : null; }
     else if (e.key === "b" || e.key === "B") { e.preventDefault(); toggleBoard(); }
+    else if (e.key === "p" || e.key === "P") { e.preventDefault(); holdToggle(); }
   });
 
   /* ---- the gaps ----------------------------------------------------------

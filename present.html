@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230728">
+<link rel="stylesheet" href="assets/theme.css?v=202609230738">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -90,6 +90,7 @@
   .talk .clock { font-size:clamp(56px,9vw,170px); font-weight:800; line-height:1; letter-spacing:-.04em;
     margin-top:4vh; font-variant-numeric:tabular-nums; }
   .talk .clock.over { color:var(--gold-300); font-size:clamp(30px,4vw,74px); }
+  .talk .clock.held { opacity:.45; }
   .talk .gap-line { font-size:clamp(13px,1.2vw,22px); color:var(--green-200); margin-bottom:2.5vh; }
 
   .closing { display:grid; place-items:center; height:100%; text-align:center; }
@@ -141,16 +142,17 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609230728"></script>
-<script src="assets/config.js?v=202609230728"></script>
-<script src="assets/strings.js?v=202609230728"></script>
-<script src="assets/slides.js?v=202609230728"></script>
-<script src="assets/qrcode.js?v=202609230728"></script>
-<script src="assets/paper.js?v=202609230728"></script>
-<script src="assets/wordcloud.js?v=202609230728"></script>
-<script src="assets/store-supabase.js?v=202609230728"></script>
-<script src="assets/store-local.js?v=202609230728"></script>
-<script src="assets/store.js?v=202609230728"></script>
+<script src="assets/version.js?v=202609230738"></script>
+<script src="assets/config.js?v=202609230738"></script>
+<script src="assets/strings.js?v=202609230738"></script>
+<script src="assets/slides.js?v=202609230738"></script>
+<script src="assets/qrcode.js?v=202609230738"></script>
+<script src="assets/timer.js?v=202609230738"></script>
+<script src="assets/paper.js?v=202609230738"></script>
+<script src="assets/wordcloud.js?v=202609230738"></script>
+<script src="assets/store-supabase.js?v=202609230738"></script>
+<script src="assets/store-local.js?v=202609230738"></script>
+<script src="assets/store.js?v=202609230738"></script>
 <script>
 (function () {
   "use strict";
@@ -291,13 +293,13 @@
     const counts = opts.blind ? "" : `${helps} · ${needs}` + (ideas ? ` · ${ideas}` : "");
     if (counts) txt(counts, W * 0.925, H * 0.15, 14, "#a9cdb9", 600, "end");
     Paper.layoutText(svg, g.label || g.problem_statement,
-      { x: W * 0.075, y: H * 0.21, w: W * 0.85, h: H * 0.42 },
-      { size: opts.tall ? 26 : 23, min: 13, fill: "#fff", weight: "700" });
+      { x: W * 0.075, y: H * 0.24, w: W * 0.85, h: H * 0.40 },
+      { size: opts.tall ? 26 : 24, min: 13, fill: "#fff", weight: "700" });
     if (g.stat) {
       // the survey number: "this is known, and it is not just you"
       Paper.layoutText(svg, g.stat,
-        { x: W * 0.075, y: H * 0.68, w: W * 0.85, h: H * 0.22 },
-        { size: opts.tall ? 15 : 13.5, min: 10, fill: accent, weight: "700" });
+        { x: W * 0.075, y: H * 0.66, w: W * 0.85, h: H * 0.26 },
+        { size: opts.tall ? 15 : 14, min: 10, fill: accent, weight: "700" });
     }
     return svg;
   }
@@ -392,7 +394,7 @@
           <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div>
           <div class="col fixes"><h3>${escapeHtml(t("pj_solutions"))} <span id="fN"></span></h3><div class="board" id="boardFixes"></div></div></div>`;
       }
-      if (!isOverall) $("gapPiece").appendChild(problemPiece(g, i, { tall: true, blind: true, practice: isPractice }));
+      if (!isOverall) $("gapPiece").appendChild(problemPiece(g, i, { blind: true, practice: isPractice }));
       else $("gapPiece").innerHTML = `<div style="color:var(--green-200);font-size:clamp(16px,1.8vw,30px);line-height:1.5;padding:2vw">${escapeHtml(t("overall_sub"))}</div>`;
     }
     if (!revealed) {
@@ -415,27 +417,31 @@
   function buildTalk(el, slide) {
     const g = gapById(slide.gapId);
     el.innerHTML = `
-      <div class="talk">
-        <div>
-          <div class="gap-line">${escapeHtml(g ? g.label : "")}</div>
-          <div class="lead">${escapeHtml(t("pj_talk"))}</div>
-          <div class="sub">${escapeHtml(t("pj_talk_sub"))}</div>
-          <div class="cues">
-            <div>${escapeHtml(t("pj_talk_cue1"))}</div>
-            <div>${escapeHtml(t("pj_talk_cue2"))}</div>
+      <div class="slide-head"><h2>${escapeHtml(g ? g.label : "")}</h2>
+        <p class="sub">${escapeHtml(t("pj_talk"))}</p></div>
+      <div class="slide-body">
+        <div class="talk">
+          <div>
+            <div class="lead">${escapeHtml(t("pj_talk_sub", { m: Math.round((cfg.talkSeconds || 120) / 60) }))}</div>
+            <div class="cues">
+              <div>${escapeHtml(t("pj_talk_cue1"))}</div>
+              <div>${escapeHtml(t("pj_talk_cue2"))}</div>
+            </div>
+            <div class="clock" id="talkClock"></div>
           </div>
-          <div class="clock" id="talkClock"></div>
         </div>
       </div>`;
-    const total = Math.max(10, cfg.talkSeconds || 60);
-    const started = Date.now();
     if (talkTimer) clearInterval(talkTimer);
     const tick = () => {
       const clock = $("talkClock");
       if (!clock) { clearInterval(talkTimer); talkTimer = null; return; }
-      const left = Math.max(0, total - Math.round((Date.now() - started) / 1000));
-      clock.textContent = left > 0 ? String(left) : t("pj_talk_over");
+      const total = Math.max(10, cfg.talkSeconds || 120);
+      const left = Math.max(0, total - Math.floor(Timer.elapsed(Store.state.room) / 1000));
+      clock.textContent = left > 0
+        ? Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0")
+        : t("pj_talk_over");
       clock.classList.toggle("over", left === 0);
+      clock.classList.toggle("held", Timer.held(Store.state.room));
     };
     tick();
     talkTimer = setInterval(tick, 250);
@@ -483,6 +489,18 @@
     if (!board) return;
     const W = board.clientWidth, H = board.clientHeight;
     if (W < 50 || H < 50) return;
+
+    /* A column with nothing in it says so. An empty rectangle on a wall reads
+       as a broken screen, and the room starts looking at the laptop. */
+    if (!notes.length) {
+      board.replaceChildren();
+      const p = document.createElement("div");
+      p.style.cssText = "position:absolute;inset:0;display:grid;place-items:center;text-align:center;" +
+        "color:var(--green-200);opacity:.55;font-size:clamp(14px,1.3vw,22px);padding:1vw";
+      p.textContent = t("pj_none_yet");
+      board.appendChild(p);
+      return;
+    }
 
     if (viewMode === "cloud" && !host) {
       WordCloud.render(board, notes, { max: 130 });

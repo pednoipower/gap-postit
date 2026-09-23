@@ -22,7 +22,9 @@ Nothing is analysed in the room.
       check the projector's gaps slide shows all four with their numbers.
 - [ ] `config.js` → `practice`: the warm-up gap and its own WHO list read
       well for this audience. `talkSeconds` is the countdown on the talk
-      slide (60 by default).
+      slide (120 by default); `sessionMinutes` is the session clock.
+- [ ] The room exists in the database with the code in `config.js`:
+      `supabase/new-room.sql` opens one.
 - [ ] Dry run with two phones (one per team). Then **Clear this room**; the
       gaps go straight back in by themselves.
 - [ ] `health.html` → **Run the checks**, all green.
@@ -76,10 +78,12 @@ Slide 3. Four cards, each with its survey number in colour. *These are what
 person — and the survey can't tell us why. You can.* Phones show the same
 list.
 
-## 0:09 — Four gaps, 6½ minutes each (26 min)
+## 0:09 — Four gaps, 7½ minutes each (30 min)
 
-For each gap, three slides: **why**, a minute of **turn and talk**, then
-**how**.
+For each gap, three slides: **why**, two minutes of **turn and talk**, then
+**how**. Each slide carries its own clock on the control panel, and the
+projector shows the same seconds; **Pause** (or <kbd>P</kbd>) stops both at
+once, **Reset** puts the round back to 0:00.
 
 **WHY (2½ min).** The phone shows the gap and its number and first asks,
 about their own week rather than about the hospital's paperwork: *ยังเจอแบบนี้
@@ -124,9 +128,10 @@ why* on the other. Read out one cause from each colour, then one "works
 here" if there is one: that is the room's proof it can be done. Do not
 discuss.
 
-**TURN AND TALK (1 min).** The why round is already closed, so nothing said
-here can shape what was written — this is the one minute the room is meant
-to be loud. The projector shows a running countdown and two questions: *ที่ของ
+**TURN AND TALK (2 min).** The why round is already closed, so nothing said
+here can shape what was written — these are the two minutes the room is meant
+to be loud. The gap stays on screen as the slide's title; under it a running
+countdown and two questions: *ที่ของ
 คุณเป็นแบบเดียวกันไหม* and *อีกทีมเห็นอะไรที่เราไม่เห็น*. Phones say, in so many
 words, put me down and turn around. Do not fill the silence; let it get
 noisy and then move.
@@ -143,12 +148,12 @@ marked ✓. Read one existing and one new. Move on.
 
 Slides 5–16: for each gap, why → turn and talk → how.
 
-## 0:35 — Overall (4 min)
+## 0:39 — Overall (3 min)
 
 Slide 17. Same *how* format, for something the two teams should do that is
-not about any one gap. No seed. Reveal at 3:00.
+not about any one gap. No seed. Reveal at 2:15.
 
-## 0:39 — Close (4 min, and 2 in hand)
+## 0:42 — Close (3 min)
 
 Slide 18. *Neither of us had the whole picture*, with tonight's counts and
 how many gaps both teams answered. If `signupUrl` is set, the QR for people

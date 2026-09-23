@@ -519,7 +519,7 @@ end $$;
 -- ============================================================================
 
 insert into public.rooms (code, title, control_token)
-values ('PZKT', 'The Missing Piece', 'change-this-to-a-long-random-phrase')
+values ('CANDO', 'The Missing Piece', 'change-this-to-a-long-random-phrase')
 on conflict (code) do nothing;
 
 -- Done. Check it worked:
