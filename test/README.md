@@ -8,6 +8,7 @@ rather than taken on trust.
 |---|---|
 | `security_test.sql` | A participant can join and post while the board is open, and can do nothing else — not edit, not delete, not drive your slides, not read internal tables. Run it against the schema in Postgres. |
 | `qr_test.js` | Generates QR codes across every size and error-correction level. Render them and decode with any scanner; they must all come back byte-identical. |
+| `../tools/contrast-check.py` | Every colour pair the app puts on a screen, with its WCAG ratio and the threshold it has to meet. Run it after changing a colour; it prints a table and a failure count. |
 | `preview_paper.html` | Open in a browser to see what the projector draws, on its own: a gap card and the post-its, with colour for discipline and a corner mark for role. |
 
 ## What was verified before shipping

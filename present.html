@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230841">
+<link rel="stylesheet" href="assets/theme.css?v=202609230847">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -93,7 +93,7 @@
   .talk .clock.held { opacity:.45; }
   /* what the colours and the folded corner mean, small, bottom of the slide */
   .key { display:flex; gap:2vw; align-items:center; flex-wrap:wrap; margin-top:.9vh;
-         font-size:clamp(11px,1.05vw,17px); color:var(--green-200); }
+         font-size:clamp(12px,1.05vw,17px); color:var(--green-200); }
   .key span { display:flex; align-items:center; gap:.5em; }
   .key i { display:inline-block; width:1.15em; height:1.15em; border-radius:2px; font-style:normal; }
   .key i.fold { position:relative; overflow:hidden; }
@@ -171,17 +171,17 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609230841"></script>
-<script src="assets/config.js?v=202609230841"></script>
-<script src="assets/strings.js?v=202609230841"></script>
-<script src="assets/slides.js?v=202609230841"></script>
-<script src="assets/qrcode.js?v=202609230841"></script>
-<script src="assets/timer.js?v=202609230841"></script>
-<script src="assets/highlight.js?v=202609230841"></script>
-<script src="assets/paper.js?v=202609230841"></script>
-<script src="assets/store-supabase.js?v=202609230841"></script>
-<script src="assets/store-local.js?v=202609230841"></script>
-<script src="assets/store.js?v=202609230841"></script>
+<script src="assets/version.js?v=202609230847"></script>
+<script src="assets/config.js?v=202609230847"></script>
+<script src="assets/strings.js?v=202609230847"></script>
+<script src="assets/slides.js?v=202609230847"></script>
+<script src="assets/qrcode.js?v=202609230847"></script>
+<script src="assets/timer.js?v=202609230847"></script>
+<script src="assets/highlight.js?v=202609230847"></script>
+<script src="assets/paper.js?v=202609230847"></script>
+<script src="assets/store-supabase.js?v=202609230847"></script>
+<script src="assets/store-local.js?v=202609230847"></script>
+<script src="assets/store.js?v=202609230847"></script>
 <script>
 (function () {
   "use strict";
@@ -585,8 +585,9 @@
     if (!notes.length) {
       board.replaceChildren();
       const p = document.createElement("div");
+      /* full strength, not 55%: at .55 this line was 3.25:1 on canopy green */
       p.style.cssText = "position:absolute;inset:0;display:grid;place-items:center;text-align:center;" +
-        "color:var(--green-200);opacity:.55;font-size:clamp(14px,1.3vw,22px);padding:1vw";
+        "color:var(--green-200);font-size:clamp(14px,1.3vw,22px);padding:1vw";
       p.textContent = t("pj_none_yet");
       board.appendChild(p);
       return;

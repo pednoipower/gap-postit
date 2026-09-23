@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230841">
+<link rel="stylesheet" href="assets/theme.css?v=202609230847">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .stat-line { font-size: 14px; color: var(--gold-700); font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
   .stat-line.practice { color: var(--text-dim); font-weight: 600; }
   .stance { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .stance .choice { text-align: center; padding: 14px 10px; line-height: 1.3; }
+  .stance .choice { text-align: center; padding: 14px 10px; line-height: 1.3; min-height: 48px; }
   .stance.three { grid-template-columns: repeat(3, 1fr); }
   .stance .choice[data-stance="asset"][aria-pressed="true"] { --pick: var(--green-500); }
   .stance .choice[data-stance="idea"][aria-pressed="true"]  { --pick: var(--primary); }
@@ -23,8 +23,8 @@
   .field textarea.note { min-height: 84px; }
   .field textarea.note.blank { min-height: 58px; }
   .field .lbl.conn { font-size: 17px; font-weight: 700; }
-  .sub-hint { display: block; font-size: 13.5px; color: var(--text); line-height: 1.5; margin: -4px 0 4px; }
-  .cues { margin: 0 0 9px; padding-left: 18px; font-size: 13px; color: var(--text-dim); line-height: 1.55; }
+  .sub-hint { display: block; font-size: 14px; color: var(--text); line-height: 1.5; margin: -4px 0 4px; }
+  .cues { margin: 0 0 9px; padding-left: 18px; font-size: 14px; color: var(--text-dim); line-height: 1.55; }
   /* one finished sentence, in the same grammar, kept on screen while they
      write their own: people copy an example far more reliably than they
      follow an instruction */
@@ -32,7 +32,7 @@
             border-radius: 0 var(--r-leaf) 0 var(--r-leaf);
             padding: 9px 12px; margin: 0 0 13px; }
   .worked summary { font-size: 14px; font-weight: 600; color: var(--gold-700); cursor: pointer;
-                    min-height: 24px; display: list-item; }
+                    min-height: 44px; display: list-item; padding: 10px 0; }
   .worked p { margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: var(--text); }
   .worked p b { font-weight: 700; }
   .nudge { margin: 7px 0 0; font-size: 14px; line-height: 1.6; color: var(--gold-700);
@@ -44,24 +44,24 @@
   .opening .gap { color: var(--text-dim); font-weight: 600; }
   /* the sentence assembling itself as they type */
   .preview { border: 2px dashed var(--edge); border-radius: var(--r-md); padding: 11px 13px; margin-top: 4px; }
-  .preview .k { font-size: 12.5px; color: var(--text-dim); font-weight: 600; margin-bottom: 4px; }
+  .preview .k { font-size: 13px; color: var(--text-dim); font-weight: 600; margin-bottom: 4px; }
   .preview .v { font-size: 15.5px; line-height: 1.55; }
   .preview .v .b { color: var(--text-dim); }
   .preview .v .f { font-weight: 700; }
   .field .lbl { font-size: 15.5px; }
-  .why-note { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; margin: 0 0 12px; }
+  .why-note { font-size: 14px; color: var(--text-dim); line-height: 1.5; margin: 0 0 12px; }
   /* where am I in the session */
   .steps { display:flex; gap:6px; margin:2px 0 14px; }
-  .steps span { flex:1; text-align:center; font-size:12.5px; font-weight:600; color:var(--text-dim);
+  .steps span { flex:1; text-align:center; font-size:13px; font-weight:600; color:var(--text-dim);
     padding:7px 4px; border-radius:8px; background:var(--paper-2); line-height:1.3; }
   .steps span[aria-current="step"] { background:var(--heading); color:#fff; }
   .steps span.done { color:var(--green-600); background:var(--green-50); }
   .gap-row { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--edge); }
   .gap-row:first-child { border-top:0; padding-top:0; }
   .gap-row .g { flex:none; width:32px; height:32px; border-radius:0 var(--r-md) 0 var(--r-md); display:grid; place-items:center;
-    font-size:12px; font-weight:700; color:var(--green-900); }
+    font-size:13px; font-weight:700; color:var(--green-900); }
   .gap-row b { display:block; font-size:15.5px; line-height:1.4; }
-  .gap-row small { display:block; font-size:13.5px; color:var(--text-dim); line-height:1.5; margin-top:2px; }
+  .gap-row small { display:block; font-size:14px; color:var(--text-dim); line-height:1.5; margin-top:2px; }
   .gap-row small.st { color:var(--gold-700); font-weight:600; }
 </style>
 </head>
@@ -148,7 +148,7 @@
   </div>
 
   <div class="mine hidden" id="mineBox">
-    <h3 id="mineHead"></h3>
+    <h2 id="mineHead"></h2>
     <div id="mineList"></div>
   </div>
 
@@ -159,13 +159,13 @@
   <p class="hint center" style="opacity:.5;font-size:11px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609230841"></script>
-<script src="assets/config.js?v=202609230841"></script>
-<script src="assets/highlight.js?v=202609230841"></script>
-<script src="assets/strings.js?v=202609230841"></script>
-<script src="assets/store-supabase.js?v=202609230841"></script>
-<script src="assets/store-local.js?v=202609230841"></script>
-<script src="assets/store.js?v=202609230841"></script>
+<script src="assets/version.js?v=202609230847"></script>
+<script src="assets/config.js?v=202609230847"></script>
+<script src="assets/highlight.js?v=202609230847"></script>
+<script src="assets/strings.js?v=202609230847"></script>
+<script src="assets/store-supabase.js?v=202609230847"></script>
+<script src="assets/store-local.js?v=202609230847"></script>
+<script src="assets/store.js?v=202609230847"></script>
 <script>
 (function () {
   "use strict";
