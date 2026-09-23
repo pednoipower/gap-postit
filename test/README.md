@@ -8,7 +8,7 @@ rather than taken on trust.
 |---|---|
 | `security_test.sql` | A participant can join and post while the board is open, and can do nothing else — not edit, not delete, not drive your slides, not read internal tables. Run it against the schema in Postgres. |
 | `qr_test.js` | Generates QR codes across every size and error-correction level. Render them and decode with any scanner; they must all come back byte-identical. |
-| `preview_jigsaw.html` | Open in a browser to see the piece shapes on their own — concerns with a notch, solutions with a tab, and the two interlocking. |
+| `preview_paper.html` | Open in a browser to see what the projector draws, on its own: a gap card and the post-its, with colour for discipline and a corner mark for role. |
 
 ## What was verified before shipping
 

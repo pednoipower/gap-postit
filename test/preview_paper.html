@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paper — shapes on their own</title>
+<style>
+  body { margin:0; padding:28px; background:#0E1118; color:#D6DCE8;
+         font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif; }
+  h1 { font-size:19px; font-weight:700; margin:0 0 4px; color:#fff; }
+  p.sub { font-size:14px; color:#8A94A8; margin:0 0 26px; max-width:70ch; line-height:1.55; }
+  h2 { font-size:13px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+       color:#7D879C; margin:30px 0 12px; }
+  .row { display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start; }
+</style>
+</head>
+<body>
+<h1>Paper</h1>
+<p class="sub">Everything the projector draws, on its own and at rest: a gap card and
+  the post-its that gather round it. Nothing interlocks. Colour is discipline,
+  the corner mark is role.</p>
+
+<h2>Notes</h2>
+<div class="row" id="notes"></div>
+
+<h2>A gap card</h2>
+<div class="row" id="cards"></div>
+
+<script>
+  // stand-in for config.js, so this page needs nothing else
+  window.CONFIG = { colors: {
+    nephro:     { base: "#1F9AB8", ink: "#052A33" },
+    palliative: { base: "#E08034", ink: "#3A1B06" },
+    fallback:   { base: "#8C8FA3", ink: "#1B1C24" }
+  } };
+</script>
+<script src="../assets/paper.js"></script>
+<script>
+  const NOTES = [
+    { disc: "nephro",     role: "doctor", text: "เมื่อคลินิกไตวันพุธคนล้น 80 ราย แพทย์โรคไตมักจะไม่ได้ประเมินว่าเหมาะกับ CKM หรือไม่" },
+    { disc: "palliative", role: "nurse",  text: "เมื่อทีม PC อยู่คนละตึก ทีมประคับประคองมักจะเห็นผู้ป่วยต่อเมื่อถูกปรึกษา" },
+    { disc: "nephro",     role: "allied", text: "Family meeting at day 3" },
+    { disc: "palliative", role: "other",  text: "✓ มีอยู่แล้ว · พยาบาล PC ที่รู้จักทีมไตอยู่แล้ว" }
+  ];
+  const host = document.getElementById("notes");
+  for (const n of NOTES) {
+    const { svg, ink } = Paper.postitSVG({ discipline: n.disc, role: n.role, width: 230, height: 150 });
+    Paper.layoutText(svg, n.text, { x: 16, y: 26, w: 198, h: 112 }, { size: 15, min: 10, fill: ink });
+    host.appendChild(svg);
+  }
+
+  const { svg } = Paper.problemSVG({ width: 440, height: 260, accent: "#7FB3D5" });
+  Paper.layoutText(svg, "โรงพยาบาลยังไม่มีระบบคัดกรองผู้ป่วยที่เหมาะกับ CKM",
+    { x: 33, y: 55, w: 374, h: 109 }, { size: 23, min: 13, fill: "#fff", weight: "700" });
+  Paper.layoutText(svg, "มีระบบชัดเจนใช้ประจำ 2 จาก 16 รพ.",
+    { x: 33, y: 177, w: 374, h: 57 }, { size: 13.5, min: 10, fill: "#7FB3D5", weight: "700" });
+  const box = document.createElement("div");
+  box.style.width = "460px";
+  box.appendChild(svg);
+  document.getElementById("cards").appendChild(box);
+</script>
+</body>
+</html>

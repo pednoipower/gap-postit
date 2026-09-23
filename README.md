@@ -13,8 +13,8 @@ by team, role and setting, ready for barrier–facilitator or realist-style
 analysis.
 
 Everything on screen is paper: the gaps are cards, the notes are post-its,
-with the causes and the solutions gathering round each gap. Colour is
-discipline.
+with the causes and the solutions gathering round each gap. Nothing
+interlocks. Colour is discipline, and a small mark in the corner is role.
 
 See `docs/2026-09-22-run-of-show-45min.md` for the minute-by-minute script.
 
