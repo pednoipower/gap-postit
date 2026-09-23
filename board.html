@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230746">
+<link rel="stylesheet" href="assets/theme.css?v=202609230750">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .stat-line { font-size: 14px; color: var(--gold-700); font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
@@ -158,12 +158,13 @@
   <p class="hint center" style="opacity:.5;font-size:11px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609230746"></script>
-<script src="assets/config.js?v=202609230746"></script>
-<script src="assets/strings.js?v=202609230746"></script>
-<script src="assets/store-supabase.js?v=202609230746"></script>
-<script src="assets/store-local.js?v=202609230746"></script>
-<script src="assets/store.js?v=202609230746"></script>
+<script src="assets/version.js?v=202609230750"></script>
+<script src="assets/config.js?v=202609230750"></script>
+<script src="assets/highlight.js?v=202609230750"></script>
+<script src="assets/strings.js?v=202609230750"></script>
+<script src="assets/store-supabase.js?v=202609230750"></script>
+<script src="assets/store-local.js?v=202609230750"></script>
+<script src="assets/store.js?v=202609230750"></script>
 <script>
 (function () {
   "use strict";
@@ -183,7 +184,7 @@
   if (cfg.colors.palliative) root.setProperty("--pall",   cfg.colors.palliative.base);
   const myColor = (cfg.colors[me.discipline] || cfg.colors.fallback).base;
   const OVERALL = "GX";
-  const PALETTE = ["#7FB3D5","#E9A06B","#8FCFA8","#C59BD1","#E5CE7A","#84C5C5","#E39A9A","#A9A3D8"];
+  const PALETTE = ["#a9cdb9","#e6cb74","#76ad90","#d5e7dd","#c9a227","#a9cdb9","#e6cb74","#76ad90"];
 
   let room = null, groups = [];
   let stance = null;             // how: "asset" | "idea"
@@ -244,7 +245,7 @@
     $("whyFields").classList.remove("hidden");
     $("whyLead").textContent = t(v === "cause" ? "why_lead" : "works_lead");
     const g = currentGap();
-    $("opening").innerHTML = `<span class="gap">${escapeHtml(g ? g.label : "")}</span> ${escapeHtml(t(v === "cause" ? "open_cause" : "open_works"))}`;
+    $("opening").innerHTML = `<span class="gap">${g ? Highlight.html(g.label, escapeHtml) : ""}</span> ${escapeHtml(t(v === "cause" ? "open_cause" : "open_works"))}`;
     $("situSub").textContent = t(v === "cause" ? "situ_sub" : "situ_sub_works");
     $("doesLbl").textContent = t(v === "cause" ? "does_lbl" : "does_works_lbl");
     $("wWhen").placeholder = hint(v === "cause" ? "situ_hint" : "situ_hint_works");
@@ -349,7 +350,7 @@
       d.className = "gap-row";
       d.innerHTML = `<span class="g" style="background:${PALETTE[i % PALETTE.length]}">${g.id}</span>
         <div><b></b><small class="st"></small></div>`;
-      d.querySelector("b").textContent = g.label;
+      d.querySelector("b").innerHTML = Highlight.html(g.label, escapeHtml);
       d.querySelector("small.st").textContent = g.stat || "";
       host.appendChild(d);
     });
@@ -484,12 +485,13 @@
     renderSteps();
 
     if (m === "why") {
-      $("promptTitle").textContent = g ? g.label : "";
+      $("promptTitle").innerHTML = g ? Highlight.html(g.label, escapeHtml) : "";
       $("promptSub").textContent = isPractice() ? t("practice_badge") : t("why_title");
       $("whyStat").textContent = isPractice() ? t("practice_note") : (g && g.stat ? g.stat : "");
       $("whyStat").classList.toggle("practice", isPractice());
     } else if (m === "how") {
-      $("promptTitle").textContent = isOverall ? t("overall_title") : (g ? g.label : "");
+      if (isOverall) $("promptTitle").textContent = t("overall_title");
+      else $("promptTitle").innerHTML = g ? Highlight.html(g.label, escapeHtml) : "";
       $("promptSub").textContent = isOverall ? t("overall_sub") : t("how_title");
       /* The program's own proposal is deliberately not shown anywhere in the
          room — on screen or on the phone. People answer "how would we fix
@@ -504,10 +506,12 @@
         $("waitText").textContent = t("wait_closing");
       } else if (room.phase === "talk") {
         $("promptTitle").textContent = t("talk_title");
-        $("promptSub").textContent = g && !isOverall ? g.label : "";
+        if (g && !isOverall) $("promptSub").innerHTML = Highlight.html(g.label, escapeHtml);
+        else $("promptSub").textContent = "";
         $("waitText").textContent = t("wait_talk");
       } else if ((room.phase === "why" || room.phase === "why_reveal" || room.phase === "how" || room.phase === "how_reveal") && g) {
-        $("promptTitle").textContent = isOverall ? t("overall_title") : g.label;
+        if (isOverall) $("promptTitle").textContent = t("overall_title");
+        else $("promptTitle").innerHTML = Highlight.html(g.label, escapeHtml);
         $("promptSub").textContent = (room.phase === "why" || room.phase === "why_reveal") ? t("why_title") : t("how_title");
         const typed = $("wBody").value.trim() || $("wWhen").value.trim() || $("wWhy").value.trim() || $("hWhat").value.trim() || $("hWhy").value.trim();
         $("waitText").textContent = t("wait_closed") + (typed ? " · " + t("draft_kept") : "");

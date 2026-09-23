@@ -154,7 +154,11 @@ window.CONFIG = {
      In the 45-minute format the gaps are decided BEFORE the day, from the
      evidence, and loaded into the room with one button on the control panel.
      Each gap has:
-       label     2-4 words, shown on the pieces and the phones
+       label     the gap as one sentence, shown on the cards and the phones
+       highlight the few words inside that label the room should catch first.
+                 They are picked out in Blossom Pink wherever the label is
+                 shown, which is the one job pink has in this design. Must
+                 appear in `label` exactly; leave it out for no highlight.
        problem   one sentence naming what is missing
        proposal  the ONE concrete thing the program might do about it. This is
                  NOT shown to the room — not on the screen and not on the
@@ -176,6 +180,7 @@ window.CONFIG = {
     {
       // Form Q6 — Met = "มีระบบชัดเจนและใช้เป็นประจำ"
       label:    "โรงพยาบาลยังไม่มีระบบคัดกรองผู้ป่วยที่เหมาะกับ CKM",
+      highlight: "ระบบคัดกรอง",
       problem:  "ยังไม่มีระบบคัดกรองผู้ป่วยที่อาจเหมาะกับ CKM ที่ชัดเจนและใช้เป็นประจำ — ที่มีอยู่ขึ้นกับแพทย์หรือทีมแต่ละคน",
       stat:     "มีระบบชัดเจนใช้ประจำ 2 จาก 16 รพ. · “มีบ้าง ขึ้นกับแพทย์/ทีม” 14 จาก 24 ผู้ตอบ",
       proposal: "กำหนดเกณฑ์คัดกรอง กลุ่มเป้าหมาย ผู้รับผิดชอบ และแบบบันทึกผลคัดกรอง"
@@ -183,6 +188,7 @@ window.CONFIG = {
     {
       // Form Q7 — Met = "มี pathway และ workflow การส่งต่อจาก CKD clinic ชัดเจน"
       label:    "CKD clinic ยังไม่มีระบบส่งต่อผู้ป่วยไปทีม PC",
+      highlight: "ระบบส่งต่อ",
       problem:  "ไม่มี pathway และ workflow ส่งต่อผู้ป่วย advanced CKD จาก CKD clinic ไปปรึกษา palliative care — ส่งปรึกษาเป็นรายกรณี",
       stat:     "มี pathway และ workflow ชัดเจน 5 จาก 16 รพ. · ส่งปรึกษาเป็นรายกรณี 17 จาก 24 ผู้ตอบ",
       proposal: "written pathway ส่งต่อจาก CKD clinic ถึงทีม PC พร้อมเกณฑ์ส่งต่อ ช่องทาง consult และผู้ประสานงาน"
@@ -190,6 +196,7 @@ window.CONFIG = {
     {
       // Form Q8 + Q10 — Met = a defined joint working model and integration level ≥ 3
       label:    "ทีมไตและทีม PC ยังทำงานร่วมกันเฉพาะผู้ป่วยซับซ้อน",
+      highlight: "เฉพาะผู้ป่วยซับซ้อน",
       problem:  "สองทีมเชื่อมโยงกันเฉพาะผู้ป่วยรายที่ซับซ้อน ผ่านการส่งปรึกษา OPD/IPD — ยังไม่ทำงานร่วมกันสม่ำเสมอ และไม่มี workflow ร่วม",
       stat:     "บูรณาการระดับ 3–4 7 จาก 16 รพ. · ระดับ 1–2 13 จาก 24 ผู้ตอบ · joint clinic 5 รพ. case conference 1 รพ.",
       proposal: "รูปแบบทำงานร่วมที่กำหนดไว้ เช่น joint clinic หรือ case conference ประจำ และ case review ร่วมสองทีม"
@@ -197,6 +204,7 @@ window.CONFIG = {
     {
       // Form Q13 + Q15 — Met = "ทำ ACP ในผู้ป่วย ESKD ไม่ว่าเลือกการรักษาแบบใด"
       label:    "การทำ ACP ยังจำกัดเฉพาะผู้ป่วยที่เลือก CKM และเริ่มเมื่ออาการทรุดแล้ว",
+      highlight: "การทำ ACP ยังจำกัด",
       problem:  "ACP ทำเฉพาะผู้ป่วย ESKD ที่เลือก CKM และมักเริ่มหลังเลือก CKM หรือหลังอาการมากขึ้น — ผู้ที่เลือก HD, PD หรือ KT ไม่ได้ทำ",
       stat:     "ทำ ACP ทุกทางเลือก 1 จาก 16 รพ. · เฉพาะ CKM 17 จาก 24 ผู้ตอบ · เริ่มก่อนตัดสินใจ KRT 5 จาก 24",
       proposal: "ทำ ACP ในผู้ป่วย ESKD ทุกทางเลือก เริ่มตั้งแต่ CKD stage 4–5 ก่อนตัดสินใจบำบัดทดแทนไต ใช้เอกสารมาตรฐาน ลงนาม และทบทวนเมื่ออาการเปลี่ยน"

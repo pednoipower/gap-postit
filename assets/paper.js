@@ -244,11 +244,26 @@
     t.setAttribute("fill", opts.fill || "#fff");
     const blockH = lines.length * size * 1.28;
     const startY = box.y + (maxH - blockH) / 2 + size * 0.95;
+    /* opts.mark picks a phrase out of the text in another colour. A phrase
+       can wrap, so the runs carry state from one line to the next. */
+    const mark = opts.mark && opts.mark.text ? opts.mark : null;
+    const state = {};
     lines.forEach((ln, i) => {
       const ts = document.createElementNS(NS, "tspan");
       ts.setAttribute("x", box.x);
       ts.setAttribute("y", startY + i * size * 1.28);
-      ts.textContent = ln;
+      if (mark && window.Highlight) {
+        for (const run of window.Highlight.runs(ln, mark.text, state)) {
+          if (!run.t) continue;
+          if (!run.on) { ts.appendChild(document.createTextNode(run.t)); continue; }
+          const em = document.createElementNS(NS, "tspan");
+          em.setAttribute("fill", mark.fill || "#ec88ac");
+          em.textContent = run.t;
+          ts.appendChild(em);
+        }
+      } else {
+        ts.textContent = ln;
+      }
       t.appendChild(ts);
     });
     svgEl.appendChild(t);
