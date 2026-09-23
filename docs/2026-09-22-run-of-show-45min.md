@@ -46,10 +46,10 @@ the ice, and it proves every phone in the room can reach the board before
 anything matters.
 
 It was chosen for its causes, not for the laugh. The chain it produces is
-*เพราะเมื่อประชุมบ่ายสาม วาระ 8 เรื่อง มีผู้บริหารอาวุโสนั่งอยู่ด้วย · ประธาน ·
-มักจะปล่อยให้เลยเวลาโดยไม่ตัดบท · เนื่องจากเกรงใจคนอาวุโสที่เตรียมมาพูด และไม่มี
-ใครได้รับมอบหมายให้คุมเวลา* — standing conditions first, then a deference and
-a job nobody was given. Same shape as the reasons behind the four real gaps,
+*ประธาน · มักจะปล่อยให้เลยเวลาโดยไม่ตัดบท · เมื่อประชุมบ่ายสาม วาระ 8 เรื่อง
+มีผู้บริหารอาวุโสนั่งอยู่ด้วย · เนื่องจากเกรงใจคนอาวุโสที่เตรียมมาพูด และไม่มีใคร
+ได้รับมอบหมายให้คุมเวลา* — a deference and a job nobody was given, under
+conditions anyone in the room can picture. Same shape as the reasons behind the four real gaps,
 which is the whole point of rehearsing on it.
 
 - 90 seconds to write. The projector shows only a count.
@@ -85,12 +85,15 @@ about their own week rather than about the hospital's paperwork: *ยังเ�
 อยู่* or *ไม่ค่อยเจอ — ที่นี่มีวิธีรับมืออยู่แล้ว*. Then a
 fill-in-the-blank, all four required:
 
-> **[gap] เพราะเมื่อ** [สถานการณ์/เงื่อนไข] · **ใคร** (tap) **มักจะ** [การตอบสนอง] · **เนื่องจาก** [เหตุผล]
+> **[gap] — ยังเจอในงานของเรา:** **ใคร** (tap) **มักจะ** [การตอบสนอง] **เมื่อ** [สถานการณ์/เงื่อนไข] **เนื่องจาก** [เหตุผล]
 
-— in what situation, who, does or doesn't do what, because of what reason or
-missing resource. The sentence assembles itself on the phone as they type.
-*Situation / condition* is free text, prompted with *ลองระบุเงื่อนไขที่ทำให้
-ช่องว่างนี้เกิดขึ้น* and four cues — time or step · task or activity ·
+— who, does or doesn't do what, in what situation, because of what reason or
+missing resource. The actor is a tap and comes first, so the sentence starts
+without anyone typing; the situation is then a question about something they
+have already written down — *เป็นแบบนั้นตอนไหน* — rather than an invitation to
+describe conditions in the abstract. The sentence assembles itself on the
+phone as they type, and a finished example in the same grammar sits above the
+blanks. *Situation / condition* is free text with four cues — time or step · task or activity ·
 resources (staff, time, budget, information, equipment) · people and rules
 (who is there, what indicator is in force) — so people describe rather than
 classify. The last cue is the one that reaches the POLICY/KPI and TEAM
@@ -99,18 +102,18 @@ busy they were. Context is decided at coding, not on the phone: what the
 blank has to produce is a circumstance that could have been otherwise, so
 that sites where the response differs can be compared. Context is coded afterwards with
 `docs/2026-09-22-context-codebook.md`.
-People from hospitals where it already works fill the mirror image
-(*[gap] ไม่เกิดที่ รพ. ของเรา เพราะเมื่อ… ใคร จะ… เนื่องจาก…*).
+People whose own week rarely shows the gap fill the mirror image
+(*[gap] — ไม่ค่อยเจอในงานของเรา: ใคร จะ… เมื่อ… เนื่องจาก…*).
 
 Examples:
-- G1, workload: *…เพราะเมื่อคลินิกไตวันพุธคนล้น 80 ราย แพทย์โรคไตมักจะไม่ได้
-  ประเมินว่าเหมาะกับ CKM หรือไม่ เนื่องจากไม่มีเกณฑ์ และไม่มีช่องใน HIS*
-- G3, place and relationship: *…เพราะเมื่อทีม PC อยู่คนละตึกและไม่มีวันราวด์ร่วม
-  ทีมประคับประคองมักจะเห็นผู้ป่วยต่อเมื่อถูกปรึกษา เนื่องจากไม่มีเวทีทบทวนผู้ป่วย
-  ร่วมกัน*
-- G4, incentive: *…เพราะเมื่อตัวชี้วัดของหน่วยนับจำนวนผู้ป่วยที่ได้เริ่มฟอก
-  แพทย์โรคไตมักจะไม่เปิดเรื่อง ACP ก่อนเริ่ม HD เนื่องจากเกรงว่าครอบครัวจะเข้าใจ
-  ว่า "ไม่รักษา"* Say out loud:
+- G1, workload: *แพทย์โรคไตมักจะไม่ได้ประเมินว่าใครเหมาะกับ CKM เมื่อคลินิกไต
+  วันพุธมีผู้ป่วย 80 ราย และมีแพทย์คนเดียว เนื่องจากไม่มีเกณฑ์ที่ตกลงกันไว้ และ
+  ไม่มีช่องบันทึกใน HIS*
+- G3, place and relationship: *ทีมประคับประคองมักจะเห็นผู้ป่วยต่อเมื่อถูกปรึกษา
+  เมื่อทีม PC อยู่คนละตึกและไม่มีวันราวด์ร่วม เนื่องจากไม่มีเวทีทบทวนผู้ป่วยร่วมกัน*
+- G4, incentive: *แพทย์โรคไตมักจะไม่เปิดเรื่อง ACP ก่อนเริ่ม HD เมื่อตัวชี้วัดของ
+  หน่วยนับจำนวนผู้ป่วยที่ได้เริ่มฟอก เนื่องจากเกรงว่าครอบครัวจะเข้าใจว่า "ไม่รักษา"*
+  Say out loud:
 *one sentence that pins down where it breaks — talk about the system, not
 people.*
 
