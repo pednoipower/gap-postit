@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230821">
+<link rel="stylesheet" href="assets/theme.css?v=202609230825">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .stat-line { font-size: 14px; color: var(--gold-700); font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
@@ -158,13 +158,13 @@
   <p class="hint center" style="opacity:.5;font-size:11px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609230821"></script>
-<script src="assets/config.js?v=202609230821"></script>
-<script src="assets/highlight.js?v=202609230821"></script>
-<script src="assets/strings.js?v=202609230821"></script>
-<script src="assets/store-supabase.js?v=202609230821"></script>
-<script src="assets/store-local.js?v=202609230821"></script>
-<script src="assets/store.js?v=202609230821"></script>
+<script src="assets/version.js?v=202609230825"></script>
+<script src="assets/config.js?v=202609230825"></script>
+<script src="assets/highlight.js?v=202609230825"></script>
+<script src="assets/strings.js?v=202609230825"></script>
+<script src="assets/store-supabase.js?v=202609230825"></script>
+<script src="assets/store-local.js?v=202609230825"></script>
+<script src="assets/store.js?v=202609230825"></script>
 <script>
 (function () {
   "use strict";
@@ -184,7 +184,9 @@
   if (cfg.colors.palliative) root.setProperty("--pall",   cfg.colors.palliative.base);
   const myColor = (cfg.colors[me.discipline] || cfg.colors.fallback).base;
   const OVERALL = "GX";
-  const PALETTE = ["#a9cdb9","#e6cb74","#76ad90","#d5e7dd","#c9a227","#a9cdb9","#e6cb74","#76ad90"];
+  const gapIdx = id => realGaps().findIndex(x => x.id === id);
+  const gapTint = i => Highlight.accent(i, true);    // the chip, a pale fill
+  const gapInk  = i => Highlight.accent(i, false);   // words on white
 
   let room = null, groups = [];
   let stance = null;             // how: "asset" | "idea"
@@ -245,6 +247,7 @@
     $("whyFields").classList.remove("hidden");
     $("whyLead").textContent = t(v === "cause" ? "why_lead" : "works_lead");
     const g = currentGap();
+    $("opening").style.setProperty("--hl", gapInk(gapIdx(g && g.id)));
     $("opening").innerHTML = `<span class="gap">${g ? Highlight.html(g.label, escapeHtml) : ""}</span> ${escapeHtml(t(v === "cause" ? "open_cause" : "open_works"))}`;
     $("situSub").textContent = t(v === "cause" ? "situ_sub" : "situ_sub_works");
     $("doesLbl").textContent = t(v === "cause" ? "does_lbl" : "does_works_lbl");
@@ -348,8 +351,8 @@
     realGaps().forEach((g, i) => {
       const d = document.createElement("div");
       d.className = "gap-row";
-      d.innerHTML = `<span class="g" style="background:${PALETTE[i % PALETTE.length]}">${g.id}</span>
-        <div><b></b></div>`;
+      d.innerHTML = `<span class="g" style="background:${gapTint(i)}">${g.id}</span>
+        <div><b style="--hl:${gapInk(i)}"></b></div>`;
       d.querySelector("b").innerHTML = Highlight.html(g.label, escapeHtml);
       host.appendChild(d);
     });
@@ -485,6 +488,7 @@
     renderSteps();
 
     if (m === "why") {
+      $("promptTitle").style.setProperty("--hl", gapInk(gapIdx(g && g.id)));
       $("promptTitle").innerHTML = g ? Highlight.html(g.label, escapeHtml) : "";
       $("promptSub").textContent = isPractice() ? t("practice_badge") : t("why_title");
       /* Only the practice round has a line here now: the numbers behind each

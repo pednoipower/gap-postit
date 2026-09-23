@@ -278,9 +278,10 @@ textarea.note::placeholder { color: var(--neutral-500); }
 }
 .mine-item.pending { opacity: .62; font-style: italic; }
 
-/* the few words in a gap sentence the room should catch first */
-.hl { font-style: normal; font-weight: 700; color: var(--primary); }
-body.present .hl { color: var(--pink-300); }
+/* The few words in a gap sentence the room should catch first, in that
+   gap's own colour: --hl is set where the sentence is drawn. */
+.hl { font-style: normal; font-weight: 700; color: var(--hl, var(--primary)); }
+body.present .hl { color: var(--hl, var(--green-200)); }
 
 .hint { font-size: 14px; color: var(--text-dim); line-height: 1.7; }
 .center { text-align: center; }

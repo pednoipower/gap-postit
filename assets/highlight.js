@@ -23,16 +23,37 @@
   function forLabel(label) {
     const cfg = window.CONFIG || {};
     const hit = (cfg.seedThemes || []).find(t => t.label === label);
-    return (hit && hit.highlight) || "";
+    const h = hit && hit.highlight;
+    return !h ? [] : Array.isArray(h) ? h.filter(Boolean) : [h];
   }
 
-  /* Every [start, end) of the phrase inside the text. */
-  function spans(text, mark) {
+  /* A gap's own colour, for whichever ground it is being shown on. */
+  function accent(index, onDark) {
+    const list = (window.CONFIG && window.CONFIG.gapAccents) || [];
+    const a = list.length ? list[Math.max(0, index) % list.length] : null;
+    return a ? (onDark ? a.onDark : a.onLight) : (onDark ? "#a9cdb9" : "#225a43");
+  }
+
+  /* Every [start, end) of the phrases inside the text, in order, with
+     overlaps dropped: two phrases that cover the same words would otherwise
+     paint over each other. */
+  function spans(text, marks) {
+    if (!text || !marks) return [];
+    const list = Array.isArray(marks) ? marks : [marks];
     const out = [];
-    if (!mark || !text) return out;
-    let i = text.indexOf(mark);
-    while (i >= 0) { out.push([i, i + mark.length]); i = text.indexOf(mark, i + mark.length); }
-    return out;
+    for (const mark of list) {
+      if (!mark) continue;
+      let i = text.indexOf(mark);
+      while (i >= 0) { out.push([i, i + mark.length]); i = text.indexOf(mark, i + mark.length); }
+    }
+    out.sort((a, b) => a[0] - b[0]);
+    const merged = [];
+    for (const sp of out) {
+      const last = merged[merged.length - 1];
+      if (last && sp[0] < last[1]) { last[1] = Math.max(last[1], sp[1]); continue; }
+      merged.push(sp.slice());
+    }
+    return merged;
   }
 
   /* Where each wrapped line begins in the original text. Wrapping collapses
@@ -81,11 +102,11 @@
      escaper. */
   function html(label, esc) {
     const mark = forLabel(label);
-    if (!mark) return esc(label);
+    if (!mark.length) return esc(label);
     return runsAt(label, 0, spans(label, mark))
       .map(r => r.on ? '<em class="hl">' + esc(r.t) + "</em>" : esc(r.t))
       .join("");
   }
 
-  window.Highlight = { forLabel, spans, lineRuns, html };
+  window.Highlight = { forLabel, accent, spans, lineRuns, html };
 })();

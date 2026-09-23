@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230821">
+<link rel="stylesheet" href="assets/theme.css?v=202609230825">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -170,17 +170,17 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609230821"></script>
-<script src="assets/config.js?v=202609230821"></script>
-<script src="assets/strings.js?v=202609230821"></script>
-<script src="assets/slides.js?v=202609230821"></script>
-<script src="assets/qrcode.js?v=202609230821"></script>
-<script src="assets/timer.js?v=202609230821"></script>
-<script src="assets/highlight.js?v=202609230821"></script>
-<script src="assets/paper.js?v=202609230821"></script>
-<script src="assets/store-supabase.js?v=202609230821"></script>
-<script src="assets/store-local.js?v=202609230821"></script>
-<script src="assets/store.js?v=202609230821"></script>
+<script src="assets/version.js?v=202609230825"></script>
+<script src="assets/config.js?v=202609230825"></script>
+<script src="assets/strings.js?v=202609230825"></script>
+<script src="assets/slides.js?v=202609230825"></script>
+<script src="assets/qrcode.js?v=202609230825"></script>
+<script src="assets/timer.js?v=202609230825"></script>
+<script src="assets/highlight.js?v=202609230825"></script>
+<script src="assets/paper.js?v=202609230825"></script>
+<script src="assets/store-supabase.js?v=202609230825"></script>
+<script src="assets/store-local.js?v=202609230825"></script>
+<script src="assets/store.js?v=202609230825"></script>
 <script>
 (function () {
   "use strict";
@@ -285,10 +285,9 @@
       <div class="slide-body" style="overflow:hidden"><div class="problems" id="problemList"></div></div>`;
   }
 
-  /* Chula Nuvo, the shades that carry on canopy green. No pink: on these
-     cards pink belongs to the highlighted words and nothing else. */
-  const GROUP_PALETTE = ["#a9cdb9","#e6cb74","#76ad90","#d5e7dd","#c9a227","#a9cdb9","#e6cb74","#76ad90"];
-  function groupColor(i) { return GROUP_PALETTE[Math.max(0, i) % GROUP_PALETTE.length]; }
+  /* Each gap's own colour, from config (assets/highlight.js reads the same
+     list for the phone, in its light-ground shade). */
+  function groupColor(i) { return Highlight.accent(i, true); }
 
   /* One gap as a card: label, the survey number and counts. The program's
      proposal is deliberately NOT on the card — the room answers "why does
@@ -323,7 +322,7 @@
     Paper.layoutText(svg, g.label || g.problem_statement,
       { x: W * 0.075, y: H * 0.22, w: W * 0.85, h: H * 0.62 },
       { size: opts.tall ? 28 : 26, min: 14, fill: "#fff", weight: "700",
-        mark: { text: Highlight.forLabel(g.label), fill: "#ec88ac" } });
+        mark: { text: Highlight.forLabel(g.label), fill: accent } });
     return svg;
   }
 
@@ -378,8 +377,11 @@
     const isOverall = slide.gapId === Slides.OVERALL;
     const isPractice = slide.gapId === PRACTICE;
     const gapH = $("gapH");
-    if (gapH) gapH.innerHTML = isOverall ? escapeHtml(t("pj_overall"))
-                             : g ? Highlight.html(g.label, escapeHtml) : escapeHtml(slide.gapId);
+    if (gapH) {
+      gapH.style.setProperty("--hl", groupColor(i));
+      gapH.innerHTML = isOverall ? escapeHtml(t("pj_overall"))
+                     : g ? Highlight.html(g.label, escapeHtml) : escapeHtml(slide.gapId);
+    }
     setText("gapSub", !g ? t("pj_waiting_gaps")
       : isOverall ? t("overall_sub")
       : isPractice ? (revealed ? t("pj_practice_rev") : t("pj_practice"))
@@ -457,7 +459,7 @@
   function buildTalk(el, slide) {
     const g = gapById(slide.gapId);
     el.innerHTML = `
-      <div class="slide-head"><h2>${g ? Highlight.html(g.label, escapeHtml) : ""}</h2></div>
+      <div class="slide-head"><h2 style="--hl:${groupColor(gapIndex(slide.gapId))}">${g ? Highlight.html(g.label, escapeHtml) : ""}</h2></div>
       <div class="slide-body">
         <div class="talk">
           <div>

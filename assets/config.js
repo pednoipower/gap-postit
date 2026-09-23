@@ -119,6 +119,21 @@ window.CONFIG = {
      Give each discipline a colour that survives a bad projector: strong,
      saturated, clearly different from each other.
      ------------------------------------------------------------------------ */
+  /* THE COLOUR OF EACH GAP, in order. `onDark` is the projector — pale
+     enough to carry on canopy green; `onLight` is the phone and the control
+     panel, dark enough to read on Mist (all at least 4.5:1). Both are the
+     same hue, so a gap keeps its identity across the two screens. */
+  gapAccents: [
+    // four that stay apart from each other AND from the white of the gap
+    // sentence they sit inside
+    { onDark: "#a9cdb9", onLight: "#225a43" },
+    { onDark: "#e6cb74", onLight: "#8a6d12" },
+    { onDark: "#76ad90", onLight: "#1b4a3b" },
+    { onDark: "#f4b6cd", onLight: "#6f1c40" },
+    { onDark: "#c9a227", onLight: "#2e6e52" },
+    { onDark: "#a9cdb9", onLight: "#225a43" }
+  ],
+
   /* WHAT A NOTE'S COLOUR MEANS. Each round puts exactly two colours on the
      wall, and each matches the words above its column:
        why round   gold = ยังเจอในงานของเรา · pink = ไม่ค่อยเจอ
@@ -176,10 +191,10 @@ window.CONFIG = {
      evidence, and loaded into the room with one button on the control panel.
      Each gap has:
        label     the gap as one sentence, shown on the cards and the phones
-       highlight the few words inside that label the room should catch first.
-                 They are picked out in Blossom Pink wherever the label is
-                 shown, which is the one job pink has in this design. Must
-                 appear in `label` exactly; leave it out for no highlight.
+       highlight one phrase, or a list of them, inside that label: the words
+                 the room should catch first. They are picked out in the gap's
+                 own colour wherever the label is shown. Each must appear in
+                 `label` exactly; leave it out for no highlight.
        problem   one sentence naming what is missing
        proposal  the ONE concrete thing the program might do about it. This is
                  NOT shown to the room — not on the screen and not on the
@@ -206,7 +221,7 @@ window.CONFIG = {
     {
       // Form Q6 — Met = "มีระบบชัดเจนและใช้เป็นประจำ"
       label:    "โรงพยาบาลยังไม่มีระบบคัดกรองผู้ป่วยที่เหมาะกับ CKM",
-      highlight: "ระบบคัดกรอง",
+      highlight: ["ยังไม่มี", "ระบบคัดกรอง"],
       problem:  "ยังไม่มีระบบคัดกรองผู้ป่วยที่อาจเหมาะกับ CKM ที่ชัดเจนและใช้เป็นประจำ — ที่มีอยู่ขึ้นกับแพทย์หรือทีมแต่ละคน",
       stat:     "มีระบบชัดเจนใช้ประจำ 2 จาก 16 รพ. · “มีบ้าง ขึ้นกับแพทย์/ทีม” 14 จาก 24 ผู้ตอบ",
       proposal: "กำหนดเกณฑ์คัดกรอง กลุ่มเป้าหมาย ผู้รับผิดชอบ และแบบบันทึกผลคัดกรอง"
@@ -214,7 +229,7 @@ window.CONFIG = {
     {
       // Form Q7 — Met = "มี pathway และ workflow การส่งต่อจาก CKD clinic ชัดเจน"
       label:    "CKD clinic ยังไม่มีระบบส่งต่อผู้ป่วยไปทีม PC",
-      highlight: "ระบบส่งต่อ",
+      highlight: ["ยังไม่มี", "ระบบส่งต่อ"],
       problem:  "ไม่มี pathway และ workflow ส่งต่อผู้ป่วย advanced CKD จาก CKD clinic ไปปรึกษา palliative care — ส่งปรึกษาเป็นรายกรณี",
       stat:     "มี pathway และ workflow ชัดเจน 5 จาก 16 รพ. · ส่งปรึกษาเป็นรายกรณี 17 จาก 24 ผู้ตอบ",
       proposal: "written pathway ส่งต่อจาก CKD clinic ถึงทีม PC พร้อมเกณฑ์ส่งต่อ ช่องทาง consult และผู้ประสานงาน"
@@ -222,7 +237,7 @@ window.CONFIG = {
     {
       // Form Q8 + Q10 — Met = a defined joint working model and integration level ≥ 3
       label:    "ทีมไตและทีม PC ยังทำงานร่วมกันเฉพาะผู้ป่วยซับซ้อน",
-      highlight: "เฉพาะผู้ป่วยซับซ้อน",
+      highlight: ["เฉพาะผู้ป่วยซับซ้อน"],
       problem:  "สองทีมเชื่อมโยงกันเฉพาะผู้ป่วยรายที่ซับซ้อน ผ่านการส่งปรึกษา OPD/IPD — ยังไม่ทำงานร่วมกันสม่ำเสมอ และไม่มี workflow ร่วม",
       stat:     "บูรณาการระดับ 3–4 7 จาก 16 รพ. · ระดับ 1–2 13 จาก 24 ผู้ตอบ · joint clinic 5 รพ. case conference 1 รพ.",
       proposal: "รูปแบบทำงานร่วมที่กำหนดไว้ เช่น joint clinic หรือ case conference ประจำ และ case review ร่วมสองทีม"
@@ -230,7 +245,7 @@ window.CONFIG = {
     {
       // Form Q13 + Q15 — Met = "ทำ ACP ในผู้ป่วย ESKD ไม่ว่าเลือกการรักษาแบบใด"
       label:    "การทำ ACP ยังจำกัดเฉพาะผู้ป่วยที่เลือก CKM และเริ่มเมื่ออาการทรุดแล้ว",
-      highlight: "การทำ ACP ยังจำกัด",
+      highlight: ["การทำ ACP ยังจำกัด"],
       problem:  "ACP ทำเฉพาะผู้ป่วย ESKD ที่เลือก CKM และมักเริ่มหลังเลือก CKM หรือหลังอาการมากขึ้น — ผู้ที่เลือก HD, PD หรือ KT ไม่ได้ทำ",
       stat:     "ทำ ACP ทุกทางเลือก 1 จาก 16 รพ. · เฉพาะ CKM 17 จาก 24 ผู้ตอบ · เริ่มก่อนตัดสินใจ KRT 5 จาก 24",
       proposal: "ทำ ACP ในผู้ป่วย ESKD ทุกทางเลือก เริ่มตั้งแต่ CKD stage 4–5 ก่อนตัดสินใจบำบัดทดแทนไต ใช้เอกสารมาตรฐาน ลงนาม และทบทวนเมื่ออาการเปลี่ยน"
