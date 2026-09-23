@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230716">
+<link rel="stylesheet" href="assets/theme.css?v=202609230724">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -18,16 +18,16 @@
   }
   .joined {
     display:flex; align-items:baseline; gap:16px; margin-top:4vh;
-    font-size:clamp(17px,1.9vw,32px); color:#9BA6BC;
+    font-size:clamp(17px,1.9vw,32px); color:var(--green-200);
   }
   .joined b { font-size:clamp(40px,5.4vw,92px); color:#fff; font-weight:800; letter-spacing:-.03em; }
 
   .who-grid { display:flex; gap:4vw; height:100%; align-items:center; justify-content:center; flex-wrap:wrap; }
   .who-col { text-align:center; }
   .who-col .n { font-size:clamp(54px,8vw,150px); font-weight:800; line-height:1; letter-spacing:-.04em; }
-  .who-col .l { font-size:clamp(16px,1.7vw,29px); color:#9BA6BC; margin-top:10px; }
+  .who-col .l { font-size:clamp(16px,1.7vw,29px); color:var(--green-200); margin-top:10px; }
   .who-roles { display:flex; gap:22px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
-  .who-roles span { font-size:clamp(13px,1.15vw,20px); color:#7D879C; }
+  .who-roles span { font-size:clamp(13px,1.15vw,20px); color:var(--green-200); }
 
   .toolbar {
     position:fixed; top:2vh; right:2vw; display:flex; gap:8px; z-index:20;
@@ -63,16 +63,16 @@
   .problems[data-n="10"] .problem-card { padding:1.4vh 2vw; }
   .problem-card {
     display:grid; grid-template-columns:auto 1fr auto; gap:2vw; align-items:center;
-    background:#161C2A; border:1px solid #2A3142; border-radius:20px;
+    background:var(--ink-soft); border:1px solid var(--ink-line); border-radius:20px;
     padding:2.2vh 2.4vw;
   }
   .problem-card .tag {
     font-size:clamp(12px,1vw,18px); font-weight:800; letter-spacing:.09em;
-    padding:7px 13px; border-radius:8px; color:#0E1118;
+    padding:7px 13px; border-radius:var(--r-sm); color:var(--green-900);
   }
   .problem-card .stmt { font-size:clamp(17px,2vw,36px); font-weight:700; line-height:1.22; }
-  .problem-card .from { font-size:clamp(12px,1.05vw,19px); color:#8A94A8; margin-top:8px; }
-  .problem-card .counts { text-align:right; font-size:clamp(12px,1.05vw,19px); color:#8A94A8; white-space:nowrap; }
+  .problem-card .from { font-size:clamp(12px,1.05vw,19px); color:var(--green-200); margin-top:8px; }
+  .problem-card .counts { text-align:right; font-size:clamp(12px,1.05vw,19px); color:var(--green-200); white-space:nowrap; }
   .problem-card .counts b { display:block; font-size:clamp(24px,2.6vw,46px); color:#fff; letter-spacing:-.02em; }
 
   .spotlight-wrap { display:grid; grid-template-columns: 1fr 1.15fr; gap:3vw; height:100%; align-items:center; }
@@ -82,18 +82,19 @@
   /* ---- turn and talk: the one slide that asks the room to be loud ---- */
   .talk { display:grid; place-items:center; height:100%; text-align:center; }
   .talk .lead { font-size:clamp(30px,4.6vw,86px); font-weight:800; letter-spacing:-.03em; line-height:1.1; }
-  .talk .sub { font-size:clamp(16px,1.8vw,31px); color:#9BA6BC; margin-top:2vh; }
+  .talk .sub { font-size:clamp(16px,1.8vw,31px); color:var(--green-200); margin-top:2vh; }
   .talk .cues { display:flex; gap:3vw; justify-content:center; flex-wrap:wrap; margin-top:4vh;
-    font-size:clamp(15px,1.55vw,27px); color:#D6DCE8; }
-  .talk .cues div { background:#161C2A; border:1px solid #2A3142; border-radius:16px; padding:1.6vh 2.2vw; }
+    font-size:clamp(15px,1.55vw,27px); color:var(--green-100); }
+  .talk .cues div { background:var(--ink-soft); border:1px solid var(--ink-line);
+    border-radius:0 var(--r-leaf) 0 var(--r-leaf); padding:1.6vh 2.2vw; }
   .talk .clock { font-size:clamp(56px,9vw,170px); font-weight:800; line-height:1; letter-spacing:-.04em;
     margin-top:4vh; font-variant-numeric:tabular-nums; }
-  .talk .clock.over { color:#E5CE7A; font-size:clamp(30px,4vw,74px); }
-  .talk .gap-line { font-size:clamp(13px,1.2vw,22px); color:#7D879C; margin-bottom:2.5vh; }
+  .talk .clock.over { color:var(--gold-300); font-size:clamp(30px,4vw,74px); }
+  .talk .gap-line { font-size:clamp(13px,1.2vw,22px); color:var(--green-200); margin-bottom:2.5vh; }
 
   .closing { display:grid; place-items:center; height:100%; text-align:center; }
   .closing .big { font-size:clamp(32px,5vw,90px); font-weight:800; letter-spacing:-.03em; line-height:1.08; }
-  .closing .sub { font-size:clamp(16px,1.8vw,31px); color:#9BA6BC; margin-top:2.4vh; }
+  .closing .sub { font-size:clamp(16px,1.8vw,31px); color:var(--green-200); margin-top:2.4vh; }
 
   .offline-flag {
     position:fixed; top:2vh; left:2vw; z-index:30;
@@ -106,23 +107,23 @@
   .react-blind .piece { position:relative; height:78%; }
   .react-blind .count { text-align:center; }
   .react-blind .count .n { font-size:clamp(70px,11vw,220px); font-weight:800; line-height:1; letter-spacing:-.04em; }
-  .react-blind .count .l { font-size:clamp(16px,1.8vw,30px); color:#9BA6BC; margin-top:1vh; }
-  .react-blind .count .split { display:flex; gap:3vw; justify-content:center; margin-top:2.4vh; font-size:clamp(14px,1.4vw,24px); color:#7D879C; }
+  .react-blind .count .l { font-size:clamp(16px,1.8vw,30px); color:var(--green-200); margin-top:1vh; }
+  .react-blind .count .split { display:flex; gap:3vw; justify-content:center; margin-top:2.4vh; font-size:clamp(14px,1.4vw,24px); color:var(--green-200); }
   .react-blind .count .split b { font-size:1.5em; display:block; }
   .react-reveal { display:grid; grid-template-columns: .72fr 1fr 1fr; gap:2vw; height:100%; }
   .react-reveal .piece { position:relative; align-self:center; height:70%; }
   .react-reveal .col { display:flex; flex-direction:column; min-height:0; }
   .react-reveal .col h3 { margin:0 0 1vh; font-size:clamp(16px,1.7vw,30px); font-weight:750; display:flex; align-items:baseline; gap:.6em; }
-  .react-reveal .col h3 span { font-size:.7em; color:#8A94A8; font-weight:600; }
+  .react-reveal .col h3 span { font-size:.7em; color:var(--green-200); font-weight:600; }
   .react-reveal .col .board { position:relative; flex:1; }
   .react-reveal.two { grid-template-columns: .72fr 2fr; }
-  .react-reveal .col.causes h3 { color:#E5CE7A; }
-  .react-reveal .col.works h3  { color:#8FCFA8; }
-  .react-reveal .col.fixes h3  { color:#8FCFA8; }
+  .react-reveal .col.causes h3 { color:var(--gold-300); }
+  .react-reveal .col.works h3  { color:var(--pink-300); }
+  .react-reveal .col.fixes h3  { color:var(--pink-300); }
   .signup { display:flex; align-items:center; gap:2vw; justify-content:center; margin-top:4vh; }
   .signup .qr { background:#fff; border-radius:16px; padding:12px; width:clamp(110px,12vw,200px); }
   .signup .qr svg { display:block; width:100%; height:auto; }
-  .signup .l { font-size:clamp(14px,1.5vw,26px); color:#9BA6BC; max-width:26ch; text-align:left; }
+  .signup .l { font-size:clamp(14px,1.5vw,26px); color:var(--green-200); max-width:26ch; text-align:left; }
 </style>
 </head>
 <body class="present">
@@ -140,16 +141,16 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609230716"></script>
-<script src="assets/config.js?v=202609230716"></script>
-<script src="assets/strings.js?v=202609230716"></script>
-<script src="assets/slides.js?v=202609230716"></script>
-<script src="assets/qrcode.js?v=202609230716"></script>
-<script src="assets/paper.js?v=202609230716"></script>
-<script src="assets/wordcloud.js?v=202609230716"></script>
-<script src="assets/store-supabase.js?v=202609230716"></script>
-<script src="assets/store-local.js?v=202609230716"></script>
-<script src="assets/store.js?v=202609230716"></script>
+<script src="assets/version.js?v=202609230724"></script>
+<script src="assets/config.js?v=202609230724"></script>
+<script src="assets/strings.js?v=202609230724"></script>
+<script src="assets/slides.js?v=202609230724"></script>
+<script src="assets/qrcode.js?v=202609230724"></script>
+<script src="assets/paper.js?v=202609230724"></script>
+<script src="assets/wordcloud.js?v=202609230724"></script>
+<script src="assets/store-supabase.js?v=202609230724"></script>
+<script src="assets/store-local.js?v=202609230724"></script>
+<script src="assets/store.js?v=202609230724"></script>
 <script>
 (function () {
   "use strict";
@@ -255,7 +256,8 @@
       <div class="slide-body" style="overflow:hidden"><div class="problems" id="problemList"></div></div>`;
   }
 
-  const GROUP_PALETTE = ["#7FB3D5","#E9A06B","#8FCFA8","#C59BD1","#E5CE7A","#84C5C5","#E39A9A","#A9A3D8"];
+  /* Chula Nuvo, the shades that carry on canopy green */
+  const GROUP_PALETTE = ["#ec88ac","#e6cb74","#a9cdb9","#f4b6cd","#76ad90","#d5e7dd","#c9a227","#ec88ac"];
   function groupColor(i) { return GROUP_PALETTE[Math.max(0, i) % GROUP_PALETTE.length]; }
 
   /* One gap as a card: label, the survey number and counts. The program's
@@ -279,7 +281,7 @@
       e.setAttribute("font-size", size); e.setAttribute("fill", fill);
       e.setAttribute("font-weight", weight || 600);
       if (anchor) e.setAttribute("text-anchor", anchor);
-      e.setAttribute("font-family", 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif');
+      e.setAttribute("font-family", '"Bai Jamjuree", "Sarabun", ui-sans-serif, system-ui, -apple-system, "Noto Sans Thai", sans-serif');
       e.textContent = str; svg.appendChild(e);
     };
     /* The label is the headline (it is a full sentence now) and the survey
@@ -287,7 +289,7 @@
        lives on the phone and in the export. */
     txt(opts.practice ? t("practice_badge") : g.id, W * 0.075, H * 0.15, 14, accent, 800);
     const counts = opts.blind ? "" : `${helps} · ${needs}` + (ideas ? ` · ${ideas}` : "");
-    if (counts) txt(counts, W * 0.925, H * 0.15, 14, "#8A94A8", 600, "end");
+    if (counts) txt(counts, W * 0.925, H * 0.15, 14, "#a9cdb9", 600, "end");
     Paper.layoutText(svg, g.label || g.problem_statement,
       { x: W * 0.075, y: H * 0.21, w: W * 0.85, h: H * 0.42 },
       { size: opts.tall ? 26 : 23, min: 13, fill: "#fff", weight: "700" });
@@ -383,7 +385,7 @@
           <div class="piece" id="gapPiece"></div>
           <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div>
           <div class="count" style="align-self:center;text-align:center"><div class="n" id="rN" style="font-size:clamp(60px,9vw,180px);font-weight:800;line-height:1">0</div>
-            <div class="l" style="color:#9BA6BC;font-size:clamp(16px,1.7vw,28px)">${escapeHtml(t("pj_answers"))}</div><div class="split" id="rSplit" style="display:flex;gap:2vw;justify-content:center;margin-top:2vh;font-size:clamp(13px,1.3vw,22px);color:#7D879C"></div></div></div>`;
+            <div class="l" style="color:var(--green-200);font-size:clamp(16px,1.7vw,28px)">${escapeHtml(t("pj_answers"))}</div><div class="split" id="rSplit" style="display:flex;gap:2vw;justify-content:center;margin-top:2vh;font-size:clamp(13px,1.3vw,22px);color:var(--green-200)"></div></div></div>`;
       } else {
         body.innerHTML = `<div class="react-reveal">
           <div class="piece" id="gapPiece"></div>
@@ -391,7 +393,7 @@
           <div class="col fixes"><h3>${escapeHtml(t("pj_solutions"))} <span id="fN"></span></h3><div class="board" id="boardFixes"></div></div></div>`;
       }
       if (!isOverall) $("gapPiece").appendChild(problemPiece(g, i, { tall: true, blind: true, practice: isPractice }));
-      else $("gapPiece").innerHTML = `<div style="color:#9BA6BC;font-size:clamp(16px,1.8vw,30px);line-height:1.5;padding:2vw">${escapeHtml(t("overall_sub"))}</div>`;
+      else $("gapPiece").innerHTML = `<div style="color:var(--green-200);font-size:clamp(16px,1.8vw,30px);line-height:1.5;padding:2vw">${escapeHtml(t("overall_sub"))}</div>`;
     }
     if (!revealed) {
       setText("rN", live.length);

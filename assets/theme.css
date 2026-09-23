@@ -1,55 +1,102 @@
 /* ============================================================================
-   THE MISSING PIECE — visual design
+   THE MISSING PIECE — visual design, on Chula Nuvo
    ----------------------------------------------------------------------------
-   Two environments, deliberately different:
+   Tokens are Chula Nuvo (Blossom Pink, Canopy Green, Royal Gold, Mist, Ink),
+   taken from that system's tokens.json. Two environments, deliberately
+   different, both from the same palette:
 
-     The projector  : dark background, bright pieces. Reads from the back row,
-                      survives a washed-out projector bulb.
-     The phone      : light background, big touch targets, thumb-reachable
-                      buttons. People are standing up in a lit room.
+     The projector  : Nuvo's dark theme — canopy ground, pale notes. Reads
+                      from the back row, survives a washed-out bulb.
+     The phone and
+     the control    : Nuvo's light theme — Mist ground, white cards, big
+                      touch targets, pink only where something is to be done.
+
+   Two deliberate departures from the system, both forced by the job:
+
+   1. Pink is a TEAM colour here, not the single focus. A board where two
+      disciplines must be told apart at a glance needs two colours of equal
+      weight; palliative care carries Blossom Pink, nephrology Canopy Green,
+      and they differ in lightness as well as hue so the pair survives
+      colour-blindness. Royal Gold stays the accent, on the survey numbers.
+   2. The faces are served from assets/fonts/ rather than from Google, because
+      nothing in this workshop may depend on the venue's wifi.
    ========================================================================== */
 
+@import url("fonts.css");
+
 :root {
-  /* Discipline colours are injected from config.js at load, so you only ever
-     set them in one place. These are the fallbacks. */
-  --nephro:      #1F9AB8;
-  --nephro-ink:  #052A33;
-  --nephro-glow: #5FD3EC;
-  --pall:        #E08034;
-  --pall-ink:    #3A1B06;
-  --pall-glow:   #FFB273;
+  /* ---- Chula Nuvo: the scales ---- */
+  --pink-50:  #fdf0f5;  --pink-100: #fadce7;  --pink-200: #f4b6cd;
+  --pink-300: #ec88ac;  --pink-400: #e2608f;  --pink-500: #d6457f;
+  --pink-600: #b8316a;  --pink-700: #962655;
 
-  --ink:      #0E1118;
-  --ink-soft: #1A1F2B;
-  --ink-line: #2A3142;
-  --paper:    #FBFAF7;
-  --paper-2:  #F1EEE8;
-  --text:     #131722;
-  --text-dim: #5D6577;
-  --edge:     #DDD8CE;
+  --green-50:  #eef5f1; --green-100: #d5e7dd; --green-200: #a9cdb9;
+  --green-300: #76ad90; --green-400: #4a8c6b; --green-500: #2e6e52;
+  --green-600: #225a43; --green-700: #1b4a3b; --green-800: #173f35;
+  --green-900: #0f2a23;
 
-  --ok:   #2E9E6B;
-  --warn: #D4A020;
-  --bad:  #C94A3F;
+  --gold-300: #e6cb74;  --gold-500: #c9a227;  --gold-700: #8a6d12;
 
-  --r-sm: 8px;
-  --r-md: 14px;
-  --r-lg: 22px;
+  --neutral-0:   #ffffff; --neutral-50:  #f5f7f5; --neutral-100: #e9edea;
+  --neutral-200: #d5dbd7; --neutral-300: #b5beb9; --neutral-400: #8c9792;
+  --neutral-500: #6a7570; --neutral-600: #505a56; --neutral-700: #39413e;
+  --neutral-900: #141a18;
 
-  --shadow-1: 0 1px 2px rgba(10,14,22,.08), 0 2px 8px rgba(10,14,22,.06);
-  --shadow-2: 0 4px 12px rgba(10,14,22,.12), 0 12px 32px rgba(10,14,22,.10);
+  /* ---- the two teams. Injected from config.js at load; these are the
+         fallbacks, and they are the reason pink is not reserved for focus. ---- */
+  --nephro:      #2e6e52;
+  --nephro-ink:  #0f2a23;
+  --nephro-glow: #76ad90;
+  --pall:        #d6457f;
+  --pall-ink:    #4a132b;
+  --pall-glow:   #f4b6cd;
+
+  /* ---- semantic, light theme (phone, control panel) ---- */
+  --paper:    #f5f7f5;            /* Mist: the ground */
+  --paper-2:  #e9edea;            /* subtle fills */
+  --text:     #141a18;            /* Ink, 16.38:1 on Mist */
+  --text-dim: #505a56;            /* smallest safe grey, 6.64:1 */
+  --edge:     #d5dbd7;
+  --heading:  #173f35;            /* Canopy Green */
+  --primary:  #b8316a;            /* interactive pink, 5.70:1 on white */
+  --primary-hover: #962655;
+  --primary-tint:  #fdf0f5;
+
+  /* ---- semantic, dark theme (projector) ---- */
+  --ink:      #0f2a23;            /* canopy page ground */
+  --ink-soft: #15352c;            /* cards */
+  --ink-line: #1c4237;
+
+  --ok:   #2e7d4f;
+  --warn: #b7791f;
+  --bad:  #c0392b;
+
+  /* ---- shape: Nuvo radii, with the leaf corner as the signature ---- */
+  --r-sm:   4px;
+  --r-md:   8px;
+  --r-lg:   16px;
+  --r-leaf: 24px;
+  --r-pill: 999px;
+
+  /* Borders separate things; the lift shadow is only for what lifts. */
+  --shadow-1: 0 1px 0 rgba(20,26,24,.06), 0 8px 24px -12px rgba(23,63,53,.25);
+  --shadow-2: 0 1px 0 rgba(20,26,24,.06), 0 12px 32px -14px rgba(23,63,53,.30);
   --shadow-3: 0 10px 40px rgba(0,0,0,.45);
 
-  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-          "Helvetica Neue", "Noto Sans Thai", "Leelawadee UI", sans-serif;
-  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI Semibold",
-          Roboto, "Noto Sans Thai", sans-serif;
+  --font: "Anuphan", "Sarabun", ui-sans-serif, system-ui, -apple-system,
+          "Noto Sans Thai", "Leelawadee UI", sans-serif;
+  --font-display: "Bai Jamjuree", "Sarabun", ui-sans-serif, system-ui,
+          -apple-system, "Noto Sans Thai", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
   font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.7;                 /* Nuvo: Thai needs 1.7 so tone marks and
+                                       vowels never collide between lines */
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
 }
@@ -82,24 +129,24 @@ body.participant {
    marks from one line touch the next. Same reason for no negative tracking. */
 .masthead h1 {
   font-family: var(--font-display);
-  font-size: 25px; line-height: 1.35; margin: 0 0 6px;
-  letter-spacing: 0; font-weight: 700;
+  font-size: 25px; line-height: 1.3; margin: 0 0 6px;
+  letter-spacing: 0; font-weight: 600;
+  color: var(--heading);
 }
-.masthead p { margin: 0; color: var(--text-dim); font-size: 15px; line-height: 1.55; }
+.masthead p { margin: 0; color: var(--text-dim); font-size: 16px; line-height: 1.7; }
 
 .card {
-  background: #fff;
+  background: var(--neutral-0);
   border: 1px solid var(--edge);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-md);
   padding: 20px;
-  box-shadow: var(--shadow-1);
   margin-bottom: 16px;
 }
 
 label.field { display: block; margin-bottom: 20px; }
 label.field > span.lbl {
-  display: block; font-size: 13px; font-weight: 650; letter-spacing: .03em;
-  text-transform: uppercase; color: var(--text-dim); margin-bottom: 9px;
+  display: block; font-size: 14px; font-weight: 600; letter-spacing: 0;
+  color: var(--heading); margin-bottom: 9px;
 }
 
 /* Big tappable choices rather than a dropdown — faster, and visible at a
@@ -110,8 +157,8 @@ label.field > span.lbl {
 
 .choice {
   appearance: none; -webkit-appearance: none;
-  border: 2px solid var(--edge);
-  background: #fff;
+  border: 2px solid var(--neutral-300);
+  background: var(--neutral-0);
   border-radius: var(--r-md);
   padding: 15px 14px;
   font: inherit; font-size: 16px; font-weight: 600;
@@ -124,18 +171,18 @@ label.field > span.lbl {
   touch-action: manipulation;       /* no 300ms tap delay on older phones */
   transition: border-color .12s, background .12s, transform .06s;
 }
-.choice:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+.choice:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
 .choice:active { transform: scale(.985); }
 .choice[aria-pressed="true"] {
-  border-color: var(--pick, var(--text));
-  background: color-mix(in srgb, var(--pick, #000) 13%, #fff);
-  font-weight: 700;
+  border-color: var(--pick, var(--primary));
+  background: color-mix(in srgb, var(--pick, var(--primary)) 11%, #fff);
+  font-weight: 600;
 }
 /* a chosen option is marked by a tick as well as by colour, so it still
    reads under a bright room light or to someone who does not see the tint */
 .choice[aria-pressed="true"]::after {
   content: "✓"; margin-left: auto; padding-left: 8px;
-  color: var(--pick, var(--text)); font-weight: 800; font-size: 18px;
+  color: var(--pick, var(--primary)); font-weight: 700; font-size: 18px;
 }
 .choice .dot {
   width: 15px; height: 15px; border-radius: 50%;
@@ -148,17 +195,17 @@ label.field > span.lbl {
 
 textarea.note {
   width: 100%;
-  border: 2px solid var(--edge);
+  border: 2px solid var(--neutral-300);
   border-radius: var(--r-md);
   padding: 15px;
-  font: inherit; font-size: 17px; line-height: 1.45;
+  font: inherit; font-size: 17px; line-height: 1.7;
   min-height: 132px; resize: vertical;
-  background: var(--paper-2);
+  background: var(--neutral-0);
   color: var(--text);
 }
-textarea.note:focus { outline: none; border-color: var(--text); background: #fff;
-  box-shadow: 0 0 0 3px rgba(19,23,34,.14); }
-textarea.note::placeholder { color: #A8A395; }
+textarea.note:focus { outline: none; border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(184,49,106,.16); }
+textarea.note::placeholder { color: var(--neutral-500); }
 
 .counter { text-align: right; font-size: 13px; color: var(--text-dim); margin-top: 7px; }
 .counter.near { color: var(--warn); }
@@ -166,21 +213,23 @@ textarea.note::placeholder { color: #A8A395; }
 
 .btn {
   appearance: none; border: none; cursor: pointer;
-  font: inherit; font-size: 17px; font-weight: 700;
-  border-radius: var(--r-md);
-  padding: 17px 20px;
+  font: inherit; font-size: 17px; font-weight: 600;
+  border-radius: var(--r-pill);     /* Nuvo: the pill is for buttons alone */
+  padding: 17px 24px;
   width: 100%;
-  background: var(--text); color: #fff;
+  background: var(--primary); color: #fff;
   min-height: 56px;
   touch-action: manipulation;
   transition: opacity .12s, transform .06s, background .12s, color .12s;
 }
-.btn:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
+.btn:hover:not(:disabled) { background: var(--primary-hover); }
+.btn:focus-visible { outline: 3px solid var(--heading); outline-offset: 3px; }
 .btn:active:not(:disabled) { transform: scale(.99); }
 /* the disabled label carries the reason ("fill in both boxes"), so it has
    to stay readable — a pale button with dark text rather than a faded one */
-.btn:disabled { background: #E6E2DA; color: #454B5A; cursor: not-allowed; }
-.btn.ghost { background: #fff; color: var(--text); border: 2px solid var(--edge); }
+.btn:disabled { background: var(--neutral-100); color: var(--neutral-600); cursor: not-allowed; }
+.btn.ghost { background: var(--neutral-0); color: var(--heading); border: 2px solid var(--neutral-300); }
+.btn.ghost:hover:not(:disabled) { background: var(--neutral-0); border-color: var(--heading); }
 .btn.small { font-size: 15px; padding: 12px 16px; min-height: 46px; width: auto; }
 
 .sticky-foot {
@@ -193,7 +242,7 @@ textarea.note::placeholder { color: #A8A395; }
 .foot-msg { font-size: 14px; line-height: 1.45; text-align: center; margin: 0 0 9px; min-height: 1.45em; }
 .foot-msg.ok   { color: #1D6B48; }
 .foot-msg.warn { color: #7A5C09; }
-.foot-msg.bad  { color: #8C2E25; font-weight: 600; }
+.foot-msg.bad  { color: var(--bad); font-weight: 600; }
 
 /* Status strip — connection, queued notes, confirmations */
 .status {
@@ -203,26 +252,25 @@ textarea.note::placeholder { color: #A8A395; }
   border: 1px solid transparent;
 }
 .status .pip { width: 9px; height: 9px; border-radius: 50%; flex: none; }
-.status.ok    { background: #EAF6F0; color: #1D6B48; border-color: #C5E5D6; }
+.status.ok    { background: var(--green-50); color: var(--green-600); border-color: var(--green-200); }
 .status.ok .pip    { background: var(--ok); }
-.status.warn  { background: #FDF6E3; color: #7A5C09; border-color: #F0E0B0; }
+.status.warn  { background: #fdf8ec; color: var(--gold-700); border-color: #ecdcb0; }
 .status.warn .pip  { background: var(--warn); }
-.status.bad   { background: #FBECEA; color: #8C2E25; border-color: #F2CFCA; }
+.status.bad   { background: #fbeceb; color: var(--bad); border-color: #f0cdc9; }
 .status.bad .pip   { background: var(--bad); }
 
 /* A participant's own notes, echoed back so they can see it landed */
 .mine { margin-top: 4px; }
 .mine h3 {
-  font-size: 13px; text-transform: uppercase; letter-spacing: .04em;
-  color: var(--text-dim); margin: 0 0 10px;
+  font-size: 14px; font-weight: 600; letter-spacing: 0;
+  color: var(--heading); margin: 0 0 10px;
 }
 .mine-item {
   display: flex; gap: 11px; align-items: flex-start;
-  background: #fff; border: 1px solid var(--edge);
-  border-left: 4px solid var(--pick, var(--edge));
-  border-radius: var(--r-sm);
-  padding: 12px 14px; margin-bottom: 8px;
-  font-size: 15px; line-height: 1.4;
+  background: var(--neutral-0); border: 1px solid var(--pick, var(--edge));
+  border-radius: 0 var(--r-leaf) 0 var(--r-leaf);
+  padding: 13px 16px; margin-bottom: 8px;
+  font-size: 15px; line-height: 1.7;
 }
 .mine-item .ref {
   font-size: 11px; font-weight: 700; color: var(--text-dim);
@@ -230,15 +278,15 @@ textarea.note::placeholder { color: #A8A395; }
 }
 .mine-item.pending { opacity: .62; font-style: italic; }
 
-.hint { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+.hint { font-size: 14px; color: var(--text-dim); line-height: 1.7; }
 .center { text-align: center; }
 
 /* ============================================================================
    PROJECTOR SIDE
    ========================================================================== */
 body.present {
-  background: var(--ink);
-  color: #fff;
+  background: var(--ink);          /* Canopy 900 */
+  color: var(--neutral-50);
   height: 100vh; overflow: hidden;
   font-family: var(--font-display);
 }
@@ -268,7 +316,7 @@ body.present {
 }
 .slide .sub {
   font-size: clamp(16px, 1.65vw, 28px);
-  color: #9BA6BC; margin: 1vh 0 0; font-weight: 450; line-height: 1.5;
+  color: var(--green-200); margin: 1vh 0 0; font-weight: 450; line-height: 1.5;
 }
 .slide-body { flex: 1; min-height: 0; position: relative; }
 
@@ -285,7 +333,7 @@ body.present {
 
 .livecount {
   position: fixed; left: 2vw; bottom: 2vh;
-  font-size: clamp(13px, 1.1vw, 19px); color: #8A94A8;
+  font-size: clamp(13px, 1.1vw, 19px); color: var(--green-200);
   display: flex; align-items: center; gap: 9px;
 }
 .livecount .pip {
@@ -337,12 +385,12 @@ body.control {
 .control-wrap { max-width: 1080px; margin: 0 auto; padding: 22px 18px 80px; }
 
 .panel {
-  background: #fff; border: 1px solid var(--edge);
+  background: var(--neutral-0); border: 1px solid var(--edge);
   border-radius: var(--r-md); padding: 18px; margin-bottom: 16px;
-  box-shadow: var(--shadow-1);
 }
 .panel h2 {
-  margin: 0 0 4px; font-size: 16px; font-weight: 700;
+  margin: 0 0 4px; font-size: 16px; font-weight: 600;
+  font-family: var(--font-display); color: var(--heading);
   display: flex; align-items: center; gap: 9px;
 }
 .panel .why {
@@ -353,49 +401,50 @@ body.control {
 .slide-list { display: grid; gap: 7px; }
 .slide-btn {
   display: flex; align-items: center; gap: 12px; text-align: left;
-  border: 2px solid var(--edge); background: #fff;
+  border: 2px solid var(--neutral-300); background: var(--neutral-0);
   border-radius: var(--r-sm); padding: 12px 14px;
   font: inherit; cursor: pointer; width: 100%;
 }
-.slide-btn[aria-current="true"] { border-color: var(--text); background: #F7F5F1; }
+.slide-btn[aria-current="true"] { border-color: var(--heading); background: var(--green-50); }
 .slide-btn .n {
   width: 26px; height: 26px; border-radius: 50%; flex: none;
   background: var(--paper-2); color: var(--text-dim);
   display: grid; place-items: center; font-size: 12.5px; font-weight: 700;
 }
-.slide-btn[aria-current="true"] .n { background: var(--text); color: #fff; }
+.slide-btn[aria-current="true"] .n { background: var(--heading); color: #fff; }
 .slide-btn .meta { margin-left: auto; font-size: 12px; color: var(--text-dim); }
 
 .stat-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(112px,1fr)); gap: 10px; }
-.stat { background: var(--paper-2); border-radius: var(--r-sm); padding: 13px 14px; }
-.stat .v { font-size: 27px; font-weight: 750; line-height: 1; letter-spacing: -.02em; }
+.stat { background: var(--green-50); padding: 13px 16px;
+        border-radius: 0 var(--r-leaf) 0 var(--r-leaf); }   /* the leaf corner */
+.stat .v { font-size: 27px; font-weight: 600; line-height: 1.1; font-family: var(--font-display); color: var(--heading); }
 .stat .k { font-size: 12px; color: var(--text-dim); margin-top: 5px; }
 
 .toggle {
   display: inline-flex; align-items: center; gap: 11px;
   padding: 11px 16px; border-radius: 100px;
-  border: 2px solid var(--edge); background: #fff;
+  border: 2px solid var(--neutral-300); background: var(--neutral-0);
   font-weight: 650; cursor: pointer; font-size: 15px;
 }
-.toggle[aria-pressed="true"] { background: #EAF6F0; border-color: #9FD4BA; color: #1D6B48; }
+.toggle[aria-pressed="true"] { background: var(--green-50); border-color: var(--green-300); color: var(--green-600); }
 .toggle .pip { width: 10px; height: 10px; border-radius: 50%; background: var(--edge); }
 .toggle[aria-pressed="true"] .pip { background: var(--ok); }
 
 input.text, textarea.text {
   width: 100%; border: 2px solid var(--edge); border-radius: var(--r-sm);
-  padding: 11px 13px; font: inherit; font-size: 15px; background: #fff; color: var(--text);
+  padding: 11px 13px; font: inherit; font-size: 15px; background: var(--neutral-0); color: var(--text);
 }
 textarea.text { min-height: 130px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; line-height: 1.5; }
 input.text:focus, textarea.text:focus { outline: none; border-color: var(--text-dim); }
 
 .note-line {
-  font-size: 13.5px; color: var(--text-dim); line-height: 1.5;
-  background: #FDF6E3; border: 1px solid #F0E0B0; color: #7A5C09;
+  font-size: 13.5px; line-height: 1.6;
+  background: #fdf8ec; border: 1px solid #ecdcb0; color: var(--gold-700);
   padding: 11px 13px; border-radius: var(--r-sm); margin-top: 11px;
 }
-.note-line.bad { background: #FBECEA; border-color: #F2CFCA; color: #8C2E25; }
-.note-line.ok  { background: #EAF6F0; border-color: #C5E5D6; color: #1D6B48; }
-.note-line.warn { background: #FDF6E3; border-color: #F0E0B0; color: #7A5C09; }
+.note-line.bad { background: #fbeceb; border-color: #f0cdc9; color: var(--bad); }
+.note-line.ok  { background: var(--green-50); border-color: var(--green-200); color: var(--green-600); }
+.note-line.warn { background: #fdf8ec; border-color: #ecdcb0; color: var(--gold-700); }
 
 /* a label that only a screen reader reads: the field beside it is already
    obvious to anyone who can see it */

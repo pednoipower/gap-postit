@@ -118,10 +118,13 @@ window.CONFIG = {
      saturated, clearly different from each other.
      ------------------------------------------------------------------------ */
   colors: {
-    nephro:     { base: "#1F9AB8", ink: "#052A33", glow: "#5FD3EC" },
-    palliative: { base: "#E08034", ink: "#3A1B06", glow: "#FFB273" },
+    // Chula Nuvo: Canopy Green and Blossom Pink. They differ in lightness as
+    // well as hue, so the two teams stay apart for colour-blind readers and
+    // on a weak projector bulb.
+    nephro:     { base: "#2e6e52", ink: "#0f2a23", glow: "#76ad90" },
+    palliative: { base: "#d6457f", ink: "#4a132b", glow: "#f4b6cd" },
     // used if someone joins with a discipline not listed above
-    fallback:   { base: "#8C8FA3", ink: "#1B1C24", glow: "#C3C6D8" }
+    fallback:   { base: "#8c9792", ink: "#141a18", glow: "#d5dbd7" }
   },
 
   /* --------------------------------------------------------------------------

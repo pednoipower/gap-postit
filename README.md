@@ -14,7 +14,13 @@ analysis.
 
 Everything on screen is paper: the gaps are cards, the notes are post-its,
 with the causes and the solutions gathering round each gap. Nothing
-interlocks. Colour is discipline, and a small mark in the corner is role.
+interlocks. Colour is discipline — Canopy Green for nephrology, Blossom Pink
+for palliative care — and a small mark in the corner is role.
+
+The visual design follows **Chula Nuvo**, an unofficial concept brand for
+Chulalongkorn work; the mapping and the two places this tool departs from it
+are in `docs/2026-09-23-chula-nuvo-mapping.md`. The typefaces are served from
+`assets/fonts/`, because nothing here may depend on the venue's wifi.
 
 See `docs/2026-09-22-run-of-show-45min.md` for the minute-by-minute script.
 

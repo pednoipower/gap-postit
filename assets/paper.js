@@ -142,7 +142,7 @@
     svg.appendChild(shadow);
 
     const card = rect(0, 0, w, h, r);
-    card.setAttribute("fill", "#1A2030");
+    card.setAttribute("fill", "#15352c");      // Nuvo dark surface
     card.setAttribute("stroke", accent);
     card.setAttribute("stroke-width", "2.4");
     svg.appendChild(card);
@@ -165,8 +165,10 @@
     const maxW = box.w, maxH = box.h;
     let size = opts.size || 16;
     const minSize = opts.min || 9;
+    // Chula Nuvo's text face; the SVG has no stylesheet of its own, so the
+    // stack is spelled out here and ends in Sarabun like every other stack
     const family = opts.family ||
-      'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif';
+      '"Anuphan", "Sarabun", ui-sans-serif, system-ui, -apple-system, "Noto Sans Thai", sans-serif';
 
     // Measuring with a canvas rather than the page means this works even
     // before the card has been added to the document. Measuring a detached
