@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230813">
+<link rel="stylesheet" href="assets/theme.css?v=202609230817">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
 /* ============================================================================
@@ -181,11 +181,12 @@
       <div class="panel">
         <h2>The projector, live</h2>
         <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#0E1118;box-shadow:var(--shadow-1)">
-          <iframe id="preview" src="present.html" title="Projector preview"
+          <iframe id="preview" title="Projector preview"
             style="position:absolute;inset:0;width:200%;height:200%;transform:scale(.5);transform-origin:0 0;border:0;pointer-events:none"></iframe>
         </div>
         <p class="why" style="margin:9px 0 0;font-size:12.5px">This is the projector page itself. If it does not match the big
-          screen, refresh the big screen — it is running an older copy.</p>
+          screen, refresh the big screen — it is running an older copy.
+          <b id="previewNote" style="color:#8C2E25"></b></p>
         <p class="keys"><b>Without touching the mouse:</b>
           <kbd>←</kbd><kbd>→</kbd> move a slide · <kbd>R</kbd> reveal, or collect again ·
           <kbd>B</kbd> open or close the board · <kbd>P</kbd> pause the clock</p>
@@ -274,15 +275,15 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609230813"></script>
-<script src="assets/config.js?v=202609230813"></script>
-<script src="assets/timer.js?v=202609230813"></script>
-<script src="assets/highlight.js?v=202609230813"></script>
-<script src="assets/slides.js?v=202609230813"></script>
-<script src="assets/export.js?v=202609230813"></script>
-<script src="assets/store-supabase.js?v=202609230813"></script>
-<script src="assets/store-local.js?v=202609230813"></script>
-<script src="assets/store.js?v=202609230813"></script>
+<script src="assets/version.js?v=202609230817"></script>
+<script src="assets/config.js?v=202609230817"></script>
+<script src="assets/timer.js?v=202609230817"></script>
+<script src="assets/highlight.js?v=202609230817"></script>
+<script src="assets/slides.js?v=202609230817"></script>
+<script src="assets/export.js?v=202609230817"></script>
+<script src="assets/store-supabase.js?v=202609230817"></script>
+<script src="assets/store-local.js?v=202609230817"></script>
+<script src="assets/store.js?v=202609230817"></script>
 <script>
 (function () {
   "use strict";
@@ -337,6 +338,24 @@
         : "Couldn't connect: " + escapeHtml(e.message));
     }
   }
+
+  /* The preview is the projector page itself. Loaded plain it can come from
+     the browser cache and quietly show an older build than the wall does —
+     which looks like the app is wrong when it is only stale. The build stamp
+     forces a fresh copy, and the check below says so out loud if a copy ever
+     does drift. */
+  $("preview").src = "present.html?v=" + (window.BUILD || Date.now());
+
+  function checkPreviewBuild() {
+    let theirs = null;
+    try { theirs = $("preview").contentWindow.BUILD; } catch (e) { return; }
+    if (!theirs || !window.BUILD) return;
+    $("previewNote").textContent = theirs === window.BUILD
+      ? ""
+      : "This preview is build " + theirs + " and this page is " + window.BUILD +
+        " — refresh the projector too.";
+  }
+  $("preview").addEventListener("load", () => setTimeout(checkPreviewBuild, 400));
 
   /* ---- tabs ---- */
   const TABS = [["tabNow","panelNow"],["tabSlides","panelSlides"],["tabAfter","panelAfter"],["tabRoom","panelRoom"]];
