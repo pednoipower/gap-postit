@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230644">
+<link rel="stylesheet" href="assets/theme.css?v=202609230649">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -140,16 +140,16 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609230644"></script>
-<script src="assets/config.js?v=202609230644"></script>
-<script src="assets/strings.js?v=202609230644"></script>
-<script src="assets/slides.js?v=202609230644"></script>
-<script src="assets/qrcode.js?v=202609230644"></script>
-<script src="assets/paper.js?v=202609230644"></script>
-<script src="assets/wordcloud.js?v=202609230644"></script>
-<script src="assets/store-supabase.js?v=202609230644"></script>
-<script src="assets/store-local.js?v=202609230644"></script>
-<script src="assets/store.js?v=202609230644"></script>
+<script src="assets/version.js?v=202609230649"></script>
+<script src="assets/config.js?v=202609230649"></script>
+<script src="assets/strings.js?v=202609230649"></script>
+<script src="assets/slides.js?v=202609230649"></script>
+<script src="assets/qrcode.js?v=202609230649"></script>
+<script src="assets/paper.js?v=202609230649"></script>
+<script src="assets/wordcloud.js?v=202609230649"></script>
+<script src="assets/store-supabase.js?v=202609230649"></script>
+<script src="assets/store-local.js?v=202609230649"></script>
+<script src="assets/store.js?v=202609230649"></script>
 <script>
 (function () {
   "use strict";
@@ -642,13 +642,23 @@
     `<span>${escapeHtml(cfg.joinUrl.replace(/^https?:\/\//, ""))}</span><b>${escapeHtml(cfg.roomCode)}</b>`;
   $("cornerCode").title = "build " + (window.BUILD || "?");
 
-  /* ---- connect and follow the facilitator ---- */
+  /* ---- connect and follow the facilitator --------------------------------
+     Draw the first slide BEFORE touching the network. A projector that shows
+     the title and the QR code while it connects is a projector people can
+     already join from; a projector that shows nothing looks broken, and in a
+     dark room a blank page is indistinguishable from a dead laptop. */
+  show(0);
+
   (async function () {
-    try {
+    let connected = false;
+    const flag = $("offline");
+    const sayOffline = text => { flag.textContent = text; flag.classList.remove("hidden"); };
+
+    async function connect() {
       await Store.init();
       Store.onChange((what, st) => {
-        if (what === "offline") { $("offline").classList.remove("hidden"); return; }
-        $("offline").classList.add("hidden");
+        if (what === "offline") { sayOffline("ขาดการเชื่อมต่อ — กำลังลองใหม่"); return; }
+        flag.classList.add("hidden");
         if (what === "room" && st.room) {
           const target = Math.max(0, Math.min(SLIDES.length - 1, st.room.current_slide | 0));
           if (target !== current) { show(target); return; }
@@ -656,17 +666,25 @@
         refreshSlide();
       });
       await Store.startWatching({ intervalMs: 1200 });
+      try { Store.state.participants = await Store.listParticipants(); } catch (e) {}
+      show(Store.state.room ? (Store.state.room.current_slide | 0) : 0);
       setInterval(async () => {
         try { Store.state.participants = await Store.listParticipants(); refreshSlide(); } catch (e) {}
       }, 5000);
-      Store.state.participants = await Store.listParticipants();
-      show(Store.state.room ? (Store.state.room.current_slide | 0) : 0);
-    } catch (e) {
-      document.body.innerHTML =
-        `<div style="display:grid;place-items:center;height:100vh;text-align:center;padding:40px">
-          <div><div style="font-size:30px;font-weight:700;margin-bottom:14px">เชื่อมต่อข้อมูลไม่ได้</div>
-          <div style="color:#9BA6BC;font-size:18px;max-width:60ch;line-height:1.5">${escapeHtml(e.message || String(e))}</div></div>
-        </div>`;
+      connected = true;
+      flag.classList.add("hidden");
+    }
+
+    /* Keep trying rather than replacing the screen with an error. The room is
+       watching this wall; the title slide with the join code is the most
+       useful thing it can show while the wifi comes back. */
+    while (!connected) {
+      try { await connect(); }
+      catch (e) {
+        sayOffline("ยังเชื่อมต่อข้อมูลไม่ได้ — กำลังลองใหม่");
+        console.error("connect failed", e);
+        await new Promise(r => setTimeout(r, 4000));
+      }
     }
   })();
 })();
