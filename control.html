@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230738">
+<link rel="stylesheet" href="assets/theme.css?v=202609230746">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
 /* ============================================================================
@@ -274,14 +274,14 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609230738"></script>
-<script src="assets/config.js?v=202609230738"></script>
-<script src="assets/timer.js?v=202609230738"></script>
-<script src="assets/slides.js?v=202609230738"></script>
-<script src="assets/export.js?v=202609230738"></script>
-<script src="assets/store-supabase.js?v=202609230738"></script>
-<script src="assets/store-local.js?v=202609230738"></script>
-<script src="assets/store.js?v=202609230738"></script>
+<script src="assets/version.js?v=202609230746"></script>
+<script src="assets/config.js?v=202609230746"></script>
+<script src="assets/timer.js?v=202609230746"></script>
+<script src="assets/slides.js?v=202609230746"></script>
+<script src="assets/export.js?v=202609230746"></script>
+<script src="assets/store-supabase.js?v=202609230746"></script>
+<script src="assets/store-local.js?v=202609230746"></script>
+<script src="assets/store.js?v=202609230746"></script>
 <script>
 (function () {
   "use strict";
@@ -688,7 +688,7 @@
   /* ---- the AI prompt ---- */
   const AI_PROMPT = `You are helping analyse a 45-minute clinical workshop that brought together nephrology teams and palliative care teams from 16 Thai hospitals. Before the workshop, a pre-survey identified four gaps in how the two teams integrate care for end-stage kidney disease. In the room, for each gap, participants first said whether the gap exists at their own hospital and wrote WHY it happens there — or, if it does not exist there, WHAT MAKES IT WORK there (marked "works here") — then WHAT they would do about it — either something that already exists there (marked "already exists") or something new — and why it would work.
 
-Below is every note, grouped under its gap. WHY-round notes were written as one sentence with blanks — ใคร (actor) | มักจะ (response) | ตอนที่ (situation/condition) | เพราะ (reason or missing resource) — so each one is already a candidate context–mechanism chain. HOW-round lines are: what — why it would work here.
+Below is every note, grouped under its gap. WHY-round notes were written as one sentence with blanks — ใคร (actor) | มักจะ (response) | ตอน (situation/condition) | เพราะ (reason or missing resource) — so each one is already a candidate context–mechanism chain. HOW-round lines are: what — why it would work here.
 
 The team is "nephro" or "palliative". Every note is anonymous.
 

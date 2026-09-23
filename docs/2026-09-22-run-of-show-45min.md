@@ -48,7 +48,7 @@ the ice, and it proves every phone in the room can reach the board before
 anything matters.
 
 It was chosen for its causes, not for the laugh. The chain it produces is
-*คนทำงานหน้างาน · มักจะทำไปก่อนทั้งที่ยังไม่แน่ใจว่าต้องทำอย่างไร · ตอนที่มี
+*คนทำงานหน้างาน · มักจะทำไปก่อนทั้งที่ยังไม่แน่ใจว่าต้องทำอย่างไร · ตอนมี
 ข้อความส่งต่อกันหลายทอดตอนเย็น และให้เริ่มใช้เช้าวันถัดไป · เพราะไม่มีคนสรุปว่า
 งานเปลี่ยนตรงไหน ใครต้องทำ และถ้าสงสัยให้ถามใคร* — instructions travelling
 down a chain with nobody named to turn them into tasks, which is the same
@@ -90,7 +90,7 @@ about their own week rather than about the hospital's paperwork: *ยังเ�
 อยู่* or *ไม่ค่อยเจอ — ที่นี่มีวิธีรับมืออยู่แล้ว*. Then a
 fill-in-the-blank, all four required:
 
-> **[gap] — ยังเจอในงานของเรา:** **ใคร** (tap) **มักจะ** [ทำอะไร] **ตอนที่** [สถานการณ์] **เพราะ** [เหตุผล]
+> **[gap] — ยังเจอในงานของเรา:** **ใคร** (tap) **มักจะ** [ทำอะไร] **ตอน** [สถานการณ์] **เพราะ** [เหตุผล]
 
 — who, does or doesn't do what, in what situation, because of what reason or
 missing resource. The actor is a tap and comes first, so the sentence starts
@@ -108,15 +108,15 @@ blank has to produce is a circumstance that could have been otherwise, so
 that sites where the response differs can be compared. Context is coded afterwards with
 `docs/2026-09-22-context-codebook.md`.
 People whose own week rarely shows the gap fill the mirror image
-(*[gap] — ไม่ค่อยเจอในงานของเรา: ใคร มักจะ… ตอนที่… เพราะ…*).
+(*[gap] — ไม่ค่อยเจอในงานของเรา: ใคร มักจะ… ตอน… เพราะ…*).
 
 Examples:
-- G1, workload: *แพทย์โรคไตมักจะไม่ได้ประเมินว่าใครเหมาะกับ CKM ตอนที่คลินิกไต
+- G1, workload: *แพทย์โรคไตมักจะไม่ได้ประเมินว่าใครเหมาะกับ CKM ตอนคลินิกไต
   วันพุธมีผู้ป่วย 80 ราย และมีแพทย์คนเดียว เพราะไม่มีเกณฑ์ที่ตกลงกันไว้ และ
   ไม่มีช่องบันทึกใน HIS*
 - G3, place and relationship: *ทีมประคับประคองมักจะเห็นผู้ป่วยต่อเมื่อถูกปรึกษา
-  ตอนที่ทีม PC อยู่คนละตึกและไม่มีวันราวด์ร่วม เพราะไม่มีเวทีทบทวนผู้ป่วยร่วมกัน*
-- G4, incentive: *แพทย์โรคไตมักจะไม่เปิดเรื่อง ACP ก่อนเริ่ม HD ตอนที่ตัวชี้วัดของ
+  ตอนทีม PC อยู่คนละตึกและไม่มีวันราวด์ร่วม เพราะไม่มีเวทีทบทวนผู้ป่วยร่วมกัน*
+- G4, incentive: *แพทย์โรคไตมักจะไม่เปิดเรื่อง ACP ก่อนเริ่ม HD ตอนตัวชี้วัดของ
   หน่วยนับจำนวนผู้ป่วยที่ได้เริ่มฟอก เพราะเกรงว่าครอบครัวจะเข้าใจว่า "ไม่รักษา"*
   Say out loud:
 *one sentence that pins down where it breaks — talk about the system, not
