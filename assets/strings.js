@@ -105,7 +105,7 @@
     pj_who:           { th: "ใครอยู่ในห้องนี้",                            en: "Who's in the room" },
     pj_who_sub:       { th: "สองด้านของปัญหาเดียวกัน",                     en: "Two halves of the same problem" },
     pj_evidence:      { th: "ช่องว่างที่หลักฐานชี้ไว้",                     en: "The gaps the evidence points to" },
-    pj_evidence_sub:  { th: "และสิ่งที่โครงการเสนอจะทำกับแต่ละช่องว่าง",     en: "And what the program proposes for each" },
+    pj_evidence_sub:  { th: "จากการสำรวจ 16 โรงพยาบาลก่อนวันนี้",           en: "From the pre-survey of 16 hospitals" },
     pj_proposal:      { th: "ข้อเสนอ",                                    en: "Proposal" },
     pj_evidence_lbl:  { th: "จาก pre-survey",                             en: "From the pre-survey" },
     pj_why_blind:     { th: "ทำไมถึงเป็นแบบนี้ที่ รพ. ของคุณ — ตอบในมือถือ เปิดเผยพร้อมกันเมื่อครบเวลา", en: "Why does this happen at your hospital? Answer on your phone — revealed together when time is up" },
