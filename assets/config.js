@@ -151,8 +151,10 @@ window.CONFIG = {
        label     2-4 words, shown on the pieces and the phones
        problem   one sentence naming what is missing
        proposal  the ONE concrete thing the program might do about it. This is
-                 what the room reacts to: "what here would help this work, and
-                 how?" / "what would get in the way, and why?"
+                 NOT shown to the room — not on the screen and not on the
+                 phones — because naming it first steers what people write.
+                 It is kept for the analysis: the export puts it beside what
+                 the room came up with on its own.
      Order matters: it is the order the gaps are worked through on the day.
 
      maxGroups is only used by the after-the-day AI grouping step.
@@ -198,10 +200,21 @@ window.CONFIG = {
   /* --------------------------------------------------------------------------
      12. THE PRACTICE ROUND
      --------------------------------------------------------------------------
-     One warm-up gap, run once before the real ones, on something everybody in
-     the room has an opinion about and nobody can be blamed for. It does three
-     jobs at once: it teaches the sentence, it breaks the ice, and it proves
-     every phone in the room can reach the board before anything matters.
+     One warm-up gap, run once before the real ones. It does three jobs at
+     once: it teaches the sentence, it breaks the ice, and it proves every
+     phone in the room can reach the board before anything matters.
+
+     Choose it carefully. The point is to rehearse the KIND of chain the real
+     rounds need — a routine that people keep enacting for reasons that make
+     sense to them: an unwritten rule, a deference, a job nobody was given, a
+     form with no box for it. A warm-up whose causes are a building or a
+     broken machine teaches the wrong chain, however funny it is.
+
+     A meeting that overruns qualifies: everybody here has sat in one, nobody
+     is to blame, and the reasons people give — เกรงใจ, ไม่มีใครคุมเวลา, วาระ
+     ไม่ได้กำหนดเวลา — are the same shape as the reasons behind the four real
+     gaps. It also has a "works here" side: some units really do finish on
+     time, and they can say why.
 
      Its notes are stored (that is the point — you can see them arrive) but
      they are left out of every export, of the closing counts and of the AI
@@ -211,13 +224,17 @@ window.CONFIG = {
      ------------------------------------------------------------------------ */
   practice: {
     id:      "G0",
-    label:   "ลิฟต์โรงพยาบาลไม่เคยมาสักที",
+    label:   "การประชุมมักจบช้ากว่าเวลาที่นัดไว้",
     problem: "รอบซ้อม — เรื่องที่ทุกคนในห้องนี้เคยเจอ",
+    /* The WHO list has the same shape as the clinical one — someone senior,
+       someone doing the task, the people on the receiving end, an organiser,
+       the system — so the warm-up rehearses the real list as well as the
+       real sentence. */
     actors: [
-      { id: "p_porter", label: "เจ้าหน้าที่เปล" },
-      { id: "p_staff",  label: "เจ้าหน้าที่ รพ." },
-      { id: "p_family", label: "ผู้ป่วย/ญาติ" },
-      { id: "p_maint",  label: "ช่าง/ฝ่ายอาคาร" },
+      { id: "p_chair",  label: "ประธาน/หัวหน้า" },
+      { id: "p_speaker",label: "คนนำเสนอ" },
+      { id: "p_member", label: "ผู้เข้าร่วมประชุม" },
+      { id: "p_sec",    label: "เลขา/ผู้จัดประชุม" },
       { id: "p_system", label: "ระบบ/ผู้บริหาร รพ." },
       { id: "p_other",  label: "อื่น ๆ" }
     ]

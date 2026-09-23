@@ -5,15 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230518">
+<link rel="stylesheet" href="assets/theme.css?v=202609230532">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
 <style>
   .stat-line { font-size: 14px; color: #8C2E25; font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
   .stat-line.practice { color: var(--text-dim); font-weight: 600; }
-  .seed { background: var(--paper-2); border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 14px; }
-  .seed .k { font-size: 12.5px; color: var(--text-dim); font-weight: 600; letter-spacing: .04em; margin-bottom: 3px; }
-  .seed .v { font-size: 16px; font-weight: 600; line-height: 1.4; }
-  .seed .n { font-size: 12.5px; color: var(--text-dim); margin-top: 5px; }
   .stance { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .stance .choice { text-align: center; padding: 14px 10px; line-height: 1.3; }
   .stance .choice[data-stance="asset"][aria-pressed="true"] { --pick: #2E9E6B; }
@@ -114,11 +110,6 @@
 
   <!-- HOW: something that exists here / something new, and why it would work -->
   <div class="card hidden" id="howCard">
-    <div class="seed" id="seedBox">
-      <div class="k" id="seedK"></div>
-      <div class="v" id="seedV"></div>
-      <div class="n" id="seedN"></div>
-    </div>
     <label class="field">
       <span class="lbl" id="stanceLbl"></span>
       <div class="stance">
@@ -150,12 +141,12 @@
   <p class="hint center" style="opacity:.5;font-size:11px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609230518"></script>
-<script src="assets/config.js?v=202609230518"></script>
-<script src="assets/strings.js?v=202609230518"></script>
-<script src="assets/store-supabase.js?v=202609230518"></script>
-<script src="assets/store-local.js?v=202609230518"></script>
-<script src="assets/store.js?v=202609230518"></script>
+<script src="assets/version.js?v=202609230532"></script>
+<script src="assets/config.js?v=202609230532"></script>
+<script src="assets/strings.js?v=202609230532"></script>
+<script src="assets/store-supabase.js?v=202609230532"></script>
+<script src="assets/store-local.js?v=202609230532"></script>
+<script src="assets/store.js?v=202609230532"></script>
 <script>
 (function () {
   "use strict";
@@ -201,8 +192,9 @@
   $("cueRes").textContent = t("situ_cue_res");
   $("becauseLbl").textContent = t("because_lbl");
   $("previewK").textContent = t("preview_lbl");
-  /* the warm-up round is about a lift, so it carries its own examples;
-     a "_p" string is used when there is one, otherwise the clinical one */
+  /* the warm-up round is about a meeting that overruns, so it carries its
+     own examples; a "_p" string is used when there is one, otherwise the
+     clinical one */
   const hint = k => (isPractice() && window.T.S[k + "_p"]) ? t(k + "_p") : t(k);
   $("wWhen").placeholder = t("situ_hint");
 
@@ -260,8 +252,6 @@
       host.appendChild(b);
     }
   }
-  $("seedK").textContent = t("how_seed");
-  $("seedN").textContent = t("how_seed_note");
   $("stanceLbl").textContent = t("how_pick");
   $("stAsset").textContent = t("how_asset");
   $("stIdea").textContent = t("how_new");
@@ -285,8 +275,8 @@
   const currentGap = () => groups.find(g => g.id === (room && room.spotlight_group));
   const PRACTICE = (cfg.practice && cfg.practice.id) || "G0";
   const isPractice = () => room && room.spotlight_group === PRACTICE;
-  /* the warm-up round asks about a hospital lift, not about CKM, so it brings
-     its own WHO list; both lists are searched when a note is read back */
+  /* the warm-up round asks about a meeting, not about CKM, so it brings its
+     own WHO list; both lists are searched when a note is read back */
   const actorsNow = () => (isPractice() && cfg.practice && cfg.practice.actors) || cfg.actors || [];
   const ALL_ACTORS = (cfg.actors || []).concat((cfg.practice && cfg.practice.actors) || []);
   const actorLabel = id => (ALL_ACTORS.find(a => a.id === id) || {}).label || "";
@@ -454,9 +444,10 @@
     } else if (m === "how") {
       $("promptTitle").textContent = isOverall ? t("overall_title") : (g ? g.label : "");
       $("promptSub").textContent = isOverall ? t("overall_sub") : t("how_title");
-      const seed = g && !isOverall && g.proposal;
-      $("seedBox").classList.toggle("hidden", !seed);
-      if (seed) $("seedV").textContent = g.proposal;
+      /* The program's own proposal is deliberately not shown anywhere in the
+         room — on screen or on the phone. People answer "how would we fix
+         it" before they are told what the program had in mind, so the ideas
+         that come back are theirs. It stays in config.js and the export. */
     } else {
       if (room.phase === "lobby") {
         $("promptTitle").textContent = t("wait_title"); $("promptSub").textContent = t("wait_sub");

@@ -62,15 +62,19 @@
     // practice round
     practice_badge:   { th: "รอบซ้อม",                                       en: "Practice round" },
     practice_note:    { th: "รอบซ้อม — ประโยคเดียวกับของจริง ไม่เก็บเป็นข้อมูล", en: "Practice — the same sentence as the real rounds, and it is not kept as data" },
-    situ_hint_p:      { th: "เช่น ช่วงเช้า 8 โมง คนมาตรวจพร้อมกันทั้งตึก",        en: "e.g. 8am, the whole building arrives at once" },
-    does_hint_p:      { th: "เช่น ต้องรอลิฟต์ตัวเดียวกับญาติผู้ป่วย",              en: "e.g. has to wait for the same lift as the families" },
-    does_works_hint_p:{ th: "เช่น ใช้ลิฟต์ที่กันไว้สำหรับเตียงผู้ป่วยได้เลย",        en: "e.g. uses the lift kept for patient beds" },
-    because_hint_p:   { th: "เช่น ลิฟต์ส่งผู้ป่วยมีตัวเดียว และไม่มีคนคุมคิว",        en: "e.g. one patient lift, and nobody manages the queue" },
-    because_works_hint_p:{ th: "เช่น ผู้บริหารกำหนดไว้ตั้งแต่ออกแบบตึก",           en: "e.g. the hospital decided it when the building was designed" },
+    situ_hint_p:      { th: "เช่น วาระมี 8 เรื่อง แต่ไม่ได้กำหนดเวลาของแต่ละเรื่อง",   en: "e.g. eight items on the agenda, none of them timed" },
+    does_hint_p:      { th: "เช่น ไม่ตัดบทเมื่อเลยเวลา",                            en: "e.g. doesn't cut in when the time is up" },
+    does_works_hint_p:{ th: "เช่น เตือนเมื่อเหลือ 2 นาที แล้วปิดวาระ",                en: "e.g. warns at two minutes left, then closes the item" },
+    because_hint_p:   { th: "เช่น เกรงใจคนที่เตรียมมาพูด และไม่มีใครได้รับมอบหมายให้คุมเวลา", en: "e.g. too polite to stop someone who prepared, and nobody was given the job of keeping time" },
+    because_works_hint_p:{ th: "เช่น ตกลงกติกาเวลากันไว้ล่วงหน้า และหัวหน้าทำตามเอง",  en: "e.g. the rule was agreed beforehand and the boss keeps it" },
     practice_lead:    { th: "เรื่องที่ทุกคนในห้องนี้เคยเจอ ลองเติมให้เป็นประโยคเดียว", en: "Something everyone here has met. Complete the sentence." },
 
     // HOW round
     how_title:        { th: "แล้วเราจะทำอย่างไร",                        en: "How would we fix it?" },
+    // how_seed / how_seed_note: the program's own proposal used to be shown
+    // here as a seed. It is not shown to the room any more — anywhere — so
+    // that the answers are the room's own. Kept only so an older cached page
+    // does not break.
     how_seed:         { th: "โครงการเสนอไว้ว่า",                          en: "The program proposes" },
     how_seed_note:    { th: "ต่อยอดจากนี้ หรือเสนอทางอื่นก็ได้",             en: "Build on it, or propose something else" },
     how_pick:         { th: "สิ่งที่คุณจะเสนอคือ",                        en: "What you're proposing is" },

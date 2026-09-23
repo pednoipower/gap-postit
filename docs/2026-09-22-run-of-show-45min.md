@@ -36,19 +36,28 @@ where they mainly work. Say out loud: *nothing is linked to your name.*
 **Say it while they are still finding seats:** *sit next to somebody from the
 other team.* Everything after this depends on it, and it is free.
 
-## 0:03 — Practice round: the lift (4 min)
+## 0:03 — Practice round: the meeting that overruns (4 min)
 
-Slide 3. A gap nobody can be blamed for — *ลิฟต์โรงพยาบาลไม่เคยมาสักที* —
-run through exactly the machinery of the real rounds: the same sentence, the
-same blind collection, the same reveal. It does three jobs at once: it
-teaches the form, it breaks the ice, and it proves every phone in the room
-can reach the board before anything matters.
+Slide 3. A gap nobody can be blamed for and everybody in this room has sat
+through — *การประชุมมักจบช้ากว่าเวลาที่นัดไว้* — run through exactly the
+machinery of the real rounds: the same sentence, the same blind collection,
+the same reveal. It does three jobs at once: it teaches the form, it breaks
+the ice, and it proves every phone in the room can reach the board before
+anything matters.
+
+It was chosen for its causes, not for the laugh. What people write is
+*เกรงใจคนที่เตรียมมาพูด · ไม่มีใครได้รับมอบหมายให้คุมเวลา · วาระไม่ได้กำหนดเวลา
+ของแต่ละเรื่อง* — a deference, a job nobody was given, a rule that was never
+written. That is the same shape as the reasons behind the four real gaps,
+which is the whole point of rehearsing on it.
 
 - 90 seconds to write. The projector shows only a count.
-- **Reveal.** Read two out loud, one of each colour. The room laughs.
+- **Reveal.** Read two out loud, one of each colour. Note the meta-joke:
+  we will find out in 40 minutes whether we are any better.
 - Then name the machine, pointing at the screen: *ในสถานการณ์ไหน · ใคร ·
-  มักจะทำอะไร · เนื่องจากอะไร. Notice nobody wrote a person's name — you all
-  wrote the system. That is exactly what we need for the next four.*
+  มักจะทำอะไร · เนื่องจากอะไร. Look at the reasons — เกรงใจ, ไม่มีใครรับผิดชอบ,
+  ไม่มีกติกา. Nobody wrote a person's name; you all wrote the system. Those
+  are exactly the kinds of reasons we need for the next four.*
 
 Its notes are stored (so you can see them arrive) but never exported, never
 counted on the closing slide, and never sent to the AI. To skip the round,
@@ -108,10 +117,12 @@ to be loud. The projector shows a running countdown and two questions: *ที�
 words, put me down and turn around. Do not fill the silence; let it get
 noisy and then move.
 
-**HOW (3 min).** The phone shows the program's proposal as a seed (*build
-on it, or propose something else*), then asks people to pick **something
-that already exists here — use it more** or **something new**, and to give
-*what* and *why it would work here*. Both boxes required. The projector
+**HOW (3 min).** The phone asks people to pick **something that already
+exists here — use it more** or **something new**, and to give *what* and
+*why it would work here*. The program's own proposal is shown nowhere —
+not on the screen, not on the phone — so that what comes back is the room's
+and not an echo. It sits in `config.js` and in the export, beside what
+people actually wrote. Both boxes required. The projector
 keeps the causes on screen and shows a count for the answers. At 2:15,
 **Reveal**: causes and solutions side by side; "already exists" notes are
 marked ✓. Read one existing and one new. Move on.

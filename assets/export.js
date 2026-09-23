@@ -231,8 +231,8 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
   }
 
   /* The warm-up round is there to teach the sentence and break the ice; its
-     notes are about a lift, not about CKM. Everything that leaves this file
-     is built from a snapshot with that round taken out. */
+     notes are not about CKM at all. Everything that leaves this file is
+     built from a snapshot with that round taken out. */
   function withoutPractice(snap, cfg) {
     const pid = (cfg && cfg.practice && cfg.practice.id) || "G0";
     if (!cfg || !cfg.practice) return snap;
