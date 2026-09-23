@@ -58,12 +58,11 @@ which is the whole point of rehearsing on it.
 - Then name the machine, pointing at the screen: *ในสถานการณ์ไหน · ใคร ·
   มักจะทำอะไร · เนื่องจากอะไร. Nobody wrote a person's name; you all wrote
   the system.*
-- **Correct the first blank here, once, and you will not have to again.**
-  Somebody will have written *ไม่ได้กำหนดเวลา* as the situation. Point at it:
-  *ช่องแรกคือสิ่งที่จริงอยู่แล้วก่อนใครจะลงมือ — กี่โมง งานล้นแค่ไหน ใครนั่งอยู่ตรงนั้น
-  กติกาอะไรที่ใช้อยู่. ส่วน "ยังไม่มีกติกา" เป็นเหตุผล ใส่ช่องสุดท้าย.* This is the
-  single most valuable sentence you will say all session: it is what makes
-  the context codable afterwards.
+- The one thing worth saying about the form, if a chain on screen repeats
+  itself: *สามช่องควรบอกคนละเรื่อง — ช่องแรกคือสถานการณ์ที่อาจจะเป็นอย่างอื่นก็ได้
+  (กี่โมง งานล้นแค่ไหน ใครอยู่ตรงนั้น กติกาอะไรใช้อยู่) ช่องสุดท้ายคือเหตุผล.* Do not
+  police which category a phrase belongs to — an absent rule is a legitimate
+  condition. Redundancy is the only failure that costs you data.
 
 Its notes are stored (so you can see them arrive) but never exported, never
 counted on the closing slide, and never sent to the AI. To skip the round,
@@ -96,7 +95,9 @@ resources (staff, time, budget, information, equipment) · people and rules
 (who is there, what indicator is in force) — so people describe rather than
 classify. The last cue is the one that reaches the POLICY/KPI and TEAM
 RELATIONSHIP rows of the codebook; without it people mostly write about how
-busy they were. Context is coded afterwards with
+busy they were. Context is decided at coding, not on the phone: what the
+blank has to produce is a circumstance that could have been otherwise, so
+that sites where the response differs can be compared. Context is coded afterwards with
 `docs/2026-09-22-context-codebook.md`.
 People from hospitals where it already works fill the mirror image
 (*[gap] ไม่เกิดที่ รพ. ของเรา เพราะเมื่อ… ใคร จะ… เนื่องจาก…*).

@@ -6,23 +6,25 @@ codebook. The AI first-pass prompt on the control panel uses the same codes;
 two human coders check a sample and resolve disagreements before anything is
 reported.
 
-## Which blank holds what
+## What makes a chain usable
 
-The three blanks are not interchangeable, and the examples people are shown
-decide what lands in each. The test:
+The blanks are not three kinds of thing. Context and the mechanism's resource
+are not distinguishable by inspecting a phrase — *ไม่มีเกณฑ์* is a missing
+resource in one chain and a standing condition of the site in another, and
+rule 2 below is what handles that. What a chain has to do to be codable is
+smaller and more practical:
 
-| Blank | Holds | Test |
-|---|---|---|
-| **เพราะเมื่อ …** (สถานการณ์/เงื่อนไข) | the standing conditions — the hour, the load, the place, who is present, the rule or indicator already in force | it was **already true before anybody acted**, and it would still be true if the actor were replaced |
-| **ใคร มักจะ …** | what someone does or does not do | you could film it |
-| **เนื่องจาก …** | the reasoning, or the resource that is missing | it answers *why would a reasonable person do that here* |
+1. **The three blanks say three different things.** The common failure is
+   redundancy: *เพราะเมื่อไม่ได้กำหนดเวลา … เนื่องจากไม่มีใครคุมเวลา* is one
+   fact written twice, and it leaves no circumstance to compare across sites.
+2. **The first blank names something that could have been otherwise** — an
+   hour, a load, a place, who was present, a rule or indicator in force. Not
+   because absences are forbidden there, but because a condition that varies
+   is the only kind that can enter a CMO (rule 4).
 
-The failure to watch for: an **absent rule or tool** written into the first
-blank — *ไม่มีเกณฑ์, ไม่ได้กำหนดเวลา, ไม่มีช่องใน HIS*. That is the mechanism's
-missing resource, not the context, and when it sits in the first blank the
-chain usually says the same thing twice and names no condition at all. On the
-day, the practice round is where this is corrected: read one chain aloud and
-point at the first blank — *นี่คือสิ่งที่จริงอยู่แล้วก่อนใครจะลงมือ*.
+Do not correct a participant's category. A chain that puts the absent rule
+first and the reasoning last is perfectly codable; a chain that says the same
+thing in every blank is not.
 
 Each chain gets **one primary code** (the feature that most directly conditions
 the response) and any number of secondary codes.
