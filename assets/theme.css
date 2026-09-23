@@ -283,7 +283,10 @@ textarea.note::placeholder { color: var(--neutral-500); }
 .hl { font-style: normal; font-weight: 700; color: var(--hl, var(--primary)); }
 body.present .hl { color: var(--hl, var(--green-200)); }
 
-.hint { font-size: 14px; color: var(--text-dim); line-height: 1.7; }
+/* the anonymity promise and the between-rounds lines are body text, not
+   captions: 15px, because Thai at 14 is a squint on a phone held at arm's
+   length in a lit room */
+.hint { font-size: 15px; color: var(--text-dim); line-height: 1.7; }
 .center { text-align: center; }
 
 /* ============================================================================
