@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230433">
+<link rel="stylesheet" href="assets/theme.css?v=202609230518">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🎛️</text></svg>">
 </head>
 <body class="control">
@@ -70,7 +70,8 @@
     <div class="panel">
       <h2>Slides</h2>
       <p class="why">The projector and every phone follow whatever you pick here. Each gap has
-        two slides — <b>why is this happening?</b> then <b>how would we fix it?</b> Both collect
+        three slides — <b>why is this happening?</b>, a minute of <b>turn and talk</b>, then
+        <b>how would we fix it?</b> The two writing rounds collect
         <b>blind</b> (the projector shows only a count) until you press <b>Reveal</b>, which
         closes that round and shows the notes in both colours.</p>
       <div class="slide-list" id="slideList"></div>
@@ -116,13 +117,13 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609230433"></script>
-<script src="assets/config.js?v=202609230433"></script>
-<script src="assets/slides.js?v=202609230433"></script>
-<script src="assets/export.js?v=202609230433"></script>
-<script src="assets/store-supabase.js?v=202609230433"></script>
-<script src="assets/store-local.js?v=202609230433"></script>
-<script src="assets/store.js?v=202609230433"></script>
+<script src="assets/version.js?v=202609230518"></script>
+<script src="assets/config.js?v=202609230518"></script>
+<script src="assets/slides.js?v=202609230518"></script>
+<script src="assets/export.js?v=202609230518"></script>
+<script src="assets/store-supabase.js?v=202609230518"></script>
+<script src="assets/store-local.js?v=202609230518"></script>
+<script src="assets/store.js?v=202609230518"></script>
 <script>
 (function () {
   "use strict";
@@ -175,8 +176,11 @@
     if (!room) return;
     renderPrompt();
 
-    const voices = new Set(st.solutions.map(c => c.participant_id).filter(Boolean));
-    const kind = k => st.solutions.filter(x => x.kind === k).length;
+    /* the warm-up round's notes are not data, so they are left out of these
+       counters — they still show as a note count on the practice slide */
+    const real = st.solutions.filter(x => x.group_id !== Slides.practiceId(cfg));
+    const voices = new Set(real.map(c => c.participant_id).filter(Boolean));
+    const kind = k => real.filter(x => x.kind === k).length;
     $("stats").innerHTML = [
       ["in the room", (st.participants || []).length],
       ["people who wrote", voices.size],
@@ -184,7 +188,7 @@
       ["where it works", kind("works")],
       ["already exists", kind("asset")],
       ["new ideas", kind("idea")],
-      ["gaps loaded", (st.groups || []).filter(g => g.id !== Slides.OVERALL).length]
+      ["gaps loaded", (st.groups || []).filter(g => g.id !== Slides.OVERALL && g.id !== Slides.practiceId(cfg)).length]
     ].map(([k, v]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
     $("gapsNote").textContent = (st.groups || []).length
       ? `${st.groups.length} gaps loaded: ${st.groups.map(g => g.id).join(", ")}`
@@ -203,7 +207,7 @@
       const b = document.createElement("button");
       b.className = "slide-btn";
       b.setAttribute("aria-current", String(i === cur));
-      const count = s.gapId
+      const count = s.gapId && s.phase !== "talk"
         ? st.solutions.filter(x => x.group_id === s.gapId && (s.phase === "why" ? (x.kind === "cause" || x.kind === "works") : (x.kind === "asset" || x.kind === "idea"))).length
         : null;
       b.innerHTML = `<span class="n">${i + 1}</span><span>${escapeHtml(s.label)}</span>` +
@@ -244,7 +248,14 @@
      to press before you start. The button is only for pushing a change you
      made to config.js while the room was already running. */
   function seedGroups() {
-    const groups = (cfg.seedThemes || []).map((tm, i) => ({
+    // the warm-up gap goes in first so notes from the practice round have
+    // somewhere to land; it is skipped by the exports and the closing counts
+    const groups = cfg.practice ? [{
+      id: Slides.practiceId(cfg), label: cfg.practice.label,
+      problem_statement: cfg.practice.problem || cfg.practice.label,
+      proposal: "", stat: "", rationale: "Practice round", source_ids: []
+    }] : [];
+    (cfg.seedThemes || []).forEach((tm, i) => groups.push({
       id: "G" + (i + 1), label: tm.label, problem_statement: tm.problem || tm.label,
       proposal: tm.proposal || "", stat: tm.stat || "", rationale: "From config.js", source_ids: []
     }));
@@ -280,7 +291,8 @@
       const r = Array.isArray(res) ? res[0] : res;
       if (r && r.ok === false) { msg("loadMsg", "bad", escapeHtml(r.message || r.error)); return false; }
       msg("loadMsg", "ok", (auto ? "Gaps written into the room from config.js: " : "Reloaded from config.js: ") +
-        escapeHtml(groups.filter(g => g.id !== Slides.OVERALL).map(g => g.id + " " + g.label).join(" · ")));
+        escapeHtml(groups.filter(g => g.id !== Slides.OVERALL && g.id !== Slides.practiceId(cfg))
+          .map(g => g.id + " " + g.label).join(" · ")));
       await refreshNow();
       return true;
     } catch (e) { msg("loadMsg", "bad", escapeHtml(e.message)); return false; }

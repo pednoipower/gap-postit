@@ -230,7 +230,20 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
     return hit ? (hit.label || hit.title || id) : id;
   }
 
+  /* The warm-up round is there to teach the sentence and break the ice; its
+     notes are about a lift, not about CKM. Everything that leaves this file
+     is built from a snapshot with that round taken out. */
+  function withoutPractice(snap, cfg) {
+    const pid = (cfg && cfg.practice && cfg.practice.id) || "G0";
+    if (!cfg || !cfg.practice) return snap;
+    return Object.assign({}, snap, {
+      groups:    (snap.groups || []).filter(g => g.id !== pid),
+      solutions: (snap.solutions || []).filter(x => x.group_id !== pid)
+    });
+  }
+
   function toXLSX(snap, cfg) {
+    snap = withoutPractice(snap, cfg);
     const discFills = {};
     (cfg.disciplines || []).forEach(d => {
       const c = (cfg.colors[d.id] || cfg.colors.fallback).base.replace("#", "");
@@ -263,7 +276,8 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
       const gs = groupStyle(r.group_id), g = gById[r.group_id] || {};
       causeRows.push([
         { v: r.ref, s: styleIndex.mono }, { v: r.group_id, s: gs }, { v: g.label || "", s: gs },
-        { v: KIND[r.kind], s: gs }, { v: labelFor(cfg.actors || [], r.actor), s: gs },
+        { v: KIND[r.kind], s: gs },
+        { v: labelFor((cfg.actors || []).concat((cfg.practice && cfg.practice.actors) || []), r.actor), s: gs },
         { v: r.context || "", s: gs }, { v: r.body, s: gs }, { v: r.reason || "", s: gs },
         { v: labelFor(cfg.roles, r.role), s: gs },
         { v: labelFor(cfg.disciplines, r.discipline), s: discStyle(r.discipline) },
@@ -388,6 +402,7 @@ ${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlfo
   }
 
   function toSolutionsTXT(snap, cfg) {
+    snap = withoutPractice(snap, cfg);
     const L = [];
     const clean = v => String(v || "").replace(/\s+/g, " ").trim();
     L.push("THE MISSING PIECE — why each gap happens, and what we would do");

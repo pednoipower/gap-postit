@@ -107,6 +107,7 @@ window.CONFIG = {
   maxCharacters:         200,   // longest a single post-it can be
   submitCooldownSeconds: 3,     // stops one person flooding the board
   maxPerPersonPerPrompt: 5,     // how many notes one person can add per question
+  talkSeconds:           60,    // the countdown on the "turn and talk" slide
 
   /* --------------------------------------------------------------------------
      8. COLOURS
@@ -193,6 +194,34 @@ window.CONFIG = {
       proposal: "ทำ ACP ในผู้ป่วย ESKD ทุกทางเลือก เริ่มตั้งแต่ CKD stage 4–5 ก่อนตัดสินใจบำบัดทดแทนไต ใช้เอกสารมาตรฐาน ลงนาม และทบทวนเมื่ออาการเปลี่ยน"
     }
   ],
+
+  /* --------------------------------------------------------------------------
+     12. THE PRACTICE ROUND
+     --------------------------------------------------------------------------
+     One warm-up gap, run once before the real ones, on something everybody in
+     the room has an opinion about and nobody can be blamed for. It does three
+     jobs at once: it teaches the sentence, it breaks the ice, and it proves
+     every phone in the room can reach the board before anything matters.
+
+     Its notes are stored (that is the point — you can see them arrive) but
+     they are left out of every export, of the closing counts and of the AI
+     prompt. Set `practice: null` to skip the round entirely.
+
+     `actors` replaces the clinical WHO list for this round only.
+     ------------------------------------------------------------------------ */
+  practice: {
+    id:      "G0",
+    label:   "ลิฟต์โรงพยาบาลไม่เคยมาสักที",
+    problem: "รอบซ้อม — เรื่องที่ทุกคนในห้องนี้เคยเจอ",
+    actors: [
+      { id: "p_porter", label: "เจ้าหน้าที่เปล" },
+      { id: "p_staff",  label: "เจ้าหน้าที่ รพ." },
+      { id: "p_family", label: "ผู้ป่วย/ญาติ" },
+      { id: "p_maint",  label: "ช่าง/ฝ่ายอาคาร" },
+      { id: "p_system", label: "ระบบ/ผู้บริหาร รพ." },
+      { id: "p_other",  label: "อื่น ๆ" }
+    ]
+  },
 
   /* An optional link (e.g. a Google Form) shown as a QR code on the closing
      slide, for people willing to be interviewed later. Kept completely

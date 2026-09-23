@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230433">
+<link rel="stylesheet" href="assets/theme.css?v=202609230518">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -79,6 +79,18 @@
   .spot-problem { position:relative; height:70%; }
   .spot-solutions { position:relative; height:100%; overflow:hidden; }
 
+  /* ---- turn and talk: the one slide that asks the room to be loud ---- */
+  .talk { display:grid; place-items:center; height:100%; text-align:center; }
+  .talk .lead { font-size:clamp(30px,4.6vw,86px); font-weight:800; letter-spacing:-.03em; line-height:1.1; }
+  .talk .sub { font-size:clamp(16px,1.8vw,31px); color:#9BA6BC; margin-top:2vh; }
+  .talk .cues { display:flex; gap:3vw; justify-content:center; flex-wrap:wrap; margin-top:4vh;
+    font-size:clamp(15px,1.55vw,27px); color:#D6DCE8; }
+  .talk .cues div { background:#161C2A; border:1px solid #2A3142; border-radius:16px; padding:1.6vh 2.2vw; }
+  .talk .clock { font-size:clamp(56px,9vw,170px); font-weight:800; line-height:1; letter-spacing:-.04em;
+    margin-top:4vh; font-variant-numeric:tabular-nums; }
+  .talk .clock.over { color:#E5CE7A; font-size:clamp(30px,4vw,74px); }
+  .talk .gap-line { font-size:clamp(13px,1.2vw,22px); color:#7D879C; margin-bottom:2.5vh; }
+
   .closing { display:grid; place-items:center; height:100%; text-align:center; }
   .closing .big { font-size:clamp(32px,5vw,90px); font-weight:800; letter-spacing:-.03em; line-height:1.08; }
   .closing .sub { font-size:clamp(16px,1.8vw,31px); color:#9BA6BC; margin-top:2.4vh; }
@@ -128,16 +140,16 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609230433"></script>
-<script src="assets/config.js?v=202609230433"></script>
-<script src="assets/strings.js?v=202609230433"></script>
-<script src="assets/slides.js?v=202609230433"></script>
-<script src="assets/qrcode.js?v=202609230433"></script>
-<script src="assets/jigsaw.js?v=202609230433"></script>
-<script src="assets/wordcloud.js?v=202609230433"></script>
-<script src="assets/store-supabase.js?v=202609230433"></script>
-<script src="assets/store-local.js?v=202609230433"></script>
-<script src="assets/store.js?v=202609230433"></script>
+<script src="assets/version.js?v=202609230518"></script>
+<script src="assets/config.js?v=202609230518"></script>
+<script src="assets/strings.js?v=202609230518"></script>
+<script src="assets/slides.js?v=202609230518"></script>
+<script src="assets/qrcode.js?v=202609230518"></script>
+<script src="assets/jigsaw.js?v=202609230518"></script>
+<script src="assets/wordcloud.js?v=202609230518"></script>
+<script src="assets/store-supabase.js?v=202609230518"></script>
+<script src="assets/store-local.js?v=202609230518"></script>
+<script src="assets/store.js?v=202609230518"></script>
 <script>
 (function () {
   "use strict";
@@ -155,7 +167,10 @@
      ---------------------------------------------------------------------- */
   const SLIDES = Slides.build(cfg);
   const BUILDERS = { title: buildTitle, who: buildWho, evidence: buildEvidence, closing: buildClosing };
-  SLIDES.forEach(s => { s.build = s.gapId ? buildGap : BUILDERS[s.key]; });
+  SLIDES.forEach(s => {
+    s.build = s.phase === "talk" ? buildTalk : s.gapId ? buildGap : BUILDERS[s.key];
+  });
+  const PRACTICE = Slides.practiceId(cfg);
   window.SLIDES = SLIDES;
 
   let current = -1, viewMode = "wall";
@@ -270,7 +285,7 @@
     /* The label is the headline (it is a full sentence now) and the survey
        number sits under it in the accent colour. The longer problem statement
        lives on the phone and in the export. */
-    txt(g.id, W * 0.075, H * 0.15, 14, accent, 800);
+    txt(opts.practice ? t("practice_badge") : g.id, W * 0.075, H * 0.15, 14, accent, 800);
     const counts = opts.blind ? "" : `${helps} · ${needs}` + (ideas ? ` · ${ideas}` : "");
     if (counts) txt(counts, W * 0.925, H * 0.15, 14, "#8A94A8", 600, "end");
     Jigsaw.layoutText(svg, g.label || g.problem_statement,
@@ -288,7 +303,7 @@
   function fillProblems() {
     const host = $("problemList");
     if (!host) return;
-    const groups = (Store.state.groups || []).filter(g => g.id !== "GX");
+    const groups = (Store.state.groups || []).filter(g => g.id !== "GX" && g.id !== PRACTICE);
     if (!groups.length) {
       host.className = "problems";
       host.innerHTML = `<p class="sub" style="text-align:center">${escapeHtml(t("pj_waiting_gaps"))}</p>`;
@@ -333,8 +348,10 @@
     const isWhy = slide.phase === "why";
     const revealed = ph === "why_reveal" || ph === "how_reveal";
     const isOverall = slide.gapId === Slides.OVERALL;
+    const isPractice = slide.gapId === PRACTICE;
     setText("gapH", isOverall ? t("pj_overall") : (g ? g.label : slide.gapId));
     setText("gapSub", !g ? t("pj_waiting_gaps")
+      : isPractice ? (revealed ? t("pj_practice_rev") : t("pj_practice"))
       : isWhy ? (revealed ? t("pj_why_revealed") : t("pj_why_blind"))
               : (revealed ? t("pj_how_revealed") : t("pj_how_blind")));
     if (!g) return;
@@ -373,7 +390,7 @@
           <div class="col causes"><h3>${escapeHtml(t("pj_causes"))} <span id="cN"></span></h3><div class="board" id="boardCauses"></div></div>
           <div class="col fixes"><h3>${escapeHtml(t("pj_solutions"))} <span id="fN"></span></h3><div class="board" id="boardFixes"></div></div></div>`;
       }
-      if (!isOverall) $("gapPiece").appendChild(problemPiece(g, i, { tall: true, blind: true }));
+      if (!isOverall) $("gapPiece").appendChild(problemPiece(g, i, { tall: true, blind: true, practice: isPractice }));
       else $("gapPiece").innerHTML = `<div style="color:#9BA6BC;font-size:clamp(16px,1.8vw,30px);line-height:1.5;padding:2vw">${escapeHtml(t("overall_sub"))}</div>`;
     }
     if (!revealed) {
@@ -386,6 +403,40 @@
     if ($("boardCauses")) { setText("cN", causes.length); renderBoard(causes, "cause", $("boardCauses")); }
     if ($("boardWorks"))  { setText("wN", works.length);  renderBoard(works, "works", $("boardWorks")); }
     if ($("boardFixes"))  { setText("fN", fixes.length);  renderBoard(fixes, "fix", $("boardFixes")); }
+  }
+
+  /* ---- slide: turn and talk ------------------------------------------------
+     The why round is closed before this slide is reached, so nothing said
+     here can shape what was written. The countdown is the whole point: a
+     minute that is visibly running is a minute people actually use. ------- */
+  let talkTimer = null;
+  function buildTalk(el, slide) {
+    const g = gapById(slide.gapId);
+    el.innerHTML = `
+      <div class="talk">
+        <div>
+          <div class="gap-line">${escapeHtml(g ? g.label : "")}</div>
+          <div class="lead">${escapeHtml(t("pj_talk"))}</div>
+          <div class="sub">${escapeHtml(t("pj_talk_sub"))}</div>
+          <div class="cues">
+            <div>${escapeHtml(t("pj_talk_cue1"))}</div>
+            <div>${escapeHtml(t("pj_talk_cue2"))}</div>
+          </div>
+          <div class="clock" id="talkClock"></div>
+        </div>
+      </div>`;
+    const total = Math.max(10, cfg.talkSeconds || 60);
+    const started = Date.now();
+    if (talkTimer) clearInterval(talkTimer);
+    const tick = () => {
+      const clock = $("talkClock");
+      if (!clock) { clearInterval(talkTimer); talkTimer = null; return; }
+      const left = Math.max(0, total - Math.round((Date.now() - started) / 1000));
+      clock.textContent = left > 0 ? String(left) : t("pj_talk_over");
+      clock.classList.toggle("over", left === 0);
+    };
+    tick();
+    talkTimer = setInterval(tick, 250);
   }
 
   /* ---- slide: closing ---- */
@@ -408,7 +459,9 @@
      THE BOARD — post-its on a loose grid. A note may carry a second line
      (its how / why), drawn smaller beneath the main text.
      ---------------------------------------------------------------------- */
-  const actorLabel = id => ((cfg.actors || []).find(a => a.id === id) || {}).label || "";
+  /* the practice round swaps in its own WHO list, so look in both */
+  const ALL_ACTORS = (cfg.actors || []).concat((cfg.practice && cfg.practice.actors) || []);
+  const actorLabel = id => (ALL_ACTORS.find(a => a.id === id) || {}).label || "";
   function noteText(n, kind) {
     // a WHY note reads as the sentence the blanks made: when · who does · because
     if (n.kind === "cause" || n.kind === "works") {
@@ -516,15 +569,16 @@
     if (s.key === "title") { const n = $("joinN"); if (n) n.textContent = (st.participants || []).length; }
     if (s.key === "who") fillWho();
     if (s.key === "evidence") fillProblems();
-    if (s.gapId) fillGap(s);
+    if (s.gapId && s.phase !== "talk") fillGap(s);   // a talk slide has no board to fill
     if (s.key === "closing") {
       const el = $("closeStats");
       if (el) {
-        const c = st.solutions.filter(x => x.kind === "cause").length;
-        const w = st.solutions.filter(x => x.kind === "works").length;
-        const a = st.solutions.filter(x => x.kind === "asset").length;
-        const i = st.solutions.filter(x => x.kind === "idea").length;
-        const both = (st.groups || []).filter(g => g.id !== Slides.OVERALL).filter(g => {
+        const real = st.solutions.filter(x => x.group_id !== PRACTICE);
+        const c = real.filter(x => x.kind === "cause").length;
+        const w = real.filter(x => x.kind === "works").length;
+        const a = real.filter(x => x.kind === "asset").length;
+        const i = real.filter(x => x.kind === "idea").length;
+        const both = (st.groups || []).filter(g => g.id !== Slides.OVERALL && g.id !== PRACTICE).filter(g => {
           const ds = new Set(st.solutions.filter(x => x.group_id === g.id).map(x => x.discipline));
           return ds.size >= 2;
         }).length;

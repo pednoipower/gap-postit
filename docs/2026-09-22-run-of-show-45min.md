@@ -20,29 +20,55 @@ Nothing is analysed in the room.
       the program's proposals read correctly in Thai.
 - [ ] `control.html` → unlock. The gaps are written into the room for you —
       check the projector's gaps slide shows all four with their numbers.
+- [ ] `config.js` → `practice`: the warm-up gap and its own WHO list read
+      well for this audience. `talkSeconds` is the countdown on the talk
+      slide (60 by default).
 - [ ] Dry run with two phones (one per team). Then **Clear this room**; the
       gaps go straight back in by themselves.
 - [ ] `health.html` → **Run the checks**, all green.
 - [ ] Scan the QR from the back of the room.
 
-## 0:00 — Join (4 min)
+## 0:00 — Join (3 min)
 
 Slide 1 (QR) then slide 2 (who's in the room). Phones ask team, role, and
 where they mainly work. Say out loud: *nothing is linked to your name.*
 
-## 0:04 — The four gaps from the pre-survey (2 min)
+**Say it while they are still finding seats:** *sit next to somebody from the
+other team.* Everything after this depends on it, and it is free.
+
+## 0:03 — Practice round: the lift (4 min)
+
+Slide 3. A gap nobody can be blamed for — *ลิฟต์โรงพยาบาลไม่เคยมาสักที* —
+run through exactly the machinery of the real rounds: the same sentence, the
+same blind collection, the same reveal. It does three jobs at once: it
+teaches the form, it breaks the ice, and it proves every phone in the room
+can reach the board before anything matters.
+
+- 90 seconds to write. The projector shows only a count.
+- **Reveal.** Read two out loud, one of each colour. The room laughs.
+- Then name the machine, pointing at the screen: *ในสถานการณ์ไหน · ใคร ·
+  มักจะทำอะไร · เนื่องจากอะไร. Notice nobody wrote a person's name — you all
+  wrote the system. That is exactly what we need for the next four.*
+
+Its notes are stored (so you can see them arrive) but never exported, never
+counted on the closing slide, and never sent to the AI. To skip the round,
+set `practice: null` in `config.js`.
+
+## 0:07 — The four gaps from the pre-survey (2 min)
 
 Slide 3. Four cards, each with its survey number in colour. *These are what
 16 hospitals told us. They have numbers. None of them is about any one
 person — and the survey can't tell us why. You can.* Phones show the same
 list.
 
-## 0:06 — Four gaps, 7 minutes each (28 min)
+## 0:09 — Four gaps, 6½ minutes each (26 min)
 
-For each gap, two slides.
+For each gap, three slides: **why**, a minute of **turn and talk**, then
+**how**.
 
-**WHY (3 min).** The phone shows the gap and its number and first asks
-*at your hospital: still the case / not the case — it works here*. Then a
+**WHY (2½ min).** The phone shows the gap and its number and first asks,
+about their own week rather than about the hospital's paperwork: *ยังเจอแบบนี้
+อยู่* or *ไม่ค่อยเจอ — ที่นี่มีวิธีรับมืออยู่แล้ว*. Then a
 fill-in-the-blank, all four required:
 
 > **[gap] เพราะเมื่อ** [สถานการณ์/เงื่อนไข] · **ใคร** (tap) **มักจะ** [การตอบสนอง] · **เนื่องจาก** [เหตุผล]
@@ -69,30 +95,37 @@ Examples:
 *one sentence that pins down where it breaks — talk about the system, not
 people.*
 
-The projector is blind: a count and the split by team. At 2:30, **Reveal**:
+The projector is blind: a count and the split by team. At 2:00, **Reveal**:
 each note reads as its sentence — causes on one side, *where it works, and
 why* on the other. Read out one cause from each colour, then one "works
 here" if there is one: that is the room's proof it can be done. Do not
 discuss.
 
-**HOW (4 min).** The phone shows the program's proposal as a seed (*build
+**TURN AND TALK (1 min).** The why round is already closed, so nothing said
+here can shape what was written — this is the one minute the room is meant
+to be loud. The projector shows a running countdown and two questions: *ที่ของ
+คุณเป็นแบบเดียวกันไหม* and *อีกทีมเห็นอะไรที่เราไม่เห็น*. Phones say, in so many
+words, put me down and turn around. Do not fill the silence; let it get
+noisy and then move.
+
+**HOW (3 min).** The phone shows the program's proposal as a seed (*build
 on it, or propose something else*), then asks people to pick **something
 that already exists here — use it more** or **something new**, and to give
 *what* and *why it would work here*. Both boxes required. The projector
-keeps the causes on screen and shows a count for the answers. At 3:30,
+keeps the causes on screen and shows a count for the answers. At 2:15,
 **Reveal**: causes and solutions side by side; "already exists" notes are
 marked ✓. Read one existing and one new. Move on.
 
-Slides 4–11: G1 why, G1 how, G2 why, G2 how, G3 why, G3 how, G4 why, G4 how.
+Slides 5–16: for each gap, why → turn and talk → how.
 
-## 0:34 — Overall (5 min)
+## 0:35 — Overall (4 min)
 
-Slide 12. Same *how* format, for something the two teams should do that is
-not about any one gap. No seed. Reveal at 4:30.
+Slide 17. Same *how* format, for something the two teams should do that is
+not about any one gap. No seed. Reveal at 3:00.
 
-## 0:39 — Close (5 min)
+## 0:39 — Close (4 min, and 2 in hand)
 
-Slide 13. *Neither of us had the whole picture*, with tonight's counts and
+Slide 18. *Neither of us had the whole picture*, with tonight's counts and
 how many gaps both teams answered. If `signupUrl` is set, the QR for people
 willing to be interviewed appears here — separate from everything they
 wrote. Tell them the summary comes back to both teams.

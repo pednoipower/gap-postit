@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230433">
+<link rel="stylesheet" href="assets/theme.css?v=202609230518">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
 <style>
   .stat-line { font-size: 14px; color: #8C2E25; font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
+  .stat-line.practice { color: var(--text-dim); font-weight: 600; }
   .seed { background: var(--paper-2); border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 14px; }
   .seed .k { font-size: 12.5px; color: var(--text-dim); font-weight: 600; letter-spacing: .04em; margin-bottom: 3px; }
   .seed .v { font-size: 16px; font-weight: 600; line-height: 1.4; }
@@ -149,12 +150,12 @@
   <p class="hint center" style="opacity:.5;font-size:11px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609230433"></script>
-<script src="assets/config.js?v=202609230433"></script>
-<script src="assets/strings.js?v=202609230433"></script>
-<script src="assets/store-supabase.js?v=202609230433"></script>
-<script src="assets/store-local.js?v=202609230433"></script>
-<script src="assets/store.js?v=202609230433"></script>
+<script src="assets/version.js?v=202609230518"></script>
+<script src="assets/config.js?v=202609230518"></script>
+<script src="assets/strings.js?v=202609230518"></script>
+<script src="assets/store-supabase.js?v=202609230518"></script>
+<script src="assets/store-local.js?v=202609230518"></script>
+<script src="assets/store.js?v=202609230518"></script>
 <script>
 (function () {
   "use strict";
@@ -200,6 +201,9 @@
   $("cueRes").textContent = t("situ_cue_res");
   $("becauseLbl").textContent = t("because_lbl");
   $("previewK").textContent = t("preview_lbl");
+  /* the warm-up round is about a lift, so it carries its own examples;
+     a "_p" string is used when there is one, otherwise the clinical one */
+  const hint = k => (isPractice() && window.T.S[k + "_p"]) ? t(k + "_p") : t(k);
   $("wWhen").placeholder = t("situ_hint");
 
   /* The sentence, assembled from the blanks. Blank parts show as ___ so the
@@ -230,9 +234,10 @@
     $("opening").innerHTML = `<span class="gap">${escapeHtml(g ? g.label : "")}</span> ${escapeHtml(t(v === "cause" ? "open_cause" : "open_works"))}`;
     $("situSub").textContent = t(v === "cause" ? "situ_sub" : "situ_sub_works");
     $("doesLbl").textContent = t(v === "cause" ? "does_lbl" : "does_works_lbl");
-    $("wBody").placeholder = t(v === "cause" ? "does_hint" : "does_works_hint");
-    $("wWhy").placeholder = t(v === "cause" ? "because_hint" : "because_works_hint");
-    chips($("whoChoices"), cfg.actors || [], id => { actor = id; renderPreview(); }, actor);
+    $("wWhen").placeholder = hint("situ_hint");
+    $("wBody").placeholder = hint(v === "cause" ? "does_hint" : "does_works_hint");
+    $("wWhy").placeholder  = hint(v === "cause" ? "because_hint" : "because_works_hint");
+    chips($("whoChoices"), actorsNow(), id => { actor = id; renderPreview(); }, actor);
     renderPreview();
     refreshSend();
     $("wWhen").focus({ preventScroll: true });
@@ -278,8 +283,14 @@
     return "wait";
   }
   const currentGap = () => groups.find(g => g.id === (room && room.spotlight_group));
-  const actorLabel = id => ((cfg.actors || []).find(a => a.id === id) || {}).label || "";
-  const realGaps = () => groups.filter(g => g.id !== OVERALL);
+  const PRACTICE = (cfg.practice && cfg.practice.id) || "G0";
+  const isPractice = () => room && room.spotlight_group === PRACTICE;
+  /* the warm-up round asks about a hospital lift, not about CKM, so it brings
+     its own WHO list; both lists are searched when a note is read back */
+  const actorsNow = () => (isPractice() && cfg.practice && cfg.practice.actors) || cfg.actors || [];
+  const ALL_ACTORS = (cfg.actors || []).concat((cfg.practice && cfg.practice.actors) || []);
+  const actorLabel = id => (ALL_ACTORS.find(a => a.id === id) || {}).label || "";
+  const realGaps = () => groups.filter(g => g.id !== OVERALL && g.id !== PRACTICE);
 
   /* ---- step strip: gap n/N · why | how · overall ---- */
   function renderSteps() {
@@ -287,13 +298,16 @@
     const gaps = realGaps();
     const spot = room && room.spotlight_group;
     const gi = gaps.findIndex(g => g.id === spot);
-    const inGap = (ph === "why" || ph === "why_reveal" || ph === "how" || ph === "how_reveal") && spot && spot !== OVERALL;
+    const isGapPhase = ph === "why" || ph === "why_reveal" || ph === "talk" || ph === "how" || ph === "how_reveal";
+    const inGap = isGapPhase && spot && spot !== OVERALL && spot !== PRACTICE;
     const inOverall = (ph === "how" || ph === "how_reveal") && spot === OVERALL;
     const isWhy = ph === "why" || ph === "why_reveal";
+    const isTalk = ph === "talk";
     const items = [
       { l: t("step_gap") + (inGap && gi >= 0 ? ` ${gi + 1}/${gaps.length}` : ""), cur: ph === "evidence" || inGap, done: inOverall || ph === "closing" },
-      { l: t("step_why"), cur: inGap && isWhy, done: (inGap && !isWhy) || inOverall || ph === "closing" },
-      { l: t("step_how"), cur: inGap && !isWhy, done: inOverall || ph === "closing" },
+      { l: t("step_why"),  cur: inGap && isWhy, done: (inGap && !isWhy) || inOverall || ph === "closing" },
+      { l: t("step_talk"), cur: inGap && isTalk, done: (inGap && !isWhy && !isTalk) || inOverall || ph === "closing" },
+      { l: t("step_how"),  cur: inGap && !isWhy && !isTalk, done: inOverall || ph === "closing" },
       { l: t("step_overall"), cur: inOverall, done: ph === "closing" }
     ];
     $("steps").replaceChildren();
@@ -304,7 +318,7 @@
       if (it.done && !it.cur) e.classList.add("done");
       $("steps").appendChild(e);
     });
-    $("steps").classList.toggle("hidden", ph === "lobby");
+    $("steps").classList.toggle("hidden", ph === "lobby" || (isGapPhase && spot === PRACTICE));
   }
 
   function renderGapsList() {
@@ -434,8 +448,9 @@
 
     if (m === "why") {
       $("promptTitle").textContent = g ? g.label : "";
-      $("promptSub").textContent = t("why_title");
-      $("whyStat").textContent = g && g.stat ? g.stat : "";
+      $("promptSub").textContent = isPractice() ? t("practice_badge") : t("why_title");
+      $("whyStat").textContent = isPractice() ? t("practice_note") : (g && g.stat ? g.stat : "");
+      $("whyStat").classList.toggle("practice", isPractice());
     } else if (m === "how") {
       $("promptTitle").textContent = isOverall ? t("overall_title") : (g ? g.label : "");
       $("promptSub").textContent = isOverall ? t("overall_sub") : t("how_title");
@@ -449,6 +464,10 @@
       } else if (room.phase === "closing") {
         $("promptTitle").textContent = cfg.workshopTitle; $("promptSub").textContent = "";
         $("waitText").textContent = t("wait_closing");
+      } else if (room.phase === "talk") {
+        $("promptTitle").textContent = t("talk_title");
+        $("promptSub").textContent = g && !isOverall ? g.label : "";
+        $("waitText").textContent = t("wait_talk");
       } else if ((room.phase === "why" || room.phase === "why_reveal" || room.phase === "how" || room.phase === "how_reveal") && g) {
         $("promptTitle").textContent = isOverall ? t("overall_title") : g.label;
         $("promptSub").textContent = (room.phase === "why" || room.phase === "why_reveal") ? t("why_title") : t("how_title");

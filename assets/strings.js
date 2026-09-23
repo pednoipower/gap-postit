@@ -28,21 +28,21 @@
 
     // WHY round
     why_title:        { th: "ทำไมถึงเป็นแบบนี้",                         en: "Why is this happening?" },
-    why_site:         { th: "ที่โรงพยาบาลของคุณ",                         en: "At your hospital" },
-    why_has:          { th: "ยังเป็นแบบนี้อยู่",                           en: "This is still the case" },
-    why_hasnot:       { th: "ไม่เป็นแบบนี้แล้ว / ทำได้แล้ว",                en: "Not the case — it works here" },
+    why_site:         { th: "ในงานประจำวันของคุณ เรื่องนี้เป็นอย่างไร",        en: "In your own week, which is it?" },
+    why_has:          { th: "ยังเจอแบบนี้อยู่",                             en: "I still run into this" },
+    why_hasnot:       { th: "ไม่ค่อยเจอ — ที่นี่มีวิธีรับมืออยู่แล้ว",           en: "Rarely — we have a way of handling it" },
     // the fill-in-the-blank, in sentence order:
     //   [gap] เนื่องจาก ในสถานการณ์ ___ · [ใคร] มักจะ ___ · เพราะ ___
     why_lead:         { th: "เติมให้เป็นประโยคเดียว",                          en: "Complete the sentence" },
     works_lead:       { th: "เติมให้เป็นประโยคเดียว",                          en: "Complete the sentence" },
     open_cause:       { th: "เพราะเมื่อ",                                       en: "because when" },
-    open_works:       { th: "ไม่เกิดที่ รพ. ของเรา เพราะเมื่อ",                     en: "does not happen at our hospital, because when" },
+    open_works:       { th: "ไม่ค่อยเจอในงานของเรา เพราะเมื่อ",                     en: "rarely comes up in our work, because when" },
     situ_lbl:         { th: "สถานการณ์ / เงื่อนไข",                              en: "Situation / condition" },
     situ_sub:         { th: "ลองระบุเงื่อนไขที่ทำให้ช่องว่างนี้เกิดขึ้น",            en: "Try to name the conditions under which this gap occurs" },
     situ_cue_time:    { th: "ช่วงเวลา: เกิดขึ้นเมื่อไร หรือในขั้นตอนไหน?",          en: "Time: when, or at which step?" },
     situ_cue_task:    { th: "งาน/กิจกรรม: ขณะทำหน้าที่หรือกิจกรรมอะไร?",            en: "Task: during which duty or activity?" },
     situ_cue_res:     { th: "ทรัพยากร: เมื่อคน เวลา งบประมาณ ข้อมูล หรืออุปกรณ์มีมากน้อยเพียงใด?", en: "Resources: how much staff, time, budget, information or equipment is there?" },
-    situ_sub_works:   { th: "ลองระบุเงื่อนไขที่ทำให้เรื่องนี้ทำได้ที่ รพ. ของคุณ",     en: "Try to name the conditions that make this work at your hospital" },
+    situ_sub_works:   { th: "ลองระบุเงื่อนไขที่ทำให้เรื่องนี้ไม่เป็นปัญหาในงานของคุณ",   en: "Try to name the conditions that keep this from being a problem in your work" },
     who_lbl:          { th: "ใคร",                                            en: "Who" },
     does_lbl:         { th: "มักจะ… (การตอบสนอง)",                              en: "usually… (response)" },
     does_works_lbl:   { th: "จะ… (การตอบสนอง)",                                 en: "will… (response)" },
@@ -58,6 +58,16 @@
     pick_who_first:   { th: "เลือก “ใคร” ก่อน",                              en: "Pick who first" },
     why_pick_first:   { th: "เลือกด้านบนก่อน",                              en: "Pick one above first" },
     send_why:         { th: "ส่ง",                                        en: "Send" },
+
+    // practice round
+    practice_badge:   { th: "รอบซ้อม",                                       en: "Practice round" },
+    practice_note:    { th: "รอบซ้อม — ประโยคเดียวกับของจริง ไม่เก็บเป็นข้อมูล", en: "Practice — the same sentence as the real rounds, and it is not kept as data" },
+    situ_hint_p:      { th: "เช่น ช่วงเช้า 8 โมง คนมาตรวจพร้อมกันทั้งตึก",        en: "e.g. 8am, the whole building arrives at once" },
+    does_hint_p:      { th: "เช่น ต้องรอลิฟต์ตัวเดียวกับญาติผู้ป่วย",              en: "e.g. has to wait for the same lift as the families" },
+    does_works_hint_p:{ th: "เช่น ใช้ลิฟต์ที่กันไว้สำหรับเตียงผู้ป่วยได้เลย",        en: "e.g. uses the lift kept for patient beds" },
+    because_hint_p:   { th: "เช่น ลิฟต์ส่งผู้ป่วยมีตัวเดียว และไม่มีคนคุมคิว",        en: "e.g. one patient lift, and nobody manages the queue" },
+    because_works_hint_p:{ th: "เช่น ผู้บริหารกำหนดไว้ตั้งแต่ออกแบบตึก",           en: "e.g. the hospital decided it when the building was designed" },
+    practice_lead:    { th: "เรื่องที่ทุกคนในห้องนี้เคยเจอ ลองเติมให้เป็นประโยคเดียว", en: "Something everyone here has met. Complete the sentence." },
 
     // HOW round
     how_title:        { th: "แล้วเราจะทำอย่างไร",                        en: "How would we fix it?" },
@@ -89,6 +99,11 @@
     mine_one:         { th: "คุณส่งแล้ว 1 ข้อ",                          en: "You've added 1 note" },
     mine_n:           { th: "คุณส่งแล้ว {n} ข้อ",                        en: "You've added {n} notes" },
 
+    // turn and talk, between the why reveal and the how round
+    talk_title:       { th: "คุยกับคนจากอีกทีม",                             en: "Turn and talk" },
+    wait_talk:        { th: "หันไปคุยกับคนข้าง ๆ ที่มาจากอีกทีม — ยังไม่ต้องพิมพ์", en: "Turn to someone from the other team — no typing yet" },
+    step_talk:        { th: "คุยกัน",                                        en: "Talk" },
+
     // step strip and between-round text
     step_gap:         { th: "ช่องว่าง",                                  en: "Gap" },
     step_why:         { th: "ทำไม",                                      en: "Why" },
@@ -101,6 +116,13 @@
     draft_kept:       { th: "ข้อความที่พิมพ์ค้างไว้ยังอยู่ — จะส่งได้เมื่อรอบเปิดอีกครั้ง", en: "What you were typing is kept — you can send it if the round reopens" },
 
     // projector
+    pj_practice:      { th: "รอบซ้อม — ตอบในมือถือ เปิดเผยพร้อมกันเมื่อครบเวลา",   en: "Practice round — answer on your phone, revealed together" },
+    pj_practice_rev:  { th: "รอบซ้อม — หน้าตาของคำตอบทั้งห้องเป็นแบบนี้",         en: "Practice round — this is what the room's answers look like" },
+    pj_talk:          { th: "หันไปคุยกับคนจากอีกทีม",                          en: "Turn to someone from the other team" },
+    pj_talk_sub:      { th: "หนึ่งนาที ก่อนจะไปคิดวิธีแก้",                      en: "One minute, before we look for fixes" },
+    pj_talk_cue1:     { th: "ที่ของคุณเป็นแบบเดียวกันไหม",                      en: "Is it the same where you work?" },
+    pj_talk_cue2:     { th: "อีกทีมเห็นอะไรที่เราไม่เห็น",                       en: "What does the other team see that we don't?" },
+    pj_talk_over:     { th: "หมดเวลา — มองที่จอ",                             en: "Time's up — look up" },
     pj_in_room:       { th: "คนในห้อง",                                  en: "in the room" },
     pj_who:           { th: "ใครอยู่ในห้องนี้",                            en: "Who's in the room" },
     pj_who_sub:       { th: "สองด้านของปัญหาเดียวกัน",                     en: "Two halves of the same problem" },
@@ -108,7 +130,7 @@
     pj_evidence_sub:  { th: "จากการสำรวจ 16 โรงพยาบาลก่อนวันนี้",           en: "From the pre-survey of 16 hospitals" },
     pj_proposal:      { th: "ข้อเสนอ",                                    en: "Proposal" },
     pj_evidence_lbl:  { th: "จาก pre-survey",                             en: "From the pre-survey" },
-    pj_why_blind:     { th: "ทำไมถึงเป็นแบบนี้ที่ รพ. ของคุณ — ตอบในมือถือ เปิดเผยพร้อมกันเมื่อครบเวลา", en: "Why does this happen at your hospital? Answer on your phone — revealed together when time is up" },
+    pj_why_blind:     { th: "ทำไมถึงเป็นแบบนี้ในงานประจำวันของคุณ — ตอบในมือถือ เปิดเผยพร้อมกันเมื่อครบเวลา", en: "Why does this happen in your own week? Answer on your phone — revealed together when time is up" },
     pj_how_blind:     { th: "แล้วเราจะทำอย่างไร — ตอบในมือถือ เปิดเผยพร้อมกันเมื่อครบเวลา", en: "How would we fix it? Answer on your phone — revealed together when time is up" },
     pj_why_revealed:  { th: "สาเหตุ จากทั้งสองทีม",                        en: "Causes, from both teams" },
     pj_how_revealed:  { th: "สาเหตุ และสิ่งที่เราจะทำ",                     en: "Causes, and what we would do" },
