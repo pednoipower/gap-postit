@@ -93,7 +93,7 @@ about their own week rather than about the hospital's paperwork: *ยังเ�
 อยู่* or *ไม่ค่อยเจอ — ที่นี่มีวิธีรับมืออยู่แล้ว*. Then a
 fill-in-the-blank, all four required:
 
-> **[gap] — ยังเจอในงานของเรา:** **ใคร** (tap) **มักจะ** [ทำอะไร] **ตอน** [สถานการณ์] **เพราะ** [เหตุผล]
+> **[gap] — ยังเจอในงานของเรา:** **ใคร** (tap) **มักจะ** [ทำอะไร] **เมื่อ** [สถานการณ์] **เพราะ** [เหตุผล]
 
 — who, does or doesn't do what, in what situation, because of what reason or
 missing resource. The actor is a tap and comes first, so the sentence starts
@@ -111,15 +111,15 @@ blank has to produce is a circumstance that could have been otherwise, so
 that sites where the response differs can be compared. Context is coded afterwards with
 `docs/2026-09-22-context-codebook.md`.
 People whose own week rarely shows the gap fill the mirror image
-(*[gap] — ไม่ค่อยเจอในงานของเรา: ใคร มักจะ… ตอน… เพราะ…*).
+(*[gap] — ไม่ค่อยเจอในงานของเรา: ใคร มักจะ… เมื่อ… เพราะ…*).
 
 Examples:
-- G1, workload: *แพทย์โรคไตมักจะไม่ได้ประเมินว่าใครเหมาะกับ CKM ตอนคลินิกไต
+- G1, workload: *แพทย์โรคไตมักจะไม่ได้ประเมินว่าใครเหมาะกับ CKM เมื่อคลินิกไต
   วันพุธมีผู้ป่วย 80 ราย และมีแพทย์คนเดียว เพราะไม่มีเกณฑ์ที่ตกลงกันไว้ และ
   ไม่มีช่องบันทึกใน HIS*
 - G3, place and relationship: *ทีมประคับประคองมักจะเห็นผู้ป่วยต่อเมื่อถูกปรึกษา
-  ตอนทีม PC อยู่คนละตึกและไม่มีวันราวด์ร่วม เพราะไม่มีเวทีทบทวนผู้ป่วยร่วมกัน*
-- G4, incentive: *แพทย์โรคไตมักจะไม่เปิดเรื่อง ACP ก่อนเริ่ม HD ตอนตัวชี้วัดของ
+  เมื่อทีม PC อยู่คนละตึกและไม่มีวันราวด์ร่วม เพราะไม่มีเวทีทบทวนผู้ป่วยร่วมกัน*
+- G4, incentive: *แพทย์โรคไตมักจะไม่เปิดเรื่อง ACP ก่อนเริ่ม HD เมื่อตัวชี้วัดของ
   หน่วยนับจำนวนผู้ป่วยที่ได้เริ่มฟอก เพราะเกรงว่าครอบครัวจะเข้าใจว่า "ไม่รักษา"*
   Say out loud:
 *one sentence that pins down where it breaks — talk about the system, not

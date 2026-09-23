@@ -1,4 +1,4 @@
-# Context codebook — for coding the ตอน [สถานการณ์] blank
+# Context codebook — for coding the เมื่อ [สถานการณ์] blank
 
 Participants describe the situation in their own words (*where · when · what
 is going on*). Context is classified **afterwards**, by the analyst, with this
@@ -15,7 +15,7 @@ rule 2 below is what handles that. What a chain has to do to be codable is
 smaller and more practical:
 
 1. **The three blanks say three different things.** The common failure is
-   redundancy: *…มักจะอ่านแล้วไม่ตอบ ตอนไม่มีใครรับผิดชอบ เพราะไม่มีใคร
+   redundancy: *…มักจะอ่านแล้วไม่ตอบ เมื่อไม่มีใครรับผิดชอบ เพราะไม่มีใคร
    รับผิดชอบ* is one
    fact written twice, and it leaves no circumstance to compare across sites.
 2. **The first blank names something that could have been otherwise** — an

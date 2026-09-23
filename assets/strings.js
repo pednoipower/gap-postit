@@ -37,7 +37,7 @@
     works_lead:       { th: "เติมให้ครบเป็นประโยคเดียว",                          en: "Complete the sentence" },
     open_cause:       { th: "ยังเจอในงานของเรา",                                 en: "still shows up in our work" },
     open_works:       { th: "ไม่ค่อยเจอในงานของเรา",                              en: "rarely comes up in our work" },
-    situ_lbl:         { th: "ตอน…",                        en: "when… (situation / condition)" },
+    situ_lbl:         { th: "เมื่อ…",                        en: "when… (situation / condition)" },
     situ_sub:         { th: "เรื่องนี้มักเกิดตอนไหน — บอกให้เห็นภาพว่าเมื่อไร ที่ไหน และตอนนั้นเป็นอย่างไร",      en: "When is it like that? Name the conditions that bring it about" },
     situ_cue_time:    { th: "เกิดขึ้นช่วงไหน หรือขั้นตอนไหนของงาน",          en: "Time: when, or at which step?" },
     situ_cue_task:    { th: "ตอนนั้นกำลังทำงานอะไร",            en: "Task: during which duty or activity?" },
@@ -48,7 +48,7 @@
     // phone's live preview, by the echo of your own notes and by the notes on
     // the projector, so all three always read the same.
     conn_does:        { th: "มักจะ",                                          en: "usually" },
-    conn_when:        { th: "ตอน",                                          en: "when" },
+    conn_when:        { th: "เมื่อ",                                          en: "when" },
     conn_because:     { th: "เพราะ",                                          en: "because" },
 
     who_lbl:          { th: "ใคร",                                            en: "Who" },
@@ -63,13 +63,13 @@
     because_works_hint:{ th: "เช่น มีช่องในแบบฟอร์ม และหัวหน้าติดตามทุกเดือน",         en: "e.g. there's a box on the form and the head checks monthly" },
     // a finished chain in the same grammar, kept on screen while they write
     worked_lbl:       { th: "ตัวอย่างเมื่อเติมครบ",                            en: "See one finished sentence" },
-    worked_cause:     { th: "“โรงพยาบาลยังไม่มีระบบคัดกรองผู้ป่วยที่เหมาะกับ CKM — <b>ยังเจอในงานของเรา</b>: <b>แพทย์โรคไต มักจะ</b> ไม่ได้ประเมินว่าใครเหมาะกับ CKM <b>ตอน</b> คลินิกไตวันพุธมีผู้ป่วย 80 ราย และมีแพทย์คนเดียว <b>เพราะ</b> ไม่มีเกณฑ์ที่ตกลงกันไว้ และไม่มีช่องให้บันทึกใน HIS”",
+    worked_cause:     { th: "“โรงพยาบาลยังไม่มีระบบคัดกรองผู้ป่วยที่เหมาะกับ CKM — <b>ยังเจอในงานของเรา</b>: <b>แพทย์โรคไต มักจะ</b> ไม่ได้ประเมินว่าใครเหมาะกับ CKM <b>เมื่อ</b> คลินิกไตวันพุธมีผู้ป่วย 80 ราย และมีแพทย์คนเดียว <b>เพราะ</b> ไม่มีเกณฑ์ที่ตกลงกันไว้ และไม่มีช่องให้บันทึกใน HIS”",
                         en: "“The nephrologist usually doesn't assess who CKM would suit, when the Wednesday clinic has 80 patients and one doctor, because there are no agreed criteria and no box to record it in the HIS.”" },
-    worked_works:     { th: "“โรงพยาบาลยังไม่มีระบบคัดกรองผู้ป่วยที่เหมาะกับ CKM — <b>ไม่ค่อยเจอในงานของเรา</b>: <b>พยาบาลไต มักจะ</b> ชวนคุยเรื่องทางเลือกตั้งแต่ stage 4 <b>ตอน</b> คลินิกไตวันอังคารมีพยาบาล PC มาร่วมทุกสัปดาห์ <b>เพราะ</b> มีช่องในแบบฟอร์ม และหัวหน้าติดตามทุกเดือน”",
+    worked_works:     { th: "“โรงพยาบาลยังไม่มีระบบคัดกรองผู้ป่วยที่เหมาะกับ CKM — <b>ไม่ค่อยเจอในงานของเรา</b>: <b>พยาบาลไต มักจะ</b> ชวนคุยเรื่องทางเลือกตั้งแต่ stage 4 <b>เมื่อ</b> คลินิกไตวันอังคารมีพยาบาล PC มาร่วมทุกสัปดาห์ <b>เพราะ</b> มีช่องในแบบฟอร์ม และหัวหน้าติดตามทุกเดือน”",
                         en: "“The renal nurse opens the options conversation at stage 4, when the Tuesday clinic has the PC nurse sitting in, because there's a box on the form and the head checks monthly.”" },
-    worked_cause_p:   { th: "“งานด่วนมักแจ้งวันนี้และให้เริ่มพรุ่งนี้ — <b>ยังเจอในงานของเรา</b>: <b>คนทำงานหน้างาน มักจะ</b> ทำไปก่อนทั้งที่ยังไม่แน่ใจว่าต้องทำอย่างไร <b>ตอน</b> มีข้อความส่งต่อกันหลายทอดตอนเย็น และให้เริ่มใช้เช้าวันถัดไป <b>เพราะ</b> ไม่มีคนสรุปว่างานเปลี่ยนตรงไหน ใครต้องทำ และถ้าสงสัยให้ถามใคร”",
+    worked_cause_p:   { th: "“งานด่วนมักแจ้งวันนี้และให้เริ่มพรุ่งนี้ — <b>ยังเจอในงานของเรา</b>: <b>คนทำงานหน้างาน มักจะ</b> ทำไปก่อนทั้งที่ยังไม่แน่ใจว่าต้องทำอย่างไร <b>เมื่อ</b> มีข้อความส่งต่อกันหลายทอดตอนเย็น และให้เริ่มใช้เช้าวันถัดไป <b>เพราะ</b> ไม่มีคนสรุปว่างานเปลี่ยนตรงไหน ใครต้องทำ และถ้าสงสัยให้ถามใคร”",
                         en: "“The 3pm meeting with eight items and a senior director in the room: the chair lets it run over, because nobody wants to cut off a senior who prepared, and nobody was given the job of keeping time.”" },
-    worked_works_p:   { th: "“งานด่วนมักแจ้งวันนี้และให้เริ่มพรุ่งนี้ — <b>ไม่ค่อยเจอในงานของเรา</b>: <b>ผู้ประสานงาน มักจะ</b> สรุปสิ่งที่ต้องทำ ผู้รับผิดชอบ และช่องทางถามกลับ <b>ตอน</b> มีเรื่องใหม่ที่ต้องเริ่มใช้ภายในวันถัดไป <b>เพราะ</b> ทีมตกลงไว้ชัดว่าใครรับเรื่อง ใครแปลงเป็นงาน และใครยืนยันก่อนเริ่มใช้”",
+    worked_works_p:   { th: "“งานด่วนมักแจ้งวันนี้และให้เริ่มพรุ่งนี้ — <b>ไม่ค่อยเจอในงานของเรา</b>: <b>ผู้ประสานงาน มักจะ</b> สรุปสิ่งที่ต้องทำ ผู้รับผิดชอบ และช่องทางถามกลับ <b>เมื่อ</b> มีเรื่องใหม่ที่ต้องเริ่มใช้ภายในวันถัดไป <b>เพราะ</b> ทีมตกลงไว้ชัดว่าใครรับเรื่อง ใครแปลงเป็นงาน และใครยืนยันก่อนเริ่มใช้”",
                         en: "“…rarely happens on Monday mornings when everyone is due on the ward at nine: the secretary warns at two minutes and closes the item, because the rule was agreed beforehand and the boss keeps it.”" },
     situ_nudge:       { th: "ช่วยเล่าให้เห็นภาพอีกนิดได้ไหม — เกิดเมื่อไร ที่ไหน และตอนนั้นมีใครอยู่บ้าง", en: "Could you make it a bit more concrete — when, where, who was there?" },
 
