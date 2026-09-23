@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609230649">
+<link rel="stylesheet" href="assets/theme.css?v=202609230653">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .stat-line { font-size: 14px; color: #8C2E25; font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
@@ -21,6 +21,17 @@
   .field .lbl.conn { font-size: 17px; font-weight: 700; }
   .sub-hint { display: block; font-size: 13.5px; color: var(--text); line-height: 1.5; margin: -4px 0 4px; }
   .cues { margin: 0 0 9px; padding-left: 18px; font-size: 13px; color: var(--text-dim); line-height: 1.55; }
+  /* one finished sentence, in the same grammar, kept on screen while they
+     write their own: people copy an example far more reliably than they
+     follow an instruction */
+  .worked { background: #FDF6E3; border: 1px solid #F0E0B0; border-radius: var(--r-sm);
+            padding: 9px 12px; margin: 0 0 13px; }
+  .worked summary { font-size: 13px; font-weight: 700; color: #7A5C09; cursor: pointer;
+                    min-height: 24px; display: list-item; }
+  .worked p { margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: var(--text); }
+  .worked p b { font-weight: 700; }
+  .nudge { margin: 7px 0 0; font-size: 13px; line-height: 1.5; color: #7A5C09;
+           background: #FDF6E3; border-radius: var(--r-sm); padding: 8px 11px; }
   .cues li { margin: 0 0 2px; }
   /* the fixed start of the sentence: the gap, then "because" */
   .opening { font-size: 16px; font-weight: 700; line-height: 1.5; margin: 0 0 12px; padding: 10px 12px;
@@ -85,11 +96,16 @@
     <div id="whyFields" class="hidden">
       <p class="why-note" id="whyLead"></p>
       <p class="opening" id="opening"></p>
+      <details class="worked" id="worked">
+        <summary id="workedLbl"></summary>
+        <p id="workedText"></p>
+      </details>
       <label class="field">
         <span class="lbl conn" id="situLbl"></span>
         <span class="sub-hint" id="situSub"></span>
         <ul class="cues" id="situCues"><li id="cueTime"></li><li id="cueTask"></li><li id="cueRes"></li><li id="cueWho"></li></ul>
         <textarea class="note blank" id="wWhen" maxlength="400" rows="3" autocomplete="off" autocorrect="on"></textarea>
+        <p class="nudge hidden" id="situNudge"></p>
       </label>
       <label class="field">
         <span class="lbl" id="whoLbl"></span>
@@ -141,12 +157,12 @@
   <p class="hint center" style="opacity:.5;font-size:11px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609230649"></script>
-<script src="assets/config.js?v=202609230649"></script>
-<script src="assets/strings.js?v=202609230649"></script>
-<script src="assets/store-supabase.js?v=202609230649"></script>
-<script src="assets/store-local.js?v=202609230649"></script>
-<script src="assets/store.js?v=202609230649"></script>
+<script src="assets/version.js?v=202609230653"></script>
+<script src="assets/config.js?v=202609230653"></script>
+<script src="assets/strings.js?v=202609230653"></script>
+<script src="assets/store-supabase.js?v=202609230653"></script>
+<script src="assets/store-local.js?v=202609230653"></script>
+<script src="assets/store.js?v=202609230653"></script>
 <script>
 (function () {
   "use strict";
@@ -230,6 +246,16 @@
     $("wWhen").placeholder = hint(v === "cause" ? "situ_hint" : "situ_hint_works");
     $("wBody").placeholder = hint(v === "cause" ? "does_hint" : "does_works_hint");
     $("wWhy").placeholder  = hint(v === "cause" ? "because_hint" : "because_works_hint");
+    /* The example is the real instruction. It is in the same grammar as the
+       blanks, it is already filled in, and it stays on screen while they
+       write — open by default in the practice round, where learning the
+       shape is the point, and folded away after that. */
+    const wk = isPractice()
+      ? (v === "cause" ? "worked_cause_p" : "worked_works_p")
+      : (v === "cause" ? "worked_cause"   : "worked_works");
+    $("workedLbl").textContent = t("worked_lbl");
+    $("workedText").innerHTML = t(wk);
+    $("worked").open = isPractice();
     chips($("whoChoices"), actorsNow(), id => { actor = id; renderPreview(); }, actor);
     renderPreview();
     refreshSend();
@@ -379,6 +405,23 @@
   setInterval(refreshSend, 400);
   ["wWhen","wBody","wWhy","hWhat","hWhy"].forEach(id => $(id).addEventListener("input", refreshSend));
   ["wWhen","wBody","wWhy"].forEach(id => $(id).addEventListener("input", renderPreview));
+
+  /* The one blank people answer with a category — "ไม่มีเวลา", "คนไม่พอ" —
+     instead of a situation. Those are true everywhere, so they can never
+     explain why the gap is here and not there. The nudge never blocks the
+     send: a thin answer is still data, and an argument with the phone is
+     worse than a thin answer. */
+  const VAGUE = /^(ไม่มีเวลา|เวลาไม่พอ|คนไม่พอ|ขาดคน|คนน้อย|งานเยอะ|ภาระงานเยอะ|ภาระงานมาก|ยุ่ง|ไม่มีระบบ|ระบบไม่ดี|นโยบาย|ผู้บริหาร|งบไม่พอ|ไม่มีงบ)[\s.!ๆ]*$/;
+  let nudgeTimer = null;
+  $("wWhen").addEventListener("input", () => {
+    clearTimeout(nudgeTimer);
+    nudgeTimer = setTimeout(() => {
+      const v = $("wWhen").value.trim();
+      const thin = v.length > 0 && (v.length < 18 || VAGUE.test(v));
+      $("situNudge").textContent = t("situ_nudge");
+      $("situNudge").classList.toggle("hidden", !thin);
+    }, 900);
+  });
 
   /* ---- echo back what they have sent this round ---- */
   function renderMine() {

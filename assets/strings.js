@@ -54,6 +54,18 @@
     does_works_hint:  { th: "เช่น ถาม surprise question และบันทึกทุกครั้ง",        en: "e.g. asks the surprise question and records it every time" },
     because_hint:     { th: "เหตุผล เช่น ไม่มีเกณฑ์ / ไม่มีช่องใน HIS / ไม่มีเวลา / กลัวครอบครัวเข้าใจว่า “ไม่รักษา” / คิดว่าเป็นหน้าที่อีกทีม", en: "the reason, e.g. no criteria / no box in the HIS / no time / afraid the family hears “no treatment” / thinks it's the other team's job" },
     because_works_hint:{ th: "เช่น มีช่องในแบบฟอร์ม และหัวหน้าดูทุกเดือน",         en: "e.g. there's a box on the form and the head checks monthly" },
+    // a finished chain in the same grammar, kept on screen while they write
+    worked_lbl:       { th: "ดูตัวอย่างหนึ่งประโยค",                            en: "See one finished sentence" },
+    worked_cause:     { th: "“โรงพยาบาลยังไม่มีระบบคัดกรองผู้ป่วยที่เหมาะกับ CKM <b>เพราะเมื่อ</b> วันพุธ คลินิกไตมีผู้ป่วย 80 ราย และมีแพทย์คนเดียว <b>แพทย์โรคไต</b> <b>มักจะ</b> ไม่ได้ประเมินว่าใครเหมาะกับ CKM <b>เนื่องจาก</b> ไม่มีเกณฑ์ที่ตกลงกันไว้ และไม่มีช่องให้บันทึกใน HIS”",
+                        en: "“…because when the Wednesday renal clinic has 80 patients and one doctor, the nephrologist usually doesn't assess who CKM would suit, because there are no agreed criteria and no box to record it in the HIS.”" },
+    worked_works:     { th: "“…<b>ไม่ค่อยเจอในงานของเรา เพราะเมื่อ</b> คลินิกไตวันอังคารมีพยาบาล PC นั่งด้วยทุกสัปดาห์ <b>พยาบาลไต</b> <b>จะ</b> ชวนคุยเรื่องทางเลือกตั้งแต่ stage 4 <b>เนื่องจาก</b> มีช่องในแบบฟอร์ม และหัวหน้าดูทุกเดือน”",
+                        en: "“…rarely comes up, because when the Tuesday clinic has the PC nurse sitting in, the renal nurse opens the options conversation at stage 4, because there's a box on the form and the head checks monthly.”" },
+    worked_cause_p:   { th: "“การประชุมมักจบช้ากว่าเวลาที่นัดไว้ <b>เพราะเมื่อ</b> ประชุมบ่ายสาม มีวาระ 8 เรื่อง และมีผู้บริหารอาวุโสนั่งอยู่ด้วย <b>ประธาน</b> <b>มักจะ</b> ปล่อยให้เลยเวลาโดยไม่ตัดบท <b>เนื่องจาก</b> เกรงใจคนอาวุโสที่เตรียมมาพูด และไม่มีใครได้รับมอบหมายให้คุมเวลา”",
+                        en: "“The 3pm meeting with eight items and a senior director in the room: the chair lets it run over, because nobody wants to cut off a senior who prepared, and nobody was given the job of keeping time.”" },
+    worked_works_p:   { th: "“…<b>ไม่ค่อยเจอในงานของเรา เพราะเมื่อ</b> ประชุมเช้าวันจันทร์ ที่ทุกคนต้องไปราวด์ต่อ 9 โมง <b>เลขา/ผู้จัดประชุม</b> <b>จะ</b> เตือนเมื่อเหลือ 2 นาที แล้วปิดวาระ <b>เนื่องจาก</b> ตกลงกติกาเวลากันไว้ล่วงหน้า และหัวหน้าทำตามเอง”",
+                        en: "“…rarely happens on Monday mornings when everyone is due on the ward at nine: the secretary warns at two minutes and closes the item, because the rule was agreed beforehand and the boss keeps it.”" },
+    situ_nudge:       { th: "ระบุให้เห็นภาพขึ้นอีกนิดได้ไหม — เมื่อไร ที่ไหน ตอนนั้นมีใครอยู่บ้าง", en: "Could you make it a bit more concrete — when, where, who was there?" },
+
     preview_lbl:      { th: "ประโยคของคุณ",                                    en: "Your sentence" },
     why_note:         { th: "พูดถึงระบบ ไม่ใช่ตัวบุคคล — ทั้งสองทีมกำลังตอบคำถามเดียวกัน", en: "Talk about the system, not people — both teams are answering the same question" },
     need_all:         { th: "เติมให้ครบทุกช่อง",                             en: "Fill in every blank" },
