@@ -211,11 +211,12 @@ window.CONFIG = {
      form with no box for it. A warm-up whose causes are a building or a
      broken machine teaches the wrong chain, however funny it is.
 
-     A meeting that overruns qualifies: everybody here has sat in one, nobody
-     is to blame, and the reasons people give — เกรงใจ, ไม่มีใครคุมเวลา, วาระ
-     ไม่ได้กำหนดเวลา — are the same shape as the reasons behind the four real
-     gaps. It also has a "works here" side: some units really do finish on
-     time, and they can say why.
+     An unanswered message in the ward's group chat qualifies: everybody has
+     watched one scroll past, no profession is singled out, and the reasons
+     people give — ทุกคนคิดว่าคงมีคนอื่นตอบ, ไม่ได้ระบุว่าใครต้องทำอะไร, ไม่มี
+     ข้อตกลงว่าเรื่องด่วนส่งอย่างไร — are the same shape as the reasons behind
+     the four real gaps. It also has an honest opposite: some teams really do
+     answer, and they can say why.
 
      Its notes are stored (that is the point — you can see them arrive) but
      they are left out of every export, of the closing counts and of the AI
@@ -225,17 +226,17 @@ window.CONFIG = {
      ------------------------------------------------------------------------ */
   practice: {
     id:      "G0",
-    label:   "การประชุมมักจบช้ากว่าเวลาที่นัดไว้",
-    problem: "รอบซ้อม — เรื่องที่ทุกคนในห้องนี้เคยเจอ",
-    /* The WHO list has the same shape as the clinical one — someone senior,
-       someone doing the task, the people on the receiving end, an organiser,
-       the system — so the warm-up rehearses the real list as well as the
-       real sentence. */
+    label:   "ข้อความสำคัญในกลุ่มงานมักไม่มีคนตอบ",
+    problem: "รอบซ้อม — เรื่องใกล้ตัวที่ทุกคนเคยเจอ",
+    /* The WHO list has the same shape as the clinical one — the person doing
+       the task, the people on the receiving end, someone senior, whoever
+       happens to be on duty, the system — so the warm-up rehearses the real
+       list as well as the real sentence. */
     actors: [
-      { id: "p_chair",  label: "ประธาน/หัวหน้า" },
-      { id: "p_speaker",label: "คนนำเสนอ" },
-      { id: "p_member", label: "ผู้เข้าร่วมประชุม" },
-      { id: "p_sec",    label: "เลขา/ผู้จัดประชุม" },
+      { id: "p_sender", label: "คนส่งข้อความ" },
+      { id: "p_member", label: "คนในกลุ่ม" },
+      { id: "p_chief",  label: "หัวหน้า/ผู้รับผิดชอบ" },
+      { id: "p_onduty", label: "คนที่อยู่เวรตอนนั้น" },
       { id: "p_system", label: "ระบบ/ผู้บริหาร รพ." },
       { id: "p_other",  label: "อื่น ๆ" }
     ]

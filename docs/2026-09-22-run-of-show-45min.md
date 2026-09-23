@@ -36,20 +36,20 @@ where they mainly work. Say out loud: *nothing is linked to your name.*
 **Say it while they are still finding seats:** *sit next to somebody from the
 other team.* Everything after this depends on it, and it is free.
 
-## 0:03 — Practice round: the meeting that overruns (4 min)
+## 0:03 — Practice round: the message nobody answers (4 min)
 
-Slide 3. A gap nobody can be blamed for and everybody in this room has sat
-through — *การประชุมมักจบช้ากว่าเวลาที่นัดไว้* — run through exactly the
-machinery of the real rounds: the same sentence, the same blind collection,
-the same reveal. It does three jobs at once: it teaches the form, it breaks
+Slide 3. A gap nobody can be blamed for and everybody in this room has
+watched scroll past — *ข้อความสำคัญในกลุ่มงานมักไม่มีคนตอบ* — run through
+exactly the machinery of the real rounds: the same sentence, the same blind
+collection, the same reveal. It does three jobs at once: it teaches the form, it breaks
 the ice, and it proves every phone in the room can reach the board before
 anything matters.
 
 It was chosen for its causes, not for the laugh. The chain it produces is
-*ประธาน · มักจะปล่อยให้เลยเวลาโดยไม่ตัดบท · เมื่อประชุมบ่ายสาม วาระ 8 เรื่อง
-มีผู้บริหารอาวุโสนั่งอยู่ด้วย · เนื่องจากเกรงใจคนอาวุโสที่เตรียมมาพูด และไม่มีใคร
-ได้รับมอบหมายให้คุมเวลา* — a deference and a job nobody was given, under
-conditions anyone in the room can picture. Same shape as the reasons behind the four real gaps,
+*คนในกลุ่ม · มักจะอ่านแล้วไม่ได้ตอบ · ตอนที่มีข้อความยาวส่งมาตอนเย็นก่อนวันหยุด
+โดยไม่ได้ระบุว่าใครต้องทำอะไร · เพราะทุกคนคิดว่าคงมีคนอื่นตอบ และไม่แน่ใจว่า
+ข้อความนั้นต้องการคำตอบหรือไม่* — a job nobody was given and an agreement
+nobody made, under conditions anyone in the room can picture. Same shape as the reasons behind the four real gaps,
 which is the whole point of rehearsing on it.
 
 - 90 seconds to write. The projector shows only a count.
@@ -85,7 +85,7 @@ about their own week rather than about the hospital's paperwork: *ยังเ�
 อยู่* or *ไม่ค่อยเจอ — ที่นี่มีวิธีรับมืออยู่แล้ว*. Then a
 fill-in-the-blank, all four required:
 
-> **[gap] — ยังเจอในงานของเรา:** **ใคร** (tap) **มักจะ** [การตอบสนอง] **เมื่อ** [สถานการณ์/เงื่อนไข] **เนื่องจาก** [เหตุผล]
+> **[gap] — ยังเจอในงานของเรา:** **ใคร** (tap) **มักจะ** [ทำอะไร] **ตอนที่** [สถานการณ์] **เพราะ** [เหตุผล]
 
 — who, does or doesn't do what, in what situation, because of what reason or
 missing resource. The actor is a tap and comes first, so the sentence starts
@@ -103,16 +103,16 @@ blank has to produce is a circumstance that could have been otherwise, so
 that sites where the response differs can be compared. Context is coded afterwards with
 `docs/2026-09-22-context-codebook.md`.
 People whose own week rarely shows the gap fill the mirror image
-(*[gap] — ไม่ค่อยเจอในงานของเรา: ใคร จะ… เมื่อ… เนื่องจาก…*).
+(*[gap] — ไม่ค่อยเจอในงานของเรา: ใคร มักจะ… ตอนที่… เพราะ…*).
 
 Examples:
-- G1, workload: *แพทย์โรคไตมักจะไม่ได้ประเมินว่าใครเหมาะกับ CKM เมื่อคลินิกไต
-  วันพุธมีผู้ป่วย 80 ราย และมีแพทย์คนเดียว เนื่องจากไม่มีเกณฑ์ที่ตกลงกันไว้ และ
+- G1, workload: *แพทย์โรคไตมักจะไม่ได้ประเมินว่าใครเหมาะกับ CKM ตอนที่คลินิกไต
+  วันพุธมีผู้ป่วย 80 ราย และมีแพทย์คนเดียว เพราะไม่มีเกณฑ์ที่ตกลงกันไว้ และ
   ไม่มีช่องบันทึกใน HIS*
 - G3, place and relationship: *ทีมประคับประคองมักจะเห็นผู้ป่วยต่อเมื่อถูกปรึกษา
-  เมื่อทีม PC อยู่คนละตึกและไม่มีวันราวด์ร่วม เนื่องจากไม่มีเวทีทบทวนผู้ป่วยร่วมกัน*
-- G4, incentive: *แพทย์โรคไตมักจะไม่เปิดเรื่อง ACP ก่อนเริ่ม HD เมื่อตัวชี้วัดของ
-  หน่วยนับจำนวนผู้ป่วยที่ได้เริ่มฟอก เนื่องจากเกรงว่าครอบครัวจะเข้าใจว่า "ไม่รักษา"*
+  ตอนที่ทีม PC อยู่คนละตึกและไม่มีวันราวด์ร่วม เพราะไม่มีเวทีทบทวนผู้ป่วยร่วมกัน*
+- G4, incentive: *แพทย์โรคไตมักจะไม่เปิดเรื่อง ACP ก่อนเริ่ม HD ตอนที่ตัวชี้วัดของ
+  หน่วยนับจำนวนผู้ป่วยที่ได้เริ่มฟอก เพราะเกรงว่าครอบครัวจะเข้าใจว่า "ไม่รักษา"*
   Say out loud:
 *one sentence that pins down where it breaks — talk about the system, not
 people.*

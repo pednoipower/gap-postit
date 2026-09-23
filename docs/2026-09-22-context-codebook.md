@@ -1,4 +1,4 @@
-# Context codebook — for coding the เมื่อ [สถานการณ์/เงื่อนไข] blank
+# Context codebook — for coding the ตอนที่ [สถานการณ์] blank
 
 Participants describe the situation in their own words (*where · when · what
 is going on*). Context is classified **afterwards**, by the analyst, with this
@@ -15,8 +15,8 @@ rule 2 below is what handles that. What a chain has to do to be codable is
 smaller and more practical:
 
 1. **The three blanks say three different things.** The common failure is
-   redundancy: *…มักจะปล่อยให้เลยเวลา เมื่อไม่ได้กำหนดเวลา เนื่องจากไม่มีใคร
-   คุมเวลา* is one
+   redundancy: *…มักจะอ่านแล้วไม่ตอบ ตอนที่ไม่มีใครรับผิดชอบ เพราะไม่มีใคร
+   รับผิดชอบ* is one
    fact written twice, and it leaves no circumstance to compare across sites.
 2. **The first blank names something that could have been otherwise** — an
    hour, a load, a place, who was present, a rule or indicator in force. Not
@@ -45,7 +45,7 @@ the response) and any number of secondary codes.
 1. Code what the **participant** described, not what you infer. If the text
    says only *วันพุธ*, code WORKLOAD/TIME; do not add PLACE because you know
    the Wednesday clinic is far away.
-2. The **เนื่องจาก** blank often names a second context (e.g. *เนื่องจากไม่มีช่องใน
+2. The **เพราะ** blank often names a second context (e.g. *เนื่องจากไม่มีช่องใน
    HIS*). Code it there as the *mechanism's missing resource*, and also as a
    secondary context code if it is a standing condition rather than a
    momentary reason.
