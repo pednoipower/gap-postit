@@ -244,14 +244,14 @@
   }
 
   /* ------------------------------------------------------------------------
-     A problem statement: a big piece with a notch for every solution slot.
-     Notches alternate around the edge so that, when solutions plug in, the
-     two disciplines end up interlocking around the same problem.
+     A gap card. Plain paper, not a puzzle piece: a dark card with a coloured
+     edge and a band of the same colour along the top, so it reads as one of
+     the notes on the wall rather than as a shape waiting to be slotted in.
+     Same call signature as before, so the projector needs no special case.
      ---------------------------------------------------------------------- */
   function problemSVG(opts) {
     const w = opts.width || 420, h = opts.height || 260;
-    // every edge is a notch (inward), so only the shadow needs any margin
-    const pad = opts.pad != null ? opts.pad : 8;
+    const pad = opts.pad != null ? opts.pad : 8;   // room for the shadow only
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", `${-pad} ${-pad} ${w + pad*2} ${h + pad*2}`);
     svg.setAttribute("width", "100%");
@@ -259,22 +259,32 @@
     svg.style.overflow = "visible";
 
     const accent = opts.accent || "#6E7BA8";
-    const d = piecePath(w, h, { left: -1, right: -1, top: -1, bottom: -1 }, 0.13);
+    const r = Math.max(4, Math.min(w, h) * 0.035);
+    const rect = (x, y, rw, rh, rx) => {
+      const e = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      e.setAttribute("x", x); e.setAttribute("y", y);
+      e.setAttribute("width", rw); e.setAttribute("height", rh);
+      e.setAttribute("rx", rx);
+      return e;
+    };
 
-    const shadow = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    shadow.setAttribute("d", d);
+    const shadow = rect(3, 6, w, h, r);
     shadow.setAttribute("fill", "rgba(0,0,0,.42)");
-    shadow.setAttribute("transform", "translate(3,6)");
     svg.appendChild(shadow);
 
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("d", d);
-    path.setAttribute("fill", "#1A2030");
-    path.setAttribute("stroke", accent);
-    path.setAttribute("stroke-width", "2.4");
-    svg.appendChild(path);
+    const card = rect(0, 0, w, h, r);
+    card.setAttribute("fill", "#1A2030");
+    card.setAttribute("stroke", accent);
+    card.setAttribute("stroke-width", "2.4");
+    svg.appendChild(card);
 
-    return { svg, pathData: d, pad };
+    // the coloured band across the top, like the glued edge of a post-it
+    const strip = rect(0, 0, w, Math.max(5, h * 0.045), r);
+    strip.setAttribute("fill", accent);
+    strip.setAttribute("opacity", ".85");
+    svg.appendChild(strip);
+
+    return { svg, pad };
   }
 
   /* Word-wrap text onto an SVG piece. SVG has no automatic wrapping, so we

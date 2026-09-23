@@ -83,7 +83,8 @@ window.CONFIG = {
   actors: [
     { id: "nephro_doc",   label: "แพทย์โรคไต" },
     { id: "nephro_nurse", label: "พยาบาลไต" },
-    { id: "pc_team",      label: "ทีมประคับประคอง" },
+    { id: "pc_doc",       label: "แพทย์ประคับประคอง" },
+    { id: "pc_nurse",     label: "พยาบาลประคับประคอง" },
     { id: "patient",      label: "ผู้ป่วย/ครอบครัว" },
     { id: "system",       label: "ระบบ/ผู้บริหาร รพ." },
     { id: "other",        label: "อื่น ๆ" }

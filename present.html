@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609220921">
+<link rel="stylesheet" href="assets/theme.css?v=202609230406">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧩</text></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -50,7 +50,7 @@
   /* The cards shrink as more problem groups arrive, so 8 groups still fit on
      one projected screen. You cannot scroll a projector. */
   .problems { display:grid; gap:1.6vh; height:100%; align-content:center; padding-bottom:6vh; }
-  /* grouped view: every problem is a jigsaw piece, laid out in a grid */
+  /* grouped view: every gap is a card, laid out in a grid */
   .problems.pieces { grid-template-columns: repeat(var(--cols, 2), 1fr); grid-auto-rows: minmax(0, 1fr);
     gap: 1vh 1vw; align-items: stretch; align-content: stretch; padding-bottom: 1vh; }
   .problem-piece { position: relative; min-height: 0; min-width: 0; display: grid; place-items: center; overflow: hidden; }
@@ -128,16 +128,16 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609220921"></script>
-<script src="assets/config.js?v=202609220921"></script>
-<script src="assets/strings.js?v=202609220921"></script>
-<script src="assets/slides.js?v=202609220921"></script>
-<script src="assets/qrcode.js?v=202609220921"></script>
-<script src="assets/jigsaw.js?v=202609220921"></script>
-<script src="assets/wordcloud.js?v=202609220921"></script>
-<script src="assets/store-supabase.js?v=202609220921"></script>
-<script src="assets/store-local.js?v=202609220921"></script>
-<script src="assets/store.js?v=202609220921"></script>
+<script src="assets/version.js?v=202609230406"></script>
+<script src="assets/config.js?v=202609230406"></script>
+<script src="assets/strings.js?v=202609230406"></script>
+<script src="assets/slides.js?v=202609230406"></script>
+<script src="assets/qrcode.js?v=202609230406"></script>
+<script src="assets/jigsaw.js?v=202609230406"></script>
+<script src="assets/wordcloud.js?v=202609230406"></script>
+<script src="assets/store-supabase.js?v=202609230406"></script>
+<script src="assets/store-local.js?v=202609230406"></script>
+<script src="assets/store.js?v=202609230406"></script>
 <script>
 (function () {
   "use strict";
@@ -243,7 +243,7 @@
   const GROUP_PALETTE = ["#7FB3D5","#E9A06B","#8FCFA8","#C59BD1","#E5CE7A","#84C5C5","#E39A9A","#A9A3D8"];
   function groupColor(i) { return GROUP_PALETTE[Math.max(0, i) % GROUP_PALETTE.length]; }
 
-  /* One gap as a jigsaw piece: label, problem, the proposal, and counts.
+  /* One gap as a card: label, the survey number, the proposal and counts.
      Drawn at a nominal size and scaled by the browser. */
   function problemPiece(g, i, opts) {
     opts = opts || {};
@@ -267,23 +267,22 @@
     /* The label is the headline (it is a full sentence now), the survey
        number sits under it in the accent colour, and the proposal below. The
        longer problem statement lives on the phone and in the export. */
-    txt(g.id, W * 0.13, H * 0.19, 14, accent, 800);
+    txt(g.id, W * 0.075, H * 0.17, 14, accent, 800);
     const counts = opts.blind ? "" : `${helps} · ${needs}` + (ideas ? ` · ${ideas}` : "");
-    if (counts) txt(counts, W * 0.87, H * 0.19, 14, "#8A94A8", 600, "end");
+    if (counts) txt(counts, W * 0.925, H * 0.17, 14, "#8A94A8", 600, "end");
     Jigsaw.layoutText(svg, g.label || g.problem_statement,
-      { x: W * 0.13, y: H * 0.23, w: W * 0.74, h: H * 0.26 },
+      { x: W * 0.075, y: H * 0.21, w: W * 0.85, h: H * 0.28 },
       { size: opts.tall ? 22 : 19, min: 12, fill: "#fff", weight: "700" });
     if (g.stat) {
       // the survey number: "this is known, and it is not just you"
       Jigsaw.layoutText(svg, g.stat,
-        { x: W * 0.13, y: H * 0.49, w: W * 0.74, h: H * 0.13 },
+        { x: W * 0.075, y: H * 0.50, w: W * 0.85, h: H * 0.14 },
         { size: 12.5, min: 10, fill: accent, weight: "700" });
     }
     if (g.proposal) {
-      // the bottom notch bites 13% into the piece, so the text stops at 85%
-      txt(t("pj_proposal"), W * 0.13, H * 0.675, 10.5, accent, 700);
+      txt(t("pj_proposal"), W * 0.075, H * 0.695, 10.5, accent, 700);
       Jigsaw.layoutText(svg, g.proposal,
-        { x: W * 0.13, y: H * 0.69, w: W * 0.74, h: H * 0.16 },
+        { x: W * 0.075, y: H * 0.715, w: W * 0.85, h: H * 0.20 },
         { size: opts.tall ? 14 : 12.5, min: 9.5, fill: "#D6DCE8", weight: "600" });
     }
     return svg;

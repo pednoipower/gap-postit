@@ -12,9 +12,9 @@ here, or something new, each with *why it would work*. Every note is tagged
 by team, role and setting, ready for barrier–facilitator or realist-style
 analysis.
 
-Notes are plain post-its. The jigsaw is reserved for the gaps themselves — a
-**piece with notches** — with the causes and solutions gathering round it.
-Colour is discipline.
+Everything on screen is paper: the gaps are cards, the notes are post-its,
+with the causes and the solutions gathering round each gap. Colour is
+discipline.
 
 See `docs/2026-09-22-run-of-show-45min.md` for the minute-by-minute script.
 

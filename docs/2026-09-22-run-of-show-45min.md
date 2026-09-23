@@ -18,10 +18,10 @@ Nothing is analysed in the room.
 
 - [ ] `config.js` → `seedThemes`: the four gaps, their survey numbers and
       the program's proposals read correctly in Thai.
-- [ ] `control.html` → unlock → **Load the expected gaps**. Check the
-      projector's gaps slide shows all four with their numbers.
-- [ ] Dry run with two phones (one per team). Then **Clear this room** and
-      **Load the expected gaps** again.
+- [ ] `control.html` → unlock. The gaps are written into the room for you —
+      check the projector's gaps slide shows all four with their numbers.
+- [ ] Dry run with two phones (one per team). Then **Clear this room**; the
+      gaps go straight back in by themselves.
 - [ ] `health.html` → **Run the checks**, all green.
 - [ ] Scan the QR from the back of the room.
 
@@ -32,7 +32,7 @@ where they mainly work. Say out loud: *nothing is linked to your name.*
 
 ## 0:04 — The four gaps from the pre-survey (2 min)
 
-Slide 3. Four pieces, each with its survey number in red. *These are what
+Slide 3. Four cards, each with its survey number in colour. *These are what
 16 hospitals told us. They have numbers. None of them is about any one
 person — and the survey can't tell us why. You can.* Phones show the same
 list.
@@ -116,6 +116,6 @@ labels. It is a draft to code from, not findings.
 | What you see | What to do |
 |---|---|
 | Phones say "wait" on a gap slide | The board is closed: check the toggle, or you pressed Reveal. **Collect again (blind)** reopens it. |
-| Gaps slide says "waiting for the gaps" | You didn't press **Load the expected gaps**. Do it now; nothing is lost. |
+| Gaps slide says "waiting for the gaps" | Unlock `control.html` — it writes them in. If they are still missing, press **Reload the gaps from config.js**. Nothing is lost either way. |
 | Projector stuck | Refresh it. It follows the control panel. |
 | No internet | `node server/server.js`, put the printed address on screen. |

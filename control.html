@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609220921">
+<link rel="stylesheet" href="assets/theme.css?v=202609230406">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🎛️</text></svg>">
 </head>
 <body class="control">
@@ -29,12 +29,13 @@
 
     <div class="panel">
       <h2>Before you start</h2>
-      <p class="why"><b>1.</b> Load the gaps from <code class="inline">config.js</code> into the room —
-        the projector's "gaps" slide, the gap slides and the phones all read them from here.
-        <b>2.</b> Run a dry run. <b>3.</b> Clear the room so the real session starts clean;
-        a dated backup is saved before anything is removed.</p>
+      <p class="why">The gaps in <code class="inline">config.js</code> are written into the room
+        automatically when you unlock this page — the projector's "gaps" slide, the gap slides and
+        the phones all read them from there, so there is nothing to load by hand.
+        <b>1.</b> Run a dry run. <b>2.</b> Clear the room so the real session starts clean;
+        a dated backup is saved first, and the gaps go straight back in.</p>
       <div class="row">
-        <button class="btn small" id="loadGaps">Load the expected gaps</button>
+        <button class="btn small" id="loadGaps">Reload the gaps from config.js</button>
         <span style="font-size:13.5px;color:var(--text-dim)" id="gapsNote"></span>
       </div>
       <div id="loadMsg"></div>
@@ -115,13 +116,13 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609220921"></script>
-<script src="assets/config.js?v=202609220921"></script>
-<script src="assets/slides.js?v=202609220921"></script>
-<script src="assets/export.js?v=202609220921"></script>
-<script src="assets/store-supabase.js?v=202609220921"></script>
-<script src="assets/store-local.js?v=202609220921"></script>
-<script src="assets/store.js?v=202609220921"></script>
+<script src="assets/version.js?v=202609230406"></script>
+<script src="assets/config.js?v=202609230406"></script>
+<script src="assets/slides.js?v=202609230406"></script>
+<script src="assets/export.js?v=202609230406"></script>
+<script src="assets/store-supabase.js?v=202609230406"></script>
+<script src="assets/store-local.js?v=202609230406"></script>
+<script src="assets/store.js?v=202609230406"></script>
 <script>
 (function () {
   "use strict";
@@ -158,6 +159,8 @@
       $("main").classList.remove("hidden");
       $("backendNote").textContent = (Store.backend === "local"
         ? "running on the local network" : "connected to Supabase") + " · build " + (window.BUILD || "?");
+      await refreshNow();
+      await ensureGaps();
       start();
     } catch (e) {
       msg("lockMsg", "bad", /token/i.test(e.message)
@@ -185,7 +188,7 @@
     ].map(([k, v]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
     $("gapsNote").textContent = (st.groups || []).length
       ? `${st.groups.length} gaps loaded: ${st.groups.map(g => g.id).join(", ")}`
-      : "no gaps loaded yet";
+      : "the gaps are not in the room yet";
 
     const curS = slides[room.current_slide | 0];
     $("nowLine").textContent = curS
@@ -235,31 +238,64 @@
     if (ch) { await Store.control(token, ch); await refreshNow(); }
   });
 
-  /* Load the gaps from config into the room. Replaces whatever gaps are
-     there, so it warns if notes are already attached to them. */
-  $("loadGaps").addEventListener("click", async () => {
-    const seeds = cfg.seedThemes || [];
-    if (!seeds.length) return msg("loadMsg", "bad", "No gaps in config.js — fill in seedThemes first.");
-    const st = Store.state;
-    if (st.solutions.length &&
-        !confirm(`There are already ${st.solutions.length} notes attached to gaps in this room. Reloading keeps the notes but re-writes the gaps G1… in config order. Continue?`)) return;
-    const groups = seeds.map((tm, i) => ({
+  /* ---- the gaps ----------------------------------------------------------
+     The gaps in config.js ARE the gaps of the day. They are written into the
+     room automatically the moment you unlock this page, so there is nothing
+     to press before you start. The button is only for pushing a change you
+     made to config.js while the room was already running. */
+  function seedGroups() {
+    const groups = (cfg.seedThemes || []).map((tm, i) => ({
       id: "G" + (i + 1), label: tm.label, problem_statement: tm.problem || tm.label,
-      proposal: tm.proposal || "", stat: tm.stat || "", rationale: "Loaded from config.js", source_ids: []
+      proposal: tm.proposal || "", stat: tm.stat || "", rationale: "From config.js", source_ids: []
     }));
     // a bucket for ideas that are not about any one gap; the projector and
     // the gap slides ignore it, the ideas round and the export include it
-    groups.push({ id: "GX", label: "ภาพรวม", problem_statement: "ไอเดียที่ไม่เจาะจงช่องว่างใด",
-                  proposal: "", rationale: "Overall bucket for ideas", source_ids: [] });
-    msg("loadMsg", "", "Loading…");
+    groups.push({ id: Slides.OVERALL, label: "ภาพรวม", problem_statement: "ไอเดียที่ไม่เจาะจงช่องว่างใด",
+                  proposal: "", stat: "", rationale: "Overall bucket for ideas", source_ids: [] });
+    return groups;
+  }
+
+  /* True when the room already holds exactly what config.js says, word for
+     word — so unlocking a running room never re-writes the gaps under it. */
+  function gapsMatchConfig() {
+    const want = seedGroups(), have = Store.state.groups || [];
+    if (have.length !== want.length) return false;
+    return want.every(w => {
+      const h = have.find(g => g.id === w.id);
+      return h && (h.label || "") === w.label
+               && (h.problem_statement || "") === w.problem_statement
+               && (h.proposal || "") === (w.proposal || "")
+               && (h.stat || "") === (w.stat || "");
+    });
+  }
+
+  async function loadGaps(auto) {
+    const groups = seedGroups();
+    if (groups.length <= 1) { msg("loadMsg", "bad", "No gaps in config.js — fill in seedThemes first."); return false; }
+    if (!auto && Store.state.solutions.length &&
+        !confirm(`There are already ${Store.state.solutions.length} notes attached to gaps in this room. Reloading keeps the notes but re-writes the gaps G1… in config order. Continue?`)) return false;
+    if (!auto) msg("loadMsg", "", "Loading…");
     try {
       const res = await Store.importGroups(token, groups);
       const r = Array.isArray(res) ? res[0] : res;
-      if (r && r.ok === false) return msg("loadMsg", "bad", escapeHtml(r.message || r.error));
-      msg("loadMsg", "ok", `Loaded ${groups.length} gaps: ${groups.map(g => g.id + " " + g.label).join(" · ")}`);
+      if (r && r.ok === false) { msg("loadMsg", "bad", escapeHtml(r.message || r.error)); return false; }
+      msg("loadMsg", "ok", (auto ? "Gaps written into the room from config.js: " : "Reloaded from config.js: ") +
+        escapeHtml(groups.filter(g => g.id !== Slides.OVERALL).map(g => g.id + " " + g.label).join(" · ")));
       await refreshNow();
-    } catch (e) { msg("loadMsg", "bad", escapeHtml(e.message)); }
-  });
+      return true;
+    } catch (e) { msg("loadMsg", "bad", escapeHtml(e.message)); return false; }
+  }
+
+  /* Called once, right after unlocking. */
+  async function ensureGaps() {
+    if (gapsMatchConfig()) {
+      msg("loadMsg", "ok", "The room already holds the gaps from config.js — nothing to load.");
+      return;
+    }
+    await loadGaps(true);
+  }
+
+  $("loadGaps").addEventListener("click", () => loadGaps(false));
 
   $("next").addEventListener("click", () => goTo((Store.state.room.current_slide | 0) + 1));
   $("prev").addEventListener("click", () => goTo((Store.state.room.current_slide | 0) - 1));
@@ -369,6 +405,11 @@ Thai prose with headings per gap (G1, G2, G3, G4, then ภาพรวม). Labe
       Exporter.download(`${stamp()}-missing-piece-backup-before-clear.json`,
         JSON.stringify(s, null, 2), "application/json");
       await Store.resetRoom(token);
+      // a cleared room is an empty room: put the gaps straight back, so the
+      // real session starts with the four gaps already on the screen
+      msg("resetMsg", "", "Cleared. Writing the gaps back in…");
+      await refreshNow();
+      await loadGaps(true);
       location.reload();
     } catch (e) { msg("resetMsg", "bad", escapeHtml(e.message)); }
   });
