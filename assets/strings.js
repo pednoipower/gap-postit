@@ -95,16 +95,8 @@
     does_works_hint_p:{ th: "เช่น สรุปสิ่งที่ต้องทำ ผู้รับผิดชอบ และช่องทางถามกลับ",                en: "e.g. warns at two minutes left, then closes the item" },
     because_hint_p:   { th: "เช่น ไม่มีคนสรุปว่างานเปลี่ยนตรงไหน ใครต้องทำ และถ้าสงสัยให้ถามใคร", en: "e.g. too polite to stop a senior who prepared, and nobody was given the job of keeping time" },
     because_works_hint_p:{ th: "เช่น ทีมตกลงไว้ชัดว่าใครรับเรื่อง ใครแปลงเป็นงาน และใครยืนยันก่อนเริ่มใช้",  en: "e.g. the rule was agreed beforehand and the boss keeps it" },
-    practice_lead:    { th: "เรื่องคุ้น ๆ ในระบบสุขภาพไทย — ลองเติมให้ครบเป็นประโยคเดียว", en: "Something everyone here has met. Complete the sentence." },
-
     // HOW round
     how_title:        { th: "แล้วเราจะทำอะไร",                        en: "How would we fix it?" },
-    // how_seed / how_seed_note: the program's own proposal used to be shown
-    // here as a seed. It is not shown to the room any more — anywhere — so
-    // that the answers are the room's own. Kept only so an older cached page
-    // does not break.
-    how_seed:         { th: "โครงการเสนอไว้ว่า",                          en: "The program proposes" },
-    how_seed_note:    { th: "ต่อยอดจากข้อนี้ หรือเสนอวิธีอื่นก็ได้",             en: "Build on it, or propose something else" },
     how_pick:         { th: "สิ่งที่คุณเสนอเป็น",                        en: "What you're proposing is" },
     how_asset:        { th: "สิ่งที่มีอยู่แล้ว — นำมาใช้ให้มากขึ้น",         en: "Something that already exists here — use it more" },
     how_new:          { th: "สิ่งใหม่ที่ควรเริ่มทำ",                            en: "Something new we should do" },
@@ -162,9 +154,6 @@
     // projector
     pj_practice:      { th: "รอบซ้อม — ตอบในมือถือ แล้วเปิดพร้อมกันเมื่อหมดเวลา",   en: "Practice round — answer on your phone, revealed together" },
     pj_practice_rev:  { th: "รอบซ้อม — นี่คือคำตอบจากทั้งห้อง",         en: "Practice round — this is what the room's answers look like" },
-    // pj_talk: no longer on the talk slide — the gap is its title and the
-    // instruction sits in the middle. Kept for an older cached page.
-    pj_talk:          { th: "หันไปคุยกับคนจากอีกทีม",                          en: "Turn to someone from the other team" },
     pj_talk_sub:      { th: "ลองชวนคนข้าง ๆ คุย",                      en: "Talk to the person next to you" },
     pj_talk_cue1:     { th: "ที่โรงพยาบาลของคุณเป็นแบบเดียวกันไหม",                      en: "Is it the same where you work?" },
     pj_talk_cue2:     { th: "อีกทีมเห็นอะไรที่ทีมเราไม่เห็น",                       en: "What does the other team see that we don't?" },
@@ -174,10 +163,6 @@
     pj_who_sub:       { th: "สองมุมของเรื่องเดียวกัน",                     en: "Two halves of the same problem" },
     pj_evidence:      { th: "ช่องว่างสี่เรื่องที่เราจะคุยกันวันนี้",                  en: "The four gaps we'll work through today" },
     pj_evidence_sub:  { th: "ทีละเรื่อง — ทำไมจึงเกิดขึ้น แล้วจะทำอะไร",   en: "One at a time: why it happens, then what we'd do" },
-    pj_proposal:      { th: "ข้อเสนอ",                                    en: "Proposal" },
-    // pj_evidence_lbl: no longer shown anywhere. Kept so an older cached page
-    // does not break.
-    pj_evidence_lbl:  { th: "",                                            en: "" },
     pj_why_blind:     { th: "ทำไมเรื่องนี้ยังเกิดขึ้นในงานของคุณ — ตอบในมือถือ แล้วเปิดพร้อมกันเมื่อหมดเวลา", en: "Why does this happen in your own week? Answer on your phone — revealed together when time is up" },
     pj_how_blind:     { th: "แล้วเราจะทำอะไร — ตอบในมือถือ แล้วเปิดพร้อมกันเมื่อหมดเวลา", en: "How would we fix it? Answer on your phone — revealed together when time is up" },
     pj_why_revealed:  { th: "เหตุที่เรื่องนี้ยังเกิด — จากทั้งสองทีม",                        en: "Causes, from both teams" },
@@ -207,11 +192,6 @@
                         en: "{c} causes · {w} where it works · {a} things that already exist · {i} new ideas · {g} gaps both teams answered" },
     pj_signup:        { th: "อยากเล่าเพิ่มไหม — สแกนเพื่อนัดคุยต่อ",     en: "Willing to talk more? Scan to leave your contact" },
     pj_waiting_gaps:  { th: "กำลังโหลดช่องว่างจากแผงควบคุม…",                   en: "Waiting for the gaps to be loaded from the control panel…" },
-    pj_concerns:      { th: "เรื่องที่ยังติดขัด",                               en: "concerns" },
-    pj_from_nephro:   { th: "จากทีมโรคไต",                                 en: "from nephrology" },
-    pj_from_pall:     { th: "จากทีมประคับประคอง",                          en: "from palliative care" },
-    pj_word_cloud:    { th: "คำที่พบมาก",                                     en: "Word cloud" },
-    pj_wall:          { th: "กระดานคำตอบ",                                   en: "Post-it wall" },
     pj_fullscreen:    { th: "เต็มจอ",                                      en: "Full screen" }
   };
 

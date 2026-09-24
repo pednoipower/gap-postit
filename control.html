@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609240901">
+<link rel="stylesheet" href="assets/theme.css?v=202609241002">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
 /* ============================================================================
@@ -66,9 +66,6 @@
   /* the pill doubles as the state read-out, so there is one thing to look at
      rather than a switch and a label that can disagree. NB: not ".board" —
      that class belongs to the projector's note wall in theme.css. */
-  .toggle.board-state { min-height: 44px; }
-  .toggle.board-state[aria-pressed="false"] { background: #fbeceb; border-color: #f0cdc9; color: var(--bad); }
-  .toggle.board-state[aria-pressed="false"] .pip { background: var(--bad); }
 
   /* the backup form is a different place to send the room, so it does not
      look like anything else in the console */
@@ -169,9 +166,6 @@
           <button class="btn step ghost" id="prev" aria-label="Previous slide" title="Previous slide (←)">←</button>
           <button class="btn primary" id="primary">Next</button>
           <button class="btn step ghost" id="next" aria-label="Next slide" title="Next slide (→)">→</button>
-          <button class="toggle board-state" id="boardToggle" aria-pressed="false" title="Open or close the board (B)">
-            <span class="pip"></span><span id="boardLbl">Board closed</span><em id="boardDo"></em>
-          </button>
           <button class="toggle form-state" id="formToggle" aria-pressed="false"
                   title="Send the room to the backup form: the projector shows its QR, every phone shows the button.">
             <span class="pip"></span><span id="formLbl">Form mode off</span><em id="formDo"></em>
@@ -206,14 +200,15 @@
           <b id="previewNote" style="color:#8C2E25"></b></p>
         <p class="keys"><b>Without touching the mouse:</b>
           <kbd>←</kbd><kbd>→</kbd> move a slide · <kbd>R</kbd> reveal, or collect again ·
-          <kbd>B</kbd> open or close the board · <kbd>P</kbd> pause the clock</p>
+          <kbd>P</kbd> pause the clock</p>
       </div>
 
       <div class="panel">
         <h2>The room so far</h2>
         <div class="stat-row" id="stats"></div>
-        <p class="why" style="margin:12px 0 0">Counts leave out the practice round. While the board is closed nobody can
-          add anything — useful between rounds so people watch the screen instead of typing.</p>
+        <p class="why" style="margin:12px 0 0">Counts leave out the practice round. The board opens and closes with the
+          rounds by itself: a writing round opens it, <b>Reveal</b> closes it, and everything else keeps it shut — so
+          nothing can be written after the room has seen the answers.</p>
       </div>
     </section>
 
@@ -302,15 +297,15 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609240901"></script>
-<script src="assets/config.js?v=202609240901"></script>
-<script src="assets/timer.js?v=202609240901"></script>
-<script src="assets/highlight.js?v=202609240901"></script>
-<script src="assets/slides.js?v=202609240901"></script>
-<script src="assets/export.js?v=202609240901"></script>
-<script src="assets/store-supabase.js?v=202609240901"></script>
-<script src="assets/store-local.js?v=202609240901"></script>
-<script src="assets/store.js?v=202609240901"></script>
+<script src="assets/version.js?v=202609241002"></script>
+<script src="assets/config.js?v=202609241002"></script>
+<script src="assets/timer.js?v=202609241002"></script>
+<script src="assets/highlight.js?v=202609241002"></script>
+<script src="assets/slides.js?v=202609241002"></script>
+<script src="assets/export.js?v=202609241002"></script>
+<script src="assets/store-supabase.js?v=202609241002"></script>
+<script src="assets/store-local.js?v=202609241002"></script>
+<script src="assets/store.js?v=202609241002"></script>
 <script>
 (function () {
   "use strict";
@@ -587,10 +582,6 @@
       }).join("");
     }
 
-    $("boardToggle").setAttribute("aria-pressed", String(!!room.board_open));
-    $("boardLbl").textContent = room.board_open ? "Board open" : "Board closed";
-    $("boardDo").textContent = room.board_open ? "press to close" : "press to open";
-
     const formOn = RoomMode.formOn(room);
     $("formToggle").setAttribute("aria-pressed", String(formOn));
     /* Always visible, even with no form configured: a control you cannot see
@@ -677,14 +668,9 @@
   }
   $("formToggle").addEventListener("click", toggleForm);
 
-  async function toggleBoard() {
-    await Store.control(token, { open: !Store.state.room.board_open });
-    await refreshNow();
-  }
 
   $("next").addEventListener("click", () => goTo(((Store.state.room.current_slide | 0) + 1)));
   $("prev").addEventListener("click", () => goTo(((Store.state.room.current_slide | 0) - 1)));
-  $("boardToggle").addEventListener("click", toggleBoard);
 
   /* Keys, so the session can be run without looking down at a trackpad. */
   document.addEventListener("keydown", e => {
@@ -696,7 +682,6 @@
     if (e.key === "ArrowRight")      { e.preventDefault(); goTo(cur + 1); }
     else if (e.key === "ArrowLeft")  { e.preventDefault(); goTo(cur - 1); }
     else if (e.key === "r" || e.key === "R") { e.preventDefault(); isCollecting() ? doReveal() : isRevealed() ? doUnreveal() : null; }
-    else if (e.key === "b" || e.key === "B") { e.preventDefault(); toggleBoard(); }
     else if (e.key === "p" || e.key === "P") { e.preventDefault(); holdToggle(); }
   });
 

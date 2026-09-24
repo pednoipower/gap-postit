@@ -179,14 +179,6 @@ window.CONFIG = {
      ------------------------------------------------------------------------ */
   language: "th",
 
-  /* --------------------------------------------------------------------------
-     10. WHAT LANGUAGE THE AI SHOULD WRITE THE PROBLEM STATEMENTS IN
-     --------------------------------------------------------------------------
-     Plain English name of the language, e.g. "Thai" or "English". This goes
-     straight into the prompt you copy to the AI. Labels like C-001 and G1 stay
-     as they are whatever you put here.
-     ------------------------------------------------------------------------ */
-  aiOutputLanguage: "Thai",
 
   /* --------------------------------------------------------------------------
      11. THE GAPS, AND WHAT THE PROGRAM PROPOSES TO DO ABOUT EACH
@@ -207,9 +199,7 @@ window.CONFIG = {
                  the room came up with on its own.
      Order matters: it is the order the gaps are worked through on the day.
 
-     maxGroups is only used by the after-the-day AI grouping step.
      ------------------------------------------------------------------------ */
-  maxGroups: 6,
   // `stat` is no longer shown on any screen — not on the projector and not on
   // the phone. It stays here and in the export so you can quote a number out
   // loud when it helps, and so the analysis keeps the evidence each gap came

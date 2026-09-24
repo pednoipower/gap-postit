@@ -74,13 +74,13 @@ have been shaped by what people saw. Everywhere else it says **Next**.
 the session against 45 minutes. **Pause** stops both screens at once (the
 countdown on the wall freezes too), **Reset** puts the round back to 0:00.
 
-**The two pills are buttons.** Each shows the state and, beside it, what
-pressing it does: *Board open · press to close*, *Form mode off · press to
-switch*. Red on the board pill means the board is shut, not that anything is
-wrong.
+**The board opens and closes by itself.** A writing round opens it, **Reveal**
+shuts it, and every other slide keeps it shut — so nothing can be written
+after the room has seen the answers. There is no button for it; the phase chip
+(*collecting · blind* / *revealed*) is what tells you.
 
 **Without the mouse:** <kbd>←</kbd> <kbd>→</kbd> move · <kbd>R</kbd> reveal or
-collect again · <kbd>B</kbd> open or close the board · <kbd>P</kbd> pause.
+collect again · <kbd>P</kbd> pause the clock.
 
 **Reading the wall.** Colour says what a note is — **gold** a gap people still
 meet, **pink** somewhere it does not, **green** something already in place,
@@ -94,7 +94,7 @@ screen**; click again or press any key to close.
 
 | What you see | What to do |
 |---|---|
-| Phones say *รอบนี้ปิดแล้ว* when they should be writing | The board is closed. Press <kbd>B</kbd>, or **Collect again**. |
+| Phones say *รอบนี้ปิดแล้ว* when they should be writing | You are on a reveal, a talk slide, or the lobby. **Collect again** reopens the round you just revealed; otherwise move to the writing slide. |
 | The projector shows the title slide with a red flag | It lost the connection. It keeps retrying by itself and will jump back to the live slide. Do not refresh unless it stays there a minute. |
 | Projector and control disagree | The projector is on an older copy. <kbd>⌘⇧R</kbd> on that window. |
 | Gaps slide says it is waiting | Unlock the control panel; it writes them in. Or Room tab → **Reload the gaps**. |
