@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609240848">
+<link rel="stylesheet" href="assets/theme.css?v=202609240901">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
 /* ============================================================================
@@ -73,6 +73,7 @@
   /* the backup form is a different place to send the room, so it does not
      look like anything else in the console */
   .toggle.form-state { min-height: 44px; }
+  .toggle.form-state:disabled { opacity: .55; cursor: not-allowed; }
   /* the state is the label; what pressing it does is spelled out beside it,
      because a button called "Board closed" reads as a fact, not an action */
   .toggle em { font-style: normal; font-weight: 500; opacity: .72; font-size: 12.5px;
@@ -279,6 +280,16 @@
         <div id="loadMsg"></div>
       </div>
 
+      <div class="panel">
+        <h2>The backup form</h2>
+        <p class="why">Where the room goes if the backend cannot be reached, or whenever you press
+          <b>Form mode</b> in the console: the projector clears to one QR and every phone shows a
+          button. Set the link as <code class="inline">fallbackFormUrl</code> in
+          <code class="inline">config.js</code>. Switch off "collect email addresses" on the form,
+          or the anonymity promise stops being true.</p>
+        <div id="formNote"></div>
+      </div>
+
       <div class="panel danger">
         <h2>Clear this room</h2>
         <p class="why">For after the dry run: deletes every note and participant so the real session
@@ -291,15 +302,15 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609240848"></script>
-<script src="assets/config.js?v=202609240848"></script>
-<script src="assets/timer.js?v=202609240848"></script>
-<script src="assets/highlight.js?v=202609240848"></script>
-<script src="assets/slides.js?v=202609240848"></script>
-<script src="assets/export.js?v=202609240848"></script>
-<script src="assets/store-supabase.js?v=202609240848"></script>
-<script src="assets/store-local.js?v=202609240848"></script>
-<script src="assets/store.js?v=202609240848"></script>
+<script src="assets/version.js?v=202609240901"></script>
+<script src="assets/config.js?v=202609240901"></script>
+<script src="assets/timer.js?v=202609240901"></script>
+<script src="assets/highlight.js?v=202609240901"></script>
+<script src="assets/slides.js?v=202609240901"></script>
+<script src="assets/export.js?v=202609240901"></script>
+<script src="assets/store-supabase.js?v=202609240901"></script>
+<script src="assets/store-local.js?v=202609240901"></script>
+<script src="assets/store.js?v=202609240901"></script>
 <script>
 (function () {
   "use strict";
@@ -582,9 +593,16 @@
 
     const formOn = RoomMode.formOn(room);
     $("formToggle").setAttribute("aria-pressed", String(formOn));
+    /* Always visible, even with no form configured: a control you cannot see
+       is a control you cannot set up. */
+    const haveForm = !!cfg.fallbackFormUrl;
     $("formLbl").textContent = formOn ? "Form mode ON" : "Form mode off";
-    $("formDo").textContent = formOn ? "press to come back" : "press to switch";
-    $("formToggle").classList.toggle("hidden", !cfg.fallbackFormUrl && !formOn);
+    $("formDo").textContent = formOn ? "press to come back"
+                            : haveForm ? "press to switch" : "no form set yet";
+    $("formToggle").disabled = !haveForm && !formOn;
+    $("formToggle").title = haveForm
+      ? "Send the room to the backup form: the projector shows its QR, every phone shows the button."
+      : "No backup form yet — set fallbackFormUrl in config.js (see the Room tab).";
     if (formOn) $("clockNote").textContent = "the room is answering in the backup form";
 
     /* ---- the room so far (practice round left out) ---- */
@@ -599,6 +617,11 @@
       ["already exists", kind("asset")],
       ["new ideas", kind("idea")]
     ].map(([k, v]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
+
+    msg("formNote", cfg.fallbackFormUrl ? "ok" : "warn",
+        cfg.fallbackFormUrl
+          ? "Form ready: " + escapeHtml(cfg.fallbackFormUrl)
+          : "No form set yet — the Form mode button stays greyed out until fallbackFormUrl has a link in it.");
 
     $("gapsNote").textContent = (st.groups || []).length
       ? `${(st.groups || []).filter(g => g.id !== Slides.OVERALL && g.id !== PRACTICE).length} gaps loaded`
