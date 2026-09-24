@@ -99,6 +99,54 @@ screen**; click again or press any key to close.
 
 ---
 
+## If the sync stops working
+
+Everything below assumes the room state is fine and something between it and a
+screen is not. **Work down this list; stop at the first one that applies.**
+
+**1. One screen is stale, the others are fine.** Refresh it. Nothing lives in a
+browser: the room is on the server, so a refreshed page lands exactly where the
+session is. The projector already retries by itself and keeps the title slide
+up while it does.
+
+**2. Everything is slow, nothing is broken.** Do nothing. Phones poll every
+four seconds, the projector every 1.2. A count that lags a few seconds is not a
+failure, and notes typed during a wobble are kept on the phone and sent when it
+clears.
+
+**3. Supabase is unreachable, the venue wifi works.** Move the whole session
+onto the laptop:
+
+```
+node server/server.js
+```
+
+It prints an address like `http://172.31.214.170:8080`. That laptop now serves
+**the pages and the data**, and the projector's QR code and the line under it
+change to point at the laptop by themselves — so the room just scans the new
+code. Open `…:8080/present.html` and `…:8080/control.html`, unlock with the
+same password, and the gaps write themselves in as usual.
+
+Two things to know before you do it: everyone has to **re-join and re-scan**,
+and the notes already written are still in Supabase, not on the laptop. You
+export both afterwards and put them side by side; nothing is lost.
+
+**4. No wifi at all.** Make a hotspot from a phone, put the laptop and the room
+on it, and run step 3. Everyone must be on the same network as the laptop —
+they do not need the internet.
+
+**5. Nothing electronic works.** Print `docs/paper-fallback.md` before the day
+and keep it in the bag. It has the four gaps and the sentence with its blanks;
+people write on paper, you photograph the wall, and the wording matches the
+app exactly so it can be typed in afterwards. Announce it as the plan, not as
+a disaster: *เขียนในกระดาษแทน เดี๋ยวเราพิมพ์เข้าระบบให้.*
+
+**Tested on 24 Sep 2026:** with Supabase switched off, the laptop server ran
+the whole chain — unlock, gaps loaded, round opened, a phone joined and sent,
+and the note came back with its label.
+
+---
+
 ## Afterwards
 
 On the control panel, **After the day**:

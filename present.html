@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609240647">
+<link rel="stylesheet" href="assets/theme.css?v=202609240654">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -171,17 +171,17 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609240647"></script>
-<script src="assets/config.js?v=202609240647"></script>
-<script src="assets/strings.js?v=202609240647"></script>
-<script src="assets/slides.js?v=202609240647"></script>
-<script src="assets/qrcode.js?v=202609240647"></script>
-<script src="assets/timer.js?v=202609240647"></script>
-<script src="assets/highlight.js?v=202609240647"></script>
-<script src="assets/paper.js?v=202609240647"></script>
-<script src="assets/store-supabase.js?v=202609240647"></script>
-<script src="assets/store-local.js?v=202609240647"></script>
-<script src="assets/store.js?v=202609240647"></script>
+<script src="assets/version.js?v=202609240654"></script>
+<script src="assets/config.js?v=202609240654"></script>
+<script src="assets/strings.js?v=202609240654"></script>
+<script src="assets/slides.js?v=202609240654"></script>
+<script src="assets/qrcode.js?v=202609240654"></script>
+<script src="assets/timer.js?v=202609240654"></script>
+<script src="assets/highlight.js?v=202609240654"></script>
+<script src="assets/paper.js?v=202609240654"></script>
+<script src="assets/store-supabase.js?v=202609240654"></script>
+<script src="assets/store-local.js?v=202609240654"></script>
+<script src="assets/store.js?v=202609240654"></script>
 <script>
 (function () {
   "use strict";
@@ -196,6 +196,22 @@
      THE SLIDE SEQUENCE — shared with the control panel (assets/slides.js).
      Here each slide also gets its builder.
      ---------------------------------------------------------------------- */
+  /* WHERE PEOPLE SHOULD JOIN.
+     config.js names the published address, but on the day this page might be
+     coming from the laptop instead — the fallback server hands out the same
+     pages over the venue wifi. In that case the QR has to point at the laptop,
+     not at a site nobody can reach. So: use whatever origin actually served
+     this page, unless it is a file:// or the same host config already names. */
+  const joinUrl = (() => {
+    try {
+      const here = new URL(location.href);
+      if (here.protocol === "file:") return cfg.joinUrl;
+      const cfgUrl = new URL(cfg.joinUrl);
+      if (here.host === cfgUrl.host) return cfg.joinUrl;
+      return here.origin + here.pathname.replace(/[^/]*$/, "");
+    } catch (e) { return cfg.joinUrl; }
+  })();
+
   const SLIDES = Slides.build(cfg);
   const BUILDERS = { title: buildTitle, who: buildWho, evidence: buildEvidence, closing: buildClosing };
   SLIDES.forEach(s => {
@@ -244,12 +260,12 @@
         <div>
           <div class="qr-card" id="qrBox"></div>
           <div class="join-line">
-            <div class="url">${escapeHtml(cfg.joinUrl.replace(/^https?:\/\//, ""))}</div>
+            <div class="url">${escapeHtml(joinUrl.replace(/^https?:\/\//, ""))}</div>
             <div class="code">${escapeHtml(cfg.roomCode)}</div>
           </div>
         </div>
       </div>`;
-    try { $("qrBox").innerHTML = QRCode.toSVG(cfg.joinUrl, { level: "M", quietZone: 1 }); }
+    try { $("qrBox").innerHTML = QRCode.toSVG(joinUrl, { level: "M", quietZone: 1 }); }
     catch (e) { $("qrBox").innerHTML = `<div style="color:#8C2E25;font-size:15px;padding:12px">QR: ${escapeHtml(e.message)}</div>`; }
   }
 
@@ -738,7 +754,7 @@
   addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(() => { gapLayout = null; refreshSlide(); }, 180); });
 
   $("cornerCode").innerHTML =
-    `<span>${escapeHtml(cfg.joinUrl.replace(/^https?:\/\//, ""))}</span><b>${escapeHtml(cfg.roomCode)}</b>`;
+    `<span>${escapeHtml(joinUrl.replace(/^https?:\/\//, ""))}</span><b>${escapeHtml(cfg.roomCode)}</b>`;
   $("cornerCode").title = "build " + (window.BUILD || "?");
 
   /* ---- connect and follow the facilitator --------------------------------
