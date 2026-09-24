@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609240725">
+<link rel="stylesheet" href="assets/theme.css?v=202609240829">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -106,6 +106,18 @@
   .closing .big { font-size:clamp(32px,5vw,90px); font-weight:800; letter-spacing:-.03em; line-height:1.08; }
   .closing .sub { font-size:clamp(16px,1.8vw,31px); color:var(--green-200); margin-top:2.4vh; }
 
+  /* The room answering in the form: the whole wall, so there is only ever one
+     code to scan. Gold, because it is not the app. */
+  .form-screen { position:fixed; inset:0; z-index:36; display:grid; place-items:center;
+    background:var(--ink); text-align:center; padding:6vh 6vw; }
+  .form-screen .lead { font-size:clamp(22px,2.6vw,48px); font-weight:700; color:var(--gold-300); }
+  .form-screen .gap { font-size:clamp(16px,1.8vw,30px); color:var(--green-100); margin-top:1.4vh;
+    max-width:40ch; margin-left:auto; margin-right:auto; line-height:1.4; }
+  .form-screen .qr { width:clamp(200px,26vw,420px); margin:4vh auto 0; background:#fff;
+    border-radius:16px; padding:14px; }
+  .form-screen .qr svg { width:100%; height:auto; display:block; }
+  .form-screen .url { font-size:clamp(13px,1.2vw,22px); color:var(--green-200); margin-top:2vh; }
+
   /* when the backend is gone and config.js names a form, the wall carries it */
   .form-wall { position:fixed; right:2vw; bottom:2vh; z-index:35; display:flex; gap:1.4vw;
     align-items:center; background:var(--ink-soft); border:1px solid var(--ink-line);
@@ -171,6 +183,16 @@
     <div class="reader-close" id="readerClose"></div>
   </div>
 </div>
+<!-- the room has been sent to the backup form: its own screen, so nobody
+     scans the wrong code -->
+<div id="formScreen" class="form-screen hidden">
+  <div>
+    <div class="lead" id="formScreenLead"></div>
+    <div class="gap" id="formScreenGap"></div>
+    <div class="qr" id="formScreenQr"></div>
+    <div class="url" id="formScreenUrl"></div>
+  </div>
+</div>
 <div id="formWall" class="form-wall hidden">
   <div class="qr" id="formQr"></div>
   <div class="l" id="formLead"></div>
@@ -183,17 +205,17 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609240725"></script>
-<script src="assets/config.js?v=202609240725"></script>
-<script src="assets/strings.js?v=202609240725"></script>
-<script src="assets/slides.js?v=202609240725"></script>
-<script src="assets/qrcode.js?v=202609240725"></script>
-<script src="assets/timer.js?v=202609240725"></script>
-<script src="assets/highlight.js?v=202609240725"></script>
-<script src="assets/paper.js?v=202609240725"></script>
-<script src="assets/store-supabase.js?v=202609240725"></script>
-<script src="assets/store-local.js?v=202609240725"></script>
-<script src="assets/store.js?v=202609240725"></script>
+<script src="assets/version.js?v=202609240829"></script>
+<script src="assets/config.js?v=202609240829"></script>
+<script src="assets/strings.js?v=202609240829"></script>
+<script src="assets/slides.js?v=202609240829"></script>
+<script src="assets/qrcode.js?v=202609240829"></script>
+<script src="assets/timer.js?v=202609240829"></script>
+<script src="assets/highlight.js?v=202609240829"></script>
+<script src="assets/paper.js?v=202609240829"></script>
+<script src="assets/store-supabase.js?v=202609240829"></script>
+<script src="assets/store-local.js?v=202609240829"></script>
+<script src="assets/store.js?v=202609240829"></script>
 <script>
 (function () {
   "use strict";
@@ -691,8 +713,25 @@
     return Math.abs(h);
   }
 
+  /* ---- the backup form takes over the wall when the room is switched ---- */
+  function renderFormScreen() {
+    const on = window.RoomMode && RoomMode.formOn(Store.state.room) && cfg.fallbackFormUrl;
+    const el = $("formScreen");
+    if (!on) { el.classList.add("hidden"); return; }
+    if (el.classList.contains("hidden")) {
+      $("formScreenLead").textContent = t("pj_form_lead");
+      $("formScreenUrl").textContent = cfg.fallbackFormUrl.replace(/^https?:\/\//, "");
+      try { $("formScreenQr").innerHTML = QRCode.toSVG(cfg.fallbackFormUrl, { level: "M", quietZone: 1 }); }
+      catch (e) {}
+      el.classList.remove("hidden");
+    }
+    const s = SLIDES[current], g = s && s.gapId ? gapById(s.gapId) : null;
+    $("formScreenGap").textContent = g ? g.label : "";
+  }
+
   /* ---- keep whatever is on screen up to date ---- */
   function refreshSlide() {
+    renderFormScreen();
     const s = SLIDES[current];
     if (!s) return;
     const st = Store.state;

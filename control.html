@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609240725">
+<link rel="stylesheet" href="assets/theme.css?v=202609240829">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
 /* ============================================================================
@@ -69,6 +69,14 @@
   .toggle.board-state { min-height: 44px; }
   .toggle.board-state[aria-pressed="false"] { background: #fbeceb; border-color: #f0cdc9; color: var(--bad); }
   .toggle.board-state[aria-pressed="false"] .pip { background: var(--bad); }
+
+  /* the backup form is a different place to send the room, so it does not
+     look like anything else in the console */
+  .toggle.form-state { min-height: 44px; }
+  .toggle.form-state[aria-pressed="true"] {
+    background: #fdf8ec; border-color: #ecdcb0; color: var(--gold-700);
+  }
+  .toggle.form-state[aria-pressed="true"] .pip { background: var(--gold-500); }
 
   .tabs { display: flex; gap: 7px; margin-bottom: 14px; flex-wrap: wrap; }
   .tab {
@@ -158,6 +166,10 @@
           <button class="btn step ghost" id="next" aria-label="Next slide" title="Next slide (→)">→</button>
           <button class="toggle board-state" id="boardToggle" aria-pressed="false" title="Open or close the board (B)">
             <span class="pip"></span><span id="boardLbl">Board closed</span>
+          </button>
+          <button class="toggle form-state" id="formToggle" aria-pressed="false"
+                  title="Send the room to the backup form: the projector shows its QR, every phone shows the button.">
+            <span class="pip"></span><span id="formLbl">Form mode off</span>
           </button>
         </div>
         <div class="actions" style="margin-top:9px">
@@ -275,15 +287,15 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609240725"></script>
-<script src="assets/config.js?v=202609240725"></script>
-<script src="assets/timer.js?v=202609240725"></script>
-<script src="assets/highlight.js?v=202609240725"></script>
-<script src="assets/slides.js?v=202609240725"></script>
-<script src="assets/export.js?v=202609240725"></script>
-<script src="assets/store-supabase.js?v=202609240725"></script>
-<script src="assets/store-local.js?v=202609240725"></script>
-<script src="assets/store.js?v=202609240725"></script>
+<script src="assets/version.js?v=202609240829"></script>
+<script src="assets/config.js?v=202609240829"></script>
+<script src="assets/timer.js?v=202609240829"></script>
+<script src="assets/highlight.js?v=202609240829"></script>
+<script src="assets/slides.js?v=202609240829"></script>
+<script src="assets/export.js?v=202609240829"></script>
+<script src="assets/store-supabase.js?v=202609240829"></script>
+<script src="assets/store-local.js?v=202609240829"></script>
+<script src="assets/store.js?v=202609240829"></script>
 <script>
 (function () {
   "use strict";
@@ -444,6 +456,7 @@
     m.classList.toggle("held", held);
     $("holdBtn").textContent = held ? "Start clock" : "Pause clock";
     $("clockNote").textContent = held ? "paused — the screen is paused too" : "";
+    if (RoomMode.formOn(room)) $("clockNote").textContent = "the room is answering in the backup form";
 
     const started = sessionStart();
     const sm = $("sessionMeter");
@@ -465,12 +478,13 @@
   async function holdToggle() {
     const room = Store.state.room; if (!room) return;
     const held = Timer.held(room);
-    const value = held ? Timer.runFrom(Timer.elapsed(room)) : Timer.holdAt(Timer.elapsed(room));
-    await Store.control(token, { prompt: value });
+    const t = held ? Timer.runFrom(Timer.elapsed(room)) : Timer.holdAt(Timer.elapsed(room));
+    await Store.control(token, { prompt: RoomMode.compose({ timer: t, form: RoomMode.formOn(room) }) });
     await refreshNow();
   }
   async function clockToZero() {
-    await Store.control(token, { prompt: Timer.fromZero() });
+    const room = Store.state.room;
+    await Store.control(token, { prompt: RoomMode.compose({ timer: Timer.fromZero(), form: RoomMode.formOn(room) }) });
     await refreshNow();
   }
   $("holdBtn").addEventListener("click", holdToggle);
@@ -561,6 +575,12 @@
     $("boardToggle").setAttribute("aria-pressed", String(!!room.board_open));
     $("boardLbl").textContent = room.board_open ? "Board open" : "Board closed";
 
+    const formOn = RoomMode.formOn(room);
+    $("formToggle").setAttribute("aria-pressed", String(formOn));
+    $("formLbl").textContent = formOn ? "Form mode ON" : "Form mode off";
+    $("formToggle").classList.toggle("hidden", !cfg.fallbackFormUrl && !formOn);
+    if (formOn) $("clockNote").textContent = "the room is answering in the backup form";
+
     /* ---- the room so far (practice round left out) ---- */
     const real = st.solutions.filter(x => x.group_id !== PRACTICE);
     const voices = new Set(real.map(c => c.participant_id).filter(Boolean));
@@ -598,7 +618,9 @@
 
   /* ---- driving the room ---- */
   async function goTo(i) {
-    await Store.control(token, Slides.changesFor(slides, i));
+    const ch = Slides.changesFor(slides, i);
+    ch.prompt = RoomMode.formOn(Store.state.room) ? RoomMode.compose({ form: true }) : null;
+    await Store.control(token, ch);
     await refreshNow();
   }
   /* Reveal closes the round at the same moment the projector changes, so
@@ -611,6 +633,21 @@
     const ch = Slides.revealChanges(currentSlide(), false);
     if (ch) { await Store.control(token, ch); await refreshNow(); }
   }
+  /* Form mode is a property of the room, so the projector and every phone
+     follow it. It survives moving between slides; the clock does not. */
+  async function toggleForm() {
+    const room = Store.state.room; if (!room) return;
+    const on = !RoomMode.formOn(room);
+    if (on && !cfg.fallbackFormUrl) {
+      msg("loadMsg", "bad", "No form to send them to — set fallbackFormUrl in config.js first.");
+      showTab("tabRoom");
+      return;
+    }
+    await Store.control(token, { prompt: RoomMode.compose({ timer: RoomMode.timerToken(room), form: on }) });
+    await refreshNow();
+  }
+  $("formToggle").addEventListener("click", toggleForm);
+
   async function toggleBoard() {
     await Store.control(token, { open: !Store.state.room.board_open });
     await refreshNow();

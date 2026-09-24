@@ -17,7 +17,16 @@
 (function () {
   "use strict";
 
+  /* `active_prompt_id` carries a few small flags for the room, separated by
+     a pipe: the round clock, and whether the room has been switched to the
+     backup form. Two flags in one column, because adding a column would mean
+     SQL everyone has to remember to run. */
   const PAT = /^tmr:(run|hold):(\d+)$/;
+  const FORM = "form";
+
+  function tokens(room) {
+    return String((room && room.active_prompt_id) || "").split("|").filter(Boolean);
+  }
   /* A clock older than this is not a clock, it is yesterday: a control panel
      left open overnight, or a timer state nobody cleared. Show nothing
      rather than 1192:01. */
@@ -28,7 +37,7 @@
     _at: Date.now(),
 
     read(room) {
-      const m = room && room.active_prompt_id && PAT.exec(room.active_prompt_id);
+      const m = tokens(room).map(t => PAT.exec(t)).find(Boolean);
       if (!m) return null;
       const st = { state: m[1], value: Number(m[2]) };
       if (st.state === "run" && Date.now() - st.value > STALE_MS) return null;
@@ -67,6 +76,23 @@
     mmss(secs) {
       secs = Math.max(0, Math.floor(secs));
       return Math.floor(secs / 60) + ":" + String(secs % 60).padStart(2, "0");
+    }
+  };
+
+  /* The backup form: on or off for the whole room, set from the control
+     panel, and kept through a slide change — the timer is not. */
+  window.RoomMode = {
+    formOn(room) { return tokens(room).includes(FORM); },
+    /* Build a new value: keep the form flag if asked, carry or drop the clock. */
+    compose(opts) {
+      const out = [];
+      if (opts.timer) out.push(opts.timer);
+      if (opts.form) out.push(FORM);
+      return out.length ? out.join("|") : null;
+    },
+    timerToken(room) {
+      const t = tokens(room).find(x => PAT.test(x));
+      return t || null;
     }
   };
 

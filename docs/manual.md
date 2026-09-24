@@ -136,10 +136,18 @@ on it, and run step 3. Everyone must be on the same network as the laptop —
 they do not need the internet.
 
 **4½. Phones work, our backend does not → the backup form.** Put a Google
-Form link in `fallbackFormUrl` in `config.js` before the day and it appears by
-itself when nothing answers: a button on every phone, and a QR in the corner
-of the projector saying *ระบบขัดข้อง — สแกนเพื่อตอบในฟอร์มสำรอง*. People keep
-writing; you bring the answers in afterwards.
+Form link in `fallbackFormUrl` in `config.js` before the day. Then either:
+
+- **You decide**: press **Form mode** in the console. The projector clears to
+  a single screen — the words, the gap being answered, and one big QR — and
+  every phone shows the button. It stays on through slide changes, so you can
+  keep walking the gaps while people answer in the form. Press it again to
+  come back; nothing was lost while it was on.
+- **Or it decides**: if nothing answers at all, the phones offer the form by
+  themselves after about twenty seconds, and the projector puts its QR in the
+  corner.
+
+Only one code is ever on the wall at a time, so nobody scans the wrong one.
 
 Make the form's questions match the export, in this order, all short-answer
 except the two choices:
