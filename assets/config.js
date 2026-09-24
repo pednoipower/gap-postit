@@ -301,6 +301,25 @@ window.CONFIG = {
     ]
   },
 
+  /* --------------------------------------------------------------------------
+     13. THE FORM OF LAST RESORT
+     --------------------------------------------------------------------------
+     A Google Form (or any link) that collects the same answers, for the day
+     the backend cannot be reached at all. Put the link here and it appears
+     by itself: a button on the phones when they cannot connect, and a QR on
+     the projector beside the message that the room should use it.
+
+     It is a fallback, not a backend. A form can take answers but cannot hand
+     them back quickly enough to drive the wall, so while it is in use there
+     is no live count, no blind round and no reveal — you read a few out from
+     your own screen instead. docs/manual.md says how to build the form so its
+     columns line up with the export, and remember to switch OFF "collect
+     email addresses" or the anonymity promise stops being true.
+
+     Leave as "" and nothing is shown.
+     ------------------------------------------------------------------------ */
+  fallbackFormUrl: "",
+
   /* An optional link (e.g. a Google Form) shown as a QR code on the closing
      slide, for people willing to be interviewed later. Kept completely
      separate from the notes, so nothing anyone wrote can be traced to them.

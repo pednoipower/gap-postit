@@ -19,6 +19,12 @@
     join_connected:   { th: "เชื่อมต่อแล้ว · ห้อง",                   en: "Connected. Room" },
     join_fail:        { th: "เชื่อมต่อไม่ได้ ลองตรวจสอบ Wi-Fi แล้วดึงหน้าจอลงเพื่อโหลดใหม่", en: "Can't reach the workshop. Check your wifi, then pull down to refresh." },
 
+    // the form of last resort
+    form_title:       { th: "ระบบขัดข้อง",                                    en: "The system is down" },
+    form_lead:        { th: "ตอบในฟอร์มสำรองแทน คำตอบจะถูกนำเข้าระบบภายหลัง",    en: "Use the backup form — answers are brought into the system afterwards" },
+    form_btn:         { th: "เปิดฟอร์มสำรอง",                                  en: "Open the backup form" },
+    pj_form_lead:     { th: "ระบบขัดข้อง — สแกนเพื่อตอบในฟอร์มสำรอง",            en: "System down — scan to answer in the backup form" },
+
     // waiting
     wait_title:       { th: "รอเริ่มสักครู่…",                            en: "Waiting to start…" },
     wait_sub:         { th: "เปิดหน้านี้ค้างไว้ คำถามจะขึ้นที่นี่",  en: "Keep this page open. The question will appear here." },

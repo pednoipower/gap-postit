@@ -135,6 +135,27 @@ export both afterwards and put them side by side; nothing is lost.
 on it, and run step 3. Everyone must be on the same network as the laptop —
 they do not need the internet.
 
+**4½. Phones work, our backend does not → the backup form.** Put a Google
+Form link in `fallbackFormUrl` in `config.js` before the day and it appears by
+itself when nothing answers: a button on every phone, and a QR in the corner
+of the projector saying *ระบบขัดข้อง — สแกนเพื่อตอบในฟอร์มสำรอง*. People keep
+writing; you bring the answers in afterwards.
+
+Make the form's questions match the export, in this order, all short-answer
+except the two choices:
+
+1. ทีม (ไต / ประคับประคอง) · 2. หน้าที่ (แพทย์ / พยาบาล / สหวิชาชีพ / อื่น ๆ) ·
+3. ที่ทำงานหลัก · 4. ช่องว่าง (G1–G4 / ภาพรวม) · 5. รอบ (ทำไม / ทำอย่างไร) ·
+6. ยังเจอ หรือ ไม่ค่อยเจอ · 7. ใคร · 8. มักจะ · 9. เมื่อ · 10. เพราะ
+
+**Turn off "collect email addresses"**, or the promise made at the start —
+that nothing can be traced back to anyone — stops being true.
+
+What you lose while the form is in use: the live count, the blind round and
+the reveal. A form can take answers but cannot hand them back fast enough to
+drive the wall. Keep the rhythm by reading two or three aloud from the
+responses sheet on your own screen at the moment you would have revealed.
+
 **5. Nothing electronic works.** Print `docs/paper-fallback.md` before the day
 and keep it in the bag. It has the four gaps and the sentence with its blanks;
 people write on paper, you photograph the wall, and the wording matches the

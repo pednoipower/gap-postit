@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609240722">
+<link rel="stylesheet" href="assets/theme.css?v=202609240725">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .stat-line { font-size: 14px; color: var(--gold-700); font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
@@ -76,6 +76,14 @@
   </div>
 
   <div id="statusBox"></div>
+
+  <!-- the way out when the backend cannot be reached at all -->
+  <div class="card center hidden" id="formCard">
+    <h2 id="formTitle" style="margin:0 0 6px;font-size:19px;font-weight:600;color:var(--heading)"></h2>
+    <p class="hint" id="formLead" style="margin:0 0 14px"></p>
+    <a class="btn" id="formBtn" href="#" target="_blank" rel="noopener"
+       style="display:flex;align-items:center;justify-content:center;text-decoration:none"></a>
+  </div>
 
   <!-- shown whenever there is nothing to type -->
   <div class="card center" id="waitCard">
@@ -159,13 +167,13 @@
   <p class="hint center" style="opacity:.6;font-size:12px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609240722"></script>
-<script src="assets/config.js?v=202609240722"></script>
-<script src="assets/highlight.js?v=202609240722"></script>
-<script src="assets/strings.js?v=202609240722"></script>
-<script src="assets/store-supabase.js?v=202609240722"></script>
-<script src="assets/store-local.js?v=202609240722"></script>
-<script src="assets/store.js?v=202609240722"></script>
+<script src="assets/version.js?v=202609240725"></script>
+<script src="assets/config.js?v=202609240725"></script>
+<script src="assets/highlight.js?v=202609240725"></script>
+<script src="assets/strings.js?v=202609240725"></script>
+<script src="assets/store-supabase.js?v=202609240725"></script>
+<script src="assets/store-local.js?v=202609240725"></script>
+<script src="assets/store.js?v=202609240725"></script>
 <script>
 (function () {
   "use strict";
@@ -524,6 +532,22 @@
     renderPreview(); refreshSend();
   }
 
+  /* When neither backend answers, the session does not stop: the room moves
+     to the form and the answers are brought in afterwards. Nothing appears
+     unless config.js names a form. */
+  function showFormFallback() {
+    if (!cfg.fallbackFormUrl) return;
+    $("formTitle").textContent = t("form_title");
+    $("formLead").textContent = t("form_lead");
+    $("formBtn").textContent = t("form_btn");
+    $("formBtn").href = cfg.fallbackFormUrl;
+    $("formCard").classList.remove("hidden");
+    $("waitCard").classList.add("hidden");
+    $("whyCard").classList.add("hidden");
+    $("howCard").classList.add("hidden");
+    $("foot").classList.add("hidden");
+  }
+
   /* ---- follow the facilitator ---- */
   let lastKey = null;
   function applyRoom(r) {
@@ -647,15 +671,18 @@
   });
 
   /* ---- polling: the room row and the gaps, only while the page is in front ---- */
-  let timer = null, lostShown = false;
+  let timer = null, lostShown = false, lostRuns = 0;
   async function poll() {
     try {
       const [r, g] = await Promise.all([Store.getRoom(), Store.listGroups()]);
       if (JSON.stringify(g) !== JSON.stringify(groups)) groups = g;
       applyRoom(r);
+      lostRuns = 0;
       if (lostShown) { status(null, null, true); lostShown = false; }
     } catch (e) {
       status("warn", t("lost")); lostShown = true;
+      lostRuns += 1;
+      if (lostRuns >= 5) showFormFallback();      // ~20 seconds of nothing
     }
   }
   function startPolling() { if (timer) return; poll(); timer = setInterval(poll, 4000); }
@@ -672,6 +699,7 @@
       startPolling();
     } catch (e) {
       status("bad", t("join_fail"));
+      showFormFallback();
     }
   })();
 })();

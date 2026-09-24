@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชิ้นส่วนที่หายไป — projector</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609240722">
+<link rel="stylesheet" href="assets/theme.css?v=202609240725">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .title-grid { display:grid; grid-template-columns: 1.25fr .75fr; gap:5vw; align-items:center; height:100%; }
@@ -106,6 +106,14 @@
   .closing .big { font-size:clamp(32px,5vw,90px); font-weight:800; letter-spacing:-.03em; line-height:1.08; }
   .closing .sub { font-size:clamp(16px,1.8vw,31px); color:var(--green-200); margin-top:2.4vh; }
 
+  /* when the backend is gone and config.js names a form, the wall carries it */
+  .form-wall { position:fixed; right:2vw; bottom:2vh; z-index:35; display:flex; gap:1.4vw;
+    align-items:center; background:var(--ink-soft); border:1px solid var(--ink-line);
+    border-radius:0 var(--r-leaf) 0 var(--r-leaf); padding:1.6vh 2vw; box-shadow:var(--shadow-3); }
+  .form-wall .qr { width:clamp(90px,9vw,180px); }
+  .form-wall .qr svg { width:100%; height:auto; display:block; background:#fff; border-radius:6px; padding:5px; }
+  .form-wall .l { font-size:clamp(14px,1.4vw,24px); color:var(--green-100); max-width:22ch; line-height:1.4; }
+
   .offline-flag {
     position:fixed; top:2vh; left:2vw; z-index:30;
     background:#C94A3F; color:#fff; border-radius:100px;
@@ -163,6 +171,10 @@
     <div class="reader-close" id="readerClose"></div>
   </div>
 </div>
+<div id="formWall" class="form-wall hidden">
+  <div class="qr" id="formQr"></div>
+  <div class="l" id="formLead"></div>
+</div>
 <div id="offline" class="offline-flag hidden">ขาดการเชื่อมต่อ — กำลังลองใหม่</div>
 
 <!-- slides are created by script so the sequence follows your config -->
@@ -171,17 +183,17 @@
 <div class="corner-code" id="cornerCode"></div>
 <div class="livecount" id="liveCount"><span class="pip"></span><span>0</span></div>
 
-<script src="assets/version.js?v=202609240722"></script>
-<script src="assets/config.js?v=202609240722"></script>
-<script src="assets/strings.js?v=202609240722"></script>
-<script src="assets/slides.js?v=202609240722"></script>
-<script src="assets/qrcode.js?v=202609240722"></script>
-<script src="assets/timer.js?v=202609240722"></script>
-<script src="assets/highlight.js?v=202609240722"></script>
-<script src="assets/paper.js?v=202609240722"></script>
-<script src="assets/store-supabase.js?v=202609240722"></script>
-<script src="assets/store-local.js?v=202609240722"></script>
-<script src="assets/store.js?v=202609240722"></script>
+<script src="assets/version.js?v=202609240725"></script>
+<script src="assets/config.js?v=202609240725"></script>
+<script src="assets/strings.js?v=202609240725"></script>
+<script src="assets/slides.js?v=202609240725"></script>
+<script src="assets/qrcode.js?v=202609240725"></script>
+<script src="assets/timer.js?v=202609240725"></script>
+<script src="assets/highlight.js?v=202609240725"></script>
+<script src="assets/paper.js?v=202609240725"></script>
+<script src="assets/store-supabase.js?v=202609240725"></script>
+<script src="assets/store-local.js?v=202609240725"></script>
+<script src="assets/store.js?v=202609240725"></script>
 <script>
 (function () {
   "use strict";
@@ -767,13 +779,22 @@
   (async function () {
     let connected = false;
     const flag = $("offline");
-    const sayOffline = text => { flag.textContent = text; flag.classList.remove("hidden"); };
+    const sayOffline = text => {
+      flag.textContent = text; flag.classList.remove("hidden");
+      if (!cfg.fallbackFormUrl || !$("formWall").classList.contains("hidden")) return;
+      try {
+        $("formQr").innerHTML = QRCode.toSVG(cfg.fallbackFormUrl, { level: "M", quietZone: 1 });
+        $("formLead").textContent = t("pj_form_lead");
+        $("formWall").classList.remove("hidden");
+      } catch (e) {}
+    };
 
     async function connect() {
       await Store.init();
       Store.onChange((what, st) => {
         if (what === "offline") { sayOffline("ขาดการเชื่อมต่อ — กำลังลองใหม่"); return; }
         flag.classList.add("hidden");
+        $("formWall").classList.add("hidden");
         if (what === "room" && st.room) {
           const target = Math.max(0, Math.min(SLIDES.length - 1, st.room.current_slide | 0));
           if (target !== current) { show(target); return; }
