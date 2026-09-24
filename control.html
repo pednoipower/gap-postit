@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609241002">
+<link rel="stylesheet" href="assets/theme.css?v=202609241047">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
 /* ============================================================================
@@ -167,7 +167,7 @@
           <button class="btn primary" id="primary">Next</button>
           <button class="btn step ghost" id="next" aria-label="Next slide" title="Next slide (→)">→</button>
           <button class="toggle form-state" id="formToggle" aria-pressed="false"
-                  title="Send the room to the backup form: the projector shows its QR, every phone shows the button.">
+                  title="Swap every QR on the wall to the form. The slides and the rounds carry on unchanged.">
             <span class="pip"></span><span id="formLbl">Form mode off</span><em id="formDo"></em>
           </button>
         </div>
@@ -209,6 +209,28 @@
         <p class="why" style="margin:12px 0 0">Counts leave out the practice round. The board opens and closes with the
           rounds by itself: a writing round opens it, <b>Reveal</b> closes it, and everything else keeps it shut — so
           nothing can be written after the room has seen the answers.</p>
+      </div>
+
+      <!-- In form mode the answers are in a Google Sheet, which the wall cannot
+           read. This is how they get onto the wall anyway, in time for the same
+           Reveal — so the round runs the way it always does. -->
+      <div class="panel hidden" id="formInPanel">
+        <h2>Answers from the form</h2>
+        <p class="why">Form mode changes where people write, not what happens on screen — but the
+          answers land in the responses sheet, which the projector cannot see. Open the sheet, copy
+          the rows for this round, and paste them here: they go onto the board as post-its and
+          <b>Reveal</b> works exactly as on any other round. For a wall of 150 answers, press
+          <b>Copy prompt + these answers</b> first, paste it into Claude, and paste what comes back
+          into the same box — it summarises them into readable notes.</p>
+        <label for="formRows" class="visually-hidden">Paste the answers from the form here</label>
+        <textarea class="text" id="formRows" style="min-height:110px"
+                  placeholder="Paste the rows copied from the responses sheet — or the JSON the AI gave you"></textarea>
+        <div class="row" style="margin-top:10px">
+          <button class="btn small" id="formPut">Put on the board</button>
+          <button class="btn small ghost" id="formAi">Copy prompt + these answers</button>
+          <span style="font-size:13.5px;color:var(--text-dim)" id="formInNote"></span>
+        </div>
+        <div id="formInMsg"></div>
       </div>
     </section>
 
@@ -277,11 +299,13 @@
 
       <div class="panel">
         <h2>The backup form</h2>
-        <p class="why">Where the room goes if the backend cannot be reached, or whenever you press
-          <b>Form mode</b> in the console: the projector clears to one QR and every phone shows a
-          button. Set the link as <code class="inline">fallbackFormUrl</code> in
-          <code class="inline">config.js</code>. Switch off "collect email addresses" on the form,
-          or the anonymity promise stops being true.</p>
+        <p class="why">One form for the whole session — it asks which gap the answer is about, so the
+          same link works on every slide. <b>Form mode</b> in the console swaps every QR on the wall
+          to it; the slides, the rounds and the order do not change, and the answers come back onto
+          the board through <b>Answers from the form</b> on the first tab. The projector also swaps
+          to it by itself if it loses the room. Set the link as
+          <code class="inline">fallbackFormUrl</code> in <code class="inline">config.js</code>, and
+          switch off "collect email addresses", or the anonymity promise stops being true.</p>
         <div id="formNote"></div>
       </div>
 
@@ -297,15 +321,15 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609241002"></script>
-<script src="assets/config.js?v=202609241002"></script>
-<script src="assets/timer.js?v=202609241002"></script>
-<script src="assets/highlight.js?v=202609241002"></script>
-<script src="assets/slides.js?v=202609241002"></script>
-<script src="assets/export.js?v=202609241002"></script>
-<script src="assets/store-supabase.js?v=202609241002"></script>
-<script src="assets/store-local.js?v=202609241002"></script>
-<script src="assets/store.js?v=202609241002"></script>
+<script src="assets/version.js?v=202609241047"></script>
+<script src="assets/config.js?v=202609241047"></script>
+<script src="assets/timer.js?v=202609241047"></script>
+<script src="assets/highlight.js?v=202609241047"></script>
+<script src="assets/slides.js?v=202609241047"></script>
+<script src="assets/export.js?v=202609241047"></script>
+<script src="assets/store-supabase.js?v=202609241047"></script>
+<script src="assets/store-local.js?v=202609241047"></script>
+<script src="assets/store.js?v=202609241047"></script>
 <script>
 (function () {
   "use strict";
@@ -592,9 +616,9 @@
                             : haveForm ? "press to switch" : "no form set yet";
     $("formToggle").disabled = !haveForm && !formOn;
     $("formToggle").title = haveForm
-      ? "Send the room to the backup form: the projector shows its QR, every phone shows the button."
+      ? "Swap every QR on the wall to the form. The slides and the rounds carry on unchanged; the answers go to the sheet."
       : "No backup form yet — set fallbackFormUrl in config.js (see the Room tab).";
-    if (formOn) $("clockNote").textContent = "the room is answering in the backup form";
+    if (formOn) $("clockNote").textContent = "the QR on the wall is the form — answers come in through the sheet";
 
     /* ---- the room so far (practice round left out) ---- */
     const real = st.solutions.filter(x => x.group_id !== PRACTICE);
@@ -609,6 +633,7 @@
       ["new ideas", kind("idea")]
     ].map(([k, v]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
 
+    $("formInPanel").classList.toggle("hidden", !cfg.fallbackFormUrl);
     msg("formNote", cfg.fallbackFormUrl ? "ok" : "warn",
         cfg.fallbackFormUrl
           ? "Form ready: " + escapeHtml(cfg.fallbackFormUrl)
@@ -832,6 +857,302 @@ Thai prose with headings per gap (G1, G2, G3, G4, then ภาพรวม). Labe
     btn.textContent = "Copied";
     setTimeout(() => btn.textContent = label, 1800);
   }
+  /* ======================================================================
+     ANSWERS THAT CAME BACK THROUGH THE FORM
+     ----------------------------------------------------------------------
+     Form mode swaps the QR, nothing else: the slides, the rounds and the
+     order are the same. The one thing it cannot do is show the answers,
+     because they are in a Google Sheet and no browser on the wall may read
+     it. So they come the other way — the facilitator pastes them here and
+     they become notes in the room, which means the blind count, the Reveal,
+     the post-it wall and the export all work exactly as they always do.
+
+     Two shapes are accepted in the same box, because under pressure nobody
+     should have to pick the right one:
+       · rows copied straight out of the responses sheet (tab or comma), one
+         note per answer;
+       · the JSON an AI gives back after summarising those rows, for when
+         150 answers would be a wall nobody can read.
+     ====================================================================== */
+  const NOTE_KINDS = ["cause", "works", "asset", "idea"];
+
+  function uuid() {
+    if (crypto && crypto.randomUUID) return crypto.randomUUID();
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+  }
+
+  /* One line of a pasted sheet. Sheets copy as tabs; a CSV download comes
+     back with quotes around anything containing a comma. */
+  function splitRow(line) {
+    if (line.indexOf("\t") >= 0) return line.split("\t");
+    const out = []; let cur = "", q = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (q) {
+        if (c === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+        else if (c === '"') q = false;
+        else cur += c;
+      } else if (c === '"') q = true;
+      else if (c === ",") { out.push(cur); cur = ""; }
+      else cur += c;
+    }
+    out.push(cur);
+    return out;
+  }
+
+  const has = (v, re) => re.test(String(v || ""));
+
+  function gapIdFrom(cell, fallback) {
+    const v = String(cell || "").trim();
+    const m = /\bG([0-9])\b/i.exec(v);
+    if (m && m[1] !== "0") return "G" + m[1];
+    if (has(v, /ภาพรวม|overall/i)) return Slides.OVERALL;
+    if (has(v, /ซ้อม|practice/i) || /\bG0\b/i.test(v)) return PRACTICE;
+    /* Someone may have written the gap out in full rather than its number. */
+    const g = (Store.state.groups || []).find(x => x.label && v.length > 6 &&
+      (v.indexOf(x.label) >= 0 || x.label.indexOf(v) >= 0));
+    return g ? g.id : fallback;
+  }
+
+  function teamFrom(cell) {
+    if (has(cell, /ทั้งสอง|both/i)) return "both";
+    if (has(cell, /ประคับประคอง|palliat/i)) return "palliative";
+    if (has(cell, /ไต|nephro|renal|kidney/i)) return "nephro";
+    return "other";
+  }
+  function roleFrom(cell) {
+    if (has(cell, /พยาบาล|nurse/i)) return "nurse";
+    if (has(cell, /แพทย์|doctor|physician/i)) return "doctor";
+    if (has(cell, /สหวิชาชีพ|allied/i)) return "allied";
+    return "other";
+  }
+  /* Which colour the note is: the same four kinds the phones send. */
+  function kindFrom(gapId, round, stance) {
+    if (gapId === Slides.OVERALL) {
+      const o = has(stance, /ส่งเสริม|promote/i) ? "promote"
+              : has(stance, /ยกเลิก|stop/i)      ? "stop"
+              : "improve";
+      return { kind: "idea", outcome: o };
+    }
+    const isHow = has(round, /ทำอย่างไร|how/i) || has(stance, /มีอยู่แล้ว|สิ่งใหม่|asset|new/i);
+    if (isHow) return { kind: has(stance, /มีอยู่แล้ว|asset|exist/i) ? "asset" : "idea", outcome: null };
+    return { kind: has(stance, /ไม่ค่อย|works/i) ? "works" : "cause", outcome: null };
+  }
+
+  /* The one shape the importer works in, whichever way the text arrived. */
+  function makeNote(f, fallbackGap) {
+    const body = String(f.body || "").trim();
+    if (!body) return null;
+    const gap = gapIdFrom(f.gap, fallbackGap);
+    if (!gap) return null;
+    let kind = String(f.kind || "").toLowerCase(), outcome = f.outcome || null;
+    if (NOTE_KINDS.indexOf(kind) < 0) {
+      const k = kindFrom(gap, f.round, f.stance);
+      kind = k.kind; outcome = outcome || k.outcome;
+    } else if (gap === Slides.OVERALL && !outcome) {
+      outcome = kindFrom(gap, f.round, f.stance).outcome;
+    }
+    return {
+      groupId: gap, kind, outcome,
+      body,
+      reason:  String(f.why  || "").trim() || null,
+      context: String(f.when || "").trim() || null,
+      actor:   String(f.actor || "").trim() || null,
+      discipline: teamFrom(f.team),
+      role: roleFrom(f.role)
+    };
+  }
+
+  /* Google Forms writes one column per question, in the order the manual
+     says to build them. Headers are matched by word where they are pasted
+     along, and by position where they are not. */
+  const COLS = [
+    ["team",   /ทีม|team/i],
+    ["role",   /หน้าที่|role/i],
+    ["setting",/ที่ทำงาน|setting|hospital/i],
+    ["gap",    /ช่องว่าง|gap/i],
+    ["round",  /รอบ|round/i],
+    ["stance", /ยังเจอ|ไม่ค่อย|stance|มีอยู่แล้ว/i],
+    ["actor",  /ใคร|actor|who/i],
+    ["body",   /มักจะ|does|what/i],
+    ["when",   /เมื่อ|when/i],
+    ["why",    /เพราะ|why|reason/i]
+  ];
+
+  function parseSheet(text, fallbackGap) {
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return { notes: [], skipped: 0 };
+    const rows = lines.map(splitRow);
+    let map = null, start = 0;
+    const head = rows[0].map(c => String(c || ""));
+    if (head.some(c => /ช่องว่าง|gap|timestamp|ประทับเวลา|มักจะ/i.test(c))) {
+      map = {};
+      COLS.forEach(([key, re]) => {
+        const i = head.findIndex(c => re.test(c));
+        if (i >= 0) map[key] = i;
+      });
+      if (Object.keys(map).length < 3) map = null;   // a header we cannot read
+      else start = 1;
+    }
+    /* No usable header: assume the documented order, with or without the
+       timestamp Google puts in front of it. */
+    if (!map) {
+      const off = rows[0].length >= 11 ? 1 : 0;
+      map = {}; COLS.forEach(([key], i) => map[key] = i + off);
+    }
+    const notes = []; let skipped = 0;
+    for (let i = start; i < rows.length; i++) {
+      const r = rows[i];
+      const at = k => (map[k] === undefined ? "" : (r[map[k]] || ""));
+      const n = makeNote({
+        gap: at("gap"), round: at("round"), stance: at("stance"), team: at("team"),
+        role: at("role"), actor: at("actor"), body: at("body"), when: at("when"), why: at("why")
+      }, fallbackGap);
+      if (n) notes.push(n); else skipped++;
+    }
+    return { notes, skipped };
+  }
+
+  function parseNotes(text, fallbackGap) {
+    const trimmed = text.trim();
+    if (!trimmed) return { notes: [], skipped: 0, from: "nothing" };
+    if (trimmed[0] === "[" || trimmed[0] === "{") {
+      let data;
+      try { data = JSON.parse(trimmed); }
+      catch (e) { return { notes: [], skipped: 0, from: "json", error: "That is not valid JSON: " + e.message }; }
+      const list = Array.isArray(data) ? data : (data.notes || [data]);
+      const notes = []; let skipped = 0;
+      for (const o of list) {
+        const n = makeNote({
+          gap: o.gap || o.group || o.group_id, round: o.round, stance: o.stance || o.outcome,
+          team: o.team || o.discipline, role: o.role, actor: o.actor,
+          body: o.body || o.does || o.what, when: o.when || o.context, why: o.why || o.reason,
+          kind: o.kind, outcome: o.outcome
+        }, fallbackGap);
+        if (n) notes.push(n); else skipped++;
+      }
+      return { notes, skipped, from: "json" };
+    }
+    const r = parseSheet(trimmed, fallbackGap);
+    return { notes: r.notes, skipped: r.skipped, from: "sheet" };
+  }
+
+  /* A summarised note is nobody's single answer, so it carries one shared id
+     rather than pretending to be a person; a pasted row is one person, and
+     gets its own. Either way the export can tell them apart from phone notes
+     by this id. */
+  const FORM_PID = "00000000-0000-4000-8000-00000000f0f0";
+
+  function formRowCount() {
+    const room = Store.state.room;
+    const fallback = room ? room.spotlight_group : null;
+    return parseNotes($("formRows").value, fallback);
+  }
+
+  function showFormCount() {
+    if (!cfg.fallbackFormUrl) return;
+    const r = formRowCount();
+    $("formInNote").textContent = !r.notes.length && !r.skipped ? ""
+      : `${r.notes.length} note${r.notes.length === 1 ? "" : "s"} ready` +
+        (r.skipped ? ` · ${r.skipped} line${r.skipped === 1 ? "" : "s"} with no text, skipped` : "");
+  }
+  $("formRows").addEventListener("input", showFormCount);
+
+  let lastImport = null;
+  async function putFormOnBoard(btn) {
+    const room = Store.state.room;
+    if (!room) { msg("formInMsg", "bad", "Not connected to the room yet."); return; }
+    const r = formRowCount();
+    if (r.error) { msg("formInMsg", "bad", escapeHtml(r.error)); return; }
+    if (!r.notes.length) {
+      msg("formInMsg", "bad", "Nothing readable in that paste. Every note needs at least the มักจะ / what column.");
+      return;
+    }
+    const signature = r.notes.length + ":" + r.notes[0].body + ":" + r.notes[r.notes.length - 1].body;
+    if (signature === lastImport &&
+        !confirm(`This looks like the same ${r.notes.length} notes you just put on the board. Add them again?`)) return;
+
+    const byGap = {};
+    r.notes.forEach(n => byGap[n.groupId] = (byGap[n.groupId] || 0) + 1);
+    const summarised = r.from === "json";
+
+    btn.disabled = true;
+    msg("formInMsg", "", `Putting ${r.notes.length} notes on the board…`);
+    /* Notes may only be written while the round is open — that is the rule
+       that keeps a revealed round honest. Open it for as long as this takes
+       and put it back exactly as it was. */
+    const wasOpen = !!room.board_open;
+    let failed = 0, queued = 0;
+    try {
+      if (!wasOpen) await Store.control(token, { open: true });
+      for (let i = 0; i < r.notes.length; i += 8) {
+        const batch = r.notes.slice(i, i + 8).map(n => Store.addSolution({
+          groupId: n.groupId, kind: n.kind, body: n.body, reason: n.reason,
+          outcome: n.outcome, actor: n.actor, context: n.context,
+          role: n.role, discipline: n.discipline,
+          participantId: summarised ? FORM_PID : uuid()
+        }).then(res => {
+          if (!res || res.ok === false) failed++;
+          /* Held on this laptop because the connection went: not on the
+             board, and not lost either. Say which it is. */
+          else if (res.queued) queued++;
+        }).catch(() => { failed++; }));
+        await Promise.all(batch);
+      }
+    } finally {
+      if (!wasOpen) { try { await Store.control(token, { open: false }); } catch (e) {} }
+      btn.disabled = false;
+    }
+    lastImport = signature;
+    const where = Object.keys(byGap).sort().map(g => g + " " + byGap[g]).join(" · ");
+    if (failed || queued) {
+      const on = r.notes.length - failed - queued;
+      msg("formInMsg", "warn",
+        `${on} of ${r.notes.length} notes are on the board (${escapeHtml(where)}).` +
+        (queued ? ` ${queued} are waiting for the connection and will go up by themselves.` : "") +
+        (failed ? ` ${failed} did not go through — paste those rows again.` : ""));
+    } else {
+      msg("formInMsg", "ok", `${r.notes.length} notes on the board: ${escapeHtml(where)}. Press Reveal when you are ready.`);
+      $("formRows").value = "";
+      showFormCount();
+    }
+    await refreshNow();
+  }
+  $("formPut").addEventListener("click", e => putFormOnBoard(e.currentTarget));
+
+  /* The same job the after-the-day prompt does, but for the wall and in the
+     middle of the session: fewer, readable notes, in the room's own words,
+     in the shape the box above can read straight back. */
+  const FORM_AI_PROMPT = `You are helping run a live workshop for Thai nephrology and palliative care clinicians. The room is answering in a Google Form, and their answers have to go up on the wall in the next two minutes as post-it notes.
+
+Below are the raw responses. Each row is one person. The columns are: team · role · main workplace · which gap · which round (ทำไม = why this gap happens here, ทำอย่างไร = what we would do) · whether they still meet the gap or not · ใคร (actor) · มักจะ (what that actor does) · เมื่อ (in what situation) · เพราะ (why, or what is missing).
+
+YOUR TASK
+Merge answers that say the same thing into single notes, in the participants' own Thai words. Keep every distinct point: if two people gave different reasons, that is two notes, not one. Do not invent anything nobody wrote, do not soften, do not translate into English.
+- At most 12 notes per gap per round.
+- Keep the sentence parts separate: actor, body, when, why — do not glue them into one string.
+- Where a point came from both teams, set "team" to "both".
+
+OUTPUT
+A JSON array and nothing else — no prose before or after, no code fence. One object per note:
+{"gap":"G1","round":"why","stance":"ยังเจอ","team":"nephro","role":"nurse","actor":"พยาบาลไต","body":"…","when":"…","why":"…"}
+- "gap": G1, G2, G3, G4 or ภาพรวม, exactly as the rows say.
+- "round": "why" or "how".
+- "stance": for a why note "ยังเจอ" or "ไม่ค่อยเจอ"; for a how note "มีอยู่แล้ว" or "สิ่งใหม่"; for ภาพรวม "ส่งเสริม", "ปรับปรุง" or "ยกเลิก".
+- "team": "nephro", "palliative" or "both".
+- A how note has no actor and no when: leave them out.`;
+
+  $("formAi").addEventListener("click", e => {
+    const rows = $("formRows").value.trim();
+    if (!rows) { msg("formInMsg", "bad", "Paste the rows from the responses sheet first."); return; }
+    copyText(FORM_AI_PROMPT + "\n\n" + "=".repeat(74) + "\nTHE RESPONSES\n" + "=".repeat(74) + "\n\n" + rows,
+             e.currentTarget, "Copy prompt + these answers");
+    msg("formInMsg", "ok", "Copied. Paste it into Claude, then paste the JSON it gives back into the same box and press Put on the board.");
+  });
+
   $("copyPrompt").addEventListener("click", e => copyText(fullPrompt(), e.currentTarget, "Copy prompt + notes"));
   $("copyPromptOnly").addEventListener("click", e => copyText(AI_PROMPT, e.currentTarget, "Prompt only"));
   $("cpTxt").addEventListener("click", async e => {

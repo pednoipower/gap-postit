@@ -328,16 +328,25 @@ body.present {
 }
 .slide-body { flex: 1; min-height: 0; position: relative; }
 
+/* The join code, kept on screen for the whole session: a QR small enough to
+   stay out of the way and big enough to scan from the middle of a lecture
+   room. Anyone who looks up on slide 9 can still get in. */
 .corner-code {
   position: fixed; right: 2vw; bottom: 2vh;
   display: flex; align-items: center; gap: 14px;
   background: rgba(255,255,255,.06);
   border: 1px solid rgba(255,255,255,.12);
-  border-radius: 100px; padding: 10px 20px;
+  border-radius: 0 var(--r-leaf) 0 var(--r-leaf); padding: 10px 14px 10px 10px;
   font-size: clamp(13px, 1.1vw, 19px); color: #C4CCDD;
   backdrop-filter: blur(8px);
 }
 .corner-code b { color: #fff; letter-spacing: .16em; font-size: 1.16em; }
+.corner-code .qr {
+  width: clamp(72px, 7vw, 132px); background: #fff;
+  border-radius: 10px; padding: 7px; flex: none;
+}
+.corner-code .qr svg { display: block; width: 100%; height: auto; }
+.corner-code .label { display: flex; flex-direction: column; gap: 3px; line-height: 1.25; }
 
 .livecount {
   position: fixed; left: 2vw; bottom: 2vh;

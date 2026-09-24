@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609241002">
+<link rel="stylesheet" href="assets/theme.css?v=202609241047">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .stat-line { font-size: 14px; color: var(--gold-700); font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
@@ -167,14 +167,14 @@
   <p class="hint center" style="opacity:.6;font-size:12px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609241002"></script>
-<script src="assets/config.js?v=202609241002"></script>
-<script src="assets/highlight.js?v=202609241002"></script>
-<script src="assets/timer.js?v=202609241002"></script>
-<script src="assets/strings.js?v=202609241002"></script>
-<script src="assets/store-supabase.js?v=202609241002"></script>
-<script src="assets/store-local.js?v=202609241002"></script>
-<script src="assets/store.js?v=202609241002"></script>
+<script src="assets/version.js?v=202609241047"></script>
+<script src="assets/config.js?v=202609241047"></script>
+<script src="assets/highlight.js?v=202609241047"></script>
+<script src="assets/timer.js?v=202609241047"></script>
+<script src="assets/strings.js?v=202609241047"></script>
+<script src="assets/store-supabase.js?v=202609241047"></script>
+<script src="assets/store-local.js?v=202609241047"></script>
+<script src="assets/store.js?v=202609241047"></script>
 <script>
 (function () {
   "use strict";
@@ -537,11 +537,14 @@
      to the form and the answers are brought in afterwards. Nothing appears
      unless config.js names a form. */
   function hideFormFallback() { $("formCard").classList.add("hidden"); }
-  function showFormFallback(gapLabel) {
+  /* The round does not change in form mode — same gap, same question, same
+     order. Only the place the answer is written moves, so the card says the
+     gap and which round it is, exactly as the round cards do. */
+  function showFormFallback(gapLabel, roundLabel) {
     if (!cfg.fallbackFormUrl) return;
-    $("formLead").textContent = gapLabel || t("form_lead");
-    $("formTitle").textContent = t("form_title");
-    if (!gapLabel) $("formLead").textContent = t("form_lead");
+    if (gapLabel) $("formTitle").innerHTML = Highlight.html(gapLabel, escapeHtml);
+    else $("formTitle").textContent = t("form_title");
+    $("formLead").textContent = (roundLabel ? roundLabel + " · " : "") + t("form_lead");
     $("formBtn").textContent = t("form_btn");
     $("formBtn").href = cfg.fallbackFormUrl;
     $("formCard").classList.remove("hidden");
@@ -585,7 +588,8 @@
        whatever round the room is otherwise in. */
     if (window.RoomMode && RoomMode.formOn(room) && cfg.fallbackFormUrl) {
       const g0 = currentGap();
-      showFormFallback(g0 ? g0.label : t("form_lead"));
+      const round = m === "why" ? t("why_title") : m === "how" ? t("how_title") : null;
+      showFormFallback(g0 && m !== "wait" ? g0.label : null, round);
       renderSteps();
       return;
     }

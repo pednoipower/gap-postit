@@ -36,7 +36,9 @@ password written somewhere that is not the laptop.
 ## Setting up in the room (5 minutes)
 
 - Projector window on the big screen, **full screen** (the button is top
-  right, or press <kbd>F</kbd>). It shows the title and the QR.
+  right, or press <kbd>F</kbd>). It shows the title and the QR. The QR then
+  stays in the bottom-right corner for the whole session, so anyone who looks
+  up late can still join without asking.
 - Control panel on the laptop screen. Unlock it.
 - Both should show the same build number — control panel next to "Supabase",
   projector in the corner chip. If they differ, hard-refresh the projector
@@ -140,19 +142,30 @@ export both afterwards and put them side by side; nothing is lost.
 on it, and run step 3. Everyone must be on the same network as the laptop —
 they do not need the internet.
 
-**4½. Phones work, our backend does not → the backup form.** Put a Google
-Form link in `fallbackFormUrl` in `config.js` before the day. Then either:
+**4½. The backup form.** Put a Google Form link in `fallbackFormUrl` in
+`config.js` before the day — **one form for the whole session**, with a
+question asking which gap the answer is about. Then **Form mode** in the
+console swaps every QR on the wall to it.
 
-- **You decide**: press **Form mode** in the console. The projector clears to
-  a single screen — the words, the gap being answered, and one big QR — and
-  every phone shows the button. It stays on through slide changes, so you can
-  keep walking the gaps while people answer in the form. Press it again to
-  come back; nothing was lost while it was on.
-- **Or it decides**: if nothing answers at all, the phones offer the form by
-  themselves after about twenty seconds, and the projector puts its QR in the
-  corner.
+Nothing else changes: same slides, same rounds, same order, same words. You
+keep driving as usual; press it again to come back. If the projector loses the
+room altogether it makes the swap itself, because nobody can tell it to.
 
-Only one code is ever on the wall at a time, so nobody scans the wrong one.
+**Getting the answers onto the wall.** On the first tab, **Answers from the
+form** appears as soon as a form is configured:
+
+1. Open the responses sheet, select the rows for the round you are in, copy.
+2. Paste them into the box. It says how many notes it can read.
+3. Few enough to read? Press **Put on the board** — they go up as post-its.
+4. Too many? Press **Copy prompt + these answers** first, paste that into
+   Claude, and paste the JSON it gives back into the same box. It merges the
+   answers that say the same thing and keeps the rest, in participants' own
+   words. Then **Put on the board**.
+5. **Reveal** as usual.
+
+They become ordinary notes — colours, counts, reveal and `.xlsx` all work on
+them. Summarised notes share one anonymous id, so the export can still tell
+them from notes written on a phone.
 
 Make the form's questions match the export, in this order, all short-answer
 except the two choices:
@@ -164,10 +177,8 @@ except the two choices:
 **Turn off "collect email addresses"**, or the promise made at the start —
 that nothing can be traced back to anyone — stops being true.
 
-What you lose while the form is in use: the live count, the blind round and
-the reveal. A form can take answers but cannot hand them back fast enough to
-drive the wall. Keep the rhythm by reading two or three aloud from the
-responses sheet on your own screen at the moment you would have revealed.
+What it costs: the count sits at nought until you paste, so the room does not
+watch itself fill up. Everything else survives.
 
 **5. Nothing electronic works.** Print `docs/paper-fallback.md` before the day
 and keep it in the bag. It has the four gaps and the sentence with its blanks;

@@ -19,11 +19,14 @@
     join_connected:   { th: "เชื่อมต่อแล้ว · ห้อง",                   en: "Connected. Room" },
     join_fail:        { th: "เชื่อมต่อไม่ได้ ลองตรวจสอบ Wi-Fi แล้วดึงหน้าจอลงเพื่อโหลดใหม่", en: "Can't reach the workshop. Check your wifi, then pull down to refresh." },
 
-    // the form of last resort
-    form_title:       { th: "ระบบขัดข้อง",                                    en: "The system is down" },
-    form_lead:        { th: "ตอบในฟอร์มสำรองแทน คำตอบจะถูกนำเข้าระบบภายหลัง",    en: "Use the backup form — answers are brought into the system afterwards" },
-    form_btn:         { th: "เปิดฟอร์มสำรอง",                                  en: "Open the backup form" },
-    pj_form_lead:     { th: "ระบบขัดข้อง — สแกนเพื่อตอบในฟอร์มสำรอง",            en: "System down — scan to answer in the backup form" },
+    // the backup form. The room may be sent there on purpose, not only when
+    // something breaks, so nothing here says the system is down.
+    form_title:       { th: "รอบนี้ตอบในฟอร์ม",                                en: "This round is answered in the form" },
+    form_lead:        { th: "เปิดฟอร์มแล้วเลือกช่องว่างที่อยู่บนจอ คำตอบจะถูกนำเข้าระบบภายหลัง", en: "Open the form and pick the gap that is on the screen — answers are brought in afterwards" },
+    form_btn:         { th: "เปิดฟอร์ม",                                       en: "Open the form" },
+    pj_form_lead:     { th: "สแกนเพื่อตอบในฟอร์ม",                              en: "Scan to answer in the form" },
+    pj_form_corner:   { th: "ตอบในฟอร์ม",                                      en: "answer in the form" },
+    pj_form_sub:      { th: "ตอบในฟอร์ม — สแกน QR ที่มุมขวาล่าง",                 en: "Answer in the form — scan the QR in the bottom right" },
 
     // waiting
     wait_title:       { th: "รอเริ่มสักครู่…",                            en: "Waiting to start…" },
