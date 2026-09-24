@@ -18,6 +18,10 @@
   "use strict";
 
   const PAT = /^tmr:(run|hold):(\d+)$/;
+  /* A clock older than this is not a clock, it is yesterday: a control panel
+     left open overnight, or a timer state nobody cleared. Show nothing
+     rather than 1192:01. */
+  const STALE_MS = 2 * 60 * 60 * 1000;
 
   const Timer = {
     _key: null,
@@ -25,8 +29,16 @@
 
     read(room) {
       const m = room && room.active_prompt_id && PAT.exec(room.active_prompt_id);
-      return m ? { state: m[1], value: Number(m[2]) } : null;
+      if (!m) return null;
+      const st = { state: m[1], value: Number(m[2]) };
+      if (st.state === "run" && Date.now() - st.value > STALE_MS) return null;
+      if (st.state === "hold" && st.value > STALE_MS) return null;
+      return st;
     },
+
+    /* True when the clock has been running longer than any round could last:
+       the page has been open since another day, not since this slide. */
+    stale(room) { return this.elapsed(room) > STALE_MS; },
 
     /* Milliseconds on the clock right now. */
     elapsed(room) {

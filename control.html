@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609231033">
+<link rel="stylesheet" href="assets/theme.css?v=202609240647">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
 /* ============================================================================
@@ -275,15 +275,15 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609231033"></script>
-<script src="assets/config.js?v=202609231033"></script>
-<script src="assets/timer.js?v=202609231033"></script>
-<script src="assets/highlight.js?v=202609231033"></script>
-<script src="assets/slides.js?v=202609231033"></script>
-<script src="assets/export.js?v=202609231033"></script>
-<script src="assets/store-supabase.js?v=202609231033"></script>
-<script src="assets/store-local.js?v=202609231033"></script>
-<script src="assets/store.js?v=202609231033"></script>
+<script src="assets/version.js?v=202609240647"></script>
+<script src="assets/config.js?v=202609240647"></script>
+<script src="assets/timer.js?v=202609240647"></script>
+<script src="assets/highlight.js?v=202609240647"></script>
+<script src="assets/slides.js?v=202609240647"></script>
+<script src="assets/export.js?v=202609240647"></script>
+<script src="assets/store-supabase.js?v=202609240647"></script>
+<script src="assets/store-local.js?v=202609240647"></script>
+<script src="assets/store.js?v=202609240647"></script>
 <script>
 (function () {
   "use strict";
@@ -408,12 +408,23 @@
      is a question for the facilitator, not for the room. */
   const mmss = secs => Timer.mmss(secs);
 
+  const DAY_MS = 12 * 60 * 60 * 1000;
   function sessionStart() {
-    try { return Number(localStorage.getItem(SESSION_KEY)) || null; } catch { return null; }
+    try {
+      const v = Number(localStorage.getItem(SESSION_KEY)) || null;
+      // a start from another day is not this session
+      if (v && Date.now() - v > DAY_MS) { localStorage.removeItem(SESSION_KEY); return null; }
+      return v;
+    } catch { return null; }
   }
   function markSessionStarted() {
     if (sessionStart()) return;
     try { localStorage.setItem(SESSION_KEY, String(Date.now())); } catch {}
+  }
+  /* Back in the lobby at slide 1 is the state a room is in before it starts
+     and after it is cleared: the session has not begun. */
+  function clearSession() {
+    try { localStorage.removeItem(SESSION_KEY); } catch {}
   }
 
   function tickClock() {
@@ -422,12 +433,14 @@
     const s = currentSlide();
     const secs = Math.floor(Timer.elapsed(room) / 1000);
     const target = isRevealed() ? REVEAL_TARGET : (s ? TARGET[s.phase] : null);
-    $("timerVal").textContent = mmss(secs);
-    $("timerLbl").textContent = target ? "of " + mmss(target) : "on this slide";
+    const idle = room.phase === "lobby" || Timer.stale(room);
+    $("timerVal").textContent = idle ? "—" : mmss(secs);
+    $("timerLbl").textContent = idle ? "not running"
+                              : target ? "of " + mmss(target) : "on this slide";
     const m = $("timerMeter");
     const held = Timer.held(room);
-    m.classList.toggle("near", !held && !!target && secs >= target * 0.8 && secs < target);
-    m.classList.toggle("over", !held && !!target && secs >= target);
+    m.classList.toggle("near", !idle && !held && !!target && secs >= target * 0.8 && secs < target);
+    m.classList.toggle("over", !idle && !held && !!target && secs >= target);
     m.classList.toggle("held", held);
     $("holdBtn").textContent = held ? "Start" : "Pause";
     $("clockNote").textContent = held ? "paused — the screen is paused too" : "";
@@ -473,7 +486,8 @@
 
     // the round clock restarts itself when the room moves (assets/timer.js);
     // the session clock starts the first time the room leaves the lobby
-    if (room.phase !== "lobby") markSessionStarted();
+    if (room.phase === "lobby" && !(room.current_slide | 0)) clearSession();
+    else if (room.phase !== "lobby") markSessionStarted();
     tickClock();
 
     /* ---- the console ---- */
