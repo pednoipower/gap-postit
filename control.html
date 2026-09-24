@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control — The Missing Piece</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609240654">
+<link rel="stylesheet" href="assets/theme.css?v=202609240722">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
 /* ============================================================================
@@ -161,8 +161,8 @@
           </button>
         </div>
         <div class="actions" style="margin-top:9px">
-          <button class="btn tiny ghost" id="holdBtn" title="Pause or restart the clock (P)">Pause</button>
-          <button class="btn tiny ghost" id="zeroBtn" title="Back to 0:00">Reset</button>
+          <button class="btn tiny ghost" id="holdBtn" title="Pause the clock on both screens (P)">Pause clock</button>
+          <button class="btn tiny ghost" id="zeroBtn" title="Puts this round's clock back to 0:00. It changes nothing anyone wrote.">Clock to 0:00</button>
           <span class="clock-note" id="clockNote"></span>
         </div>
         <div id="secondary" class="actions" style="margin-top:9px"></div>
@@ -275,15 +275,15 @@
   </div>
 </div>
 
-<script src="assets/version.js?v=202609240654"></script>
-<script src="assets/config.js?v=202609240654"></script>
-<script src="assets/timer.js?v=202609240654"></script>
-<script src="assets/highlight.js?v=202609240654"></script>
-<script src="assets/slides.js?v=202609240654"></script>
-<script src="assets/export.js?v=202609240654"></script>
-<script src="assets/store-supabase.js?v=202609240654"></script>
-<script src="assets/store-local.js?v=202609240654"></script>
-<script src="assets/store.js?v=202609240654"></script>
+<script src="assets/version.js?v=202609240722"></script>
+<script src="assets/config.js?v=202609240722"></script>
+<script src="assets/timer.js?v=202609240722"></script>
+<script src="assets/highlight.js?v=202609240722"></script>
+<script src="assets/slides.js?v=202609240722"></script>
+<script src="assets/export.js?v=202609240722"></script>
+<script src="assets/store-supabase.js?v=202609240722"></script>
+<script src="assets/store-local.js?v=202609240722"></script>
+<script src="assets/store.js?v=202609240722"></script>
 <script>
 (function () {
   "use strict";
@@ -442,7 +442,7 @@
     m.classList.toggle("near", !idle && !held && !!target && secs >= target * 0.8 && secs < target);
     m.classList.toggle("over", !idle && !held && !!target && secs >= target);
     m.classList.toggle("held", held);
-    $("holdBtn").textContent = held ? "Start" : "Pause";
+    $("holdBtn").textContent = held ? "Start clock" : "Pause clock";
     $("clockNote").textContent = held ? "paused — the screen is paused too" : "";
 
     const started = sessionStart();

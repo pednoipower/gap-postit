@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBFAF7">
 <title>ชิ้นส่วนที่หายไป</title>
-<link rel="stylesheet" href="assets/theme.css?v=202609240654">
+<link rel="stylesheet" href="assets/theme.css?v=202609240722">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='2' fill='%23F2E6B8'/><rect x='5' y='5' width='22' height='5' rx='2' fill='%23D4A020'/></svg>">
 <style>
   .stat-line { font-size: 14px; color: var(--gold-700); font-weight: 600; line-height: 1.5; margin: 0 0 12px; }
@@ -159,13 +159,13 @@
   <p class="hint center" style="opacity:.6;font-size:12px;margin:8px 0 4px" id="buildLine"></p>
 </div>
 
-<script src="assets/version.js?v=202609240654"></script>
-<script src="assets/config.js?v=202609240654"></script>
-<script src="assets/highlight.js?v=202609240654"></script>
-<script src="assets/strings.js?v=202609240654"></script>
-<script src="assets/store-supabase.js?v=202609240654"></script>
-<script src="assets/store-local.js?v=202609240654"></script>
-<script src="assets/store.js?v=202609240654"></script>
+<script src="assets/version.js?v=202609240722"></script>
+<script src="assets/config.js?v=202609240722"></script>
+<script src="assets/highlight.js?v=202609240722"></script>
+<script src="assets/strings.js?v=202609240722"></script>
+<script src="assets/store-supabase.js?v=202609240722"></script>
+<script src="assets/store-local.js?v=202609240722"></script>
+<script src="assets/store.js?v=202609240722"></script>
 <script>
 (function () {
   "use strict";
@@ -243,6 +243,7 @@
   }
   function setSite(v) {
     site = v;
+    saveDraft(lastKey);
     $("stHas").setAttribute("aria-pressed", String(v === "cause"));
     $("stHasnot").setAttribute("aria-pressed", String(v === "works"));
     $("whyFields").classList.remove("hidden");
@@ -265,7 +266,7 @@
     $("workedLbl").textContent = t("worked_lbl");
     $("workedText").innerHTML = t(wk);
     $("worked").open = isPractice();
-    chips($("whoChoices"), actorsNow(), id => { actor = id; renderPreview(); }, actor);
+    chips($("whoChoices"), actorsNow(), id => { actor = id; renderPreview(); saveDraft(lastKey); }, actor);
     renderPreview();
     refreshSend();
   }
@@ -392,6 +393,7 @@
 
   function setStance(s) {
     stance = s;
+    saveDraft(lastKey);
     const list = stanceList(), hit = list.find(x => x.id === s) || list[0];
     [...$("stanceRow").children].forEach(b => b.setAttribute("aria-pressed", String(b.dataset.stance === s)));
     $("howFields").classList.remove("hidden");
@@ -438,7 +440,11 @@
       cooling ? t("cooling") : label;
   }
   setInterval(refreshSend, 400);
-  ["wWhen","wBody","wWhy","hWhat","hWhy"].forEach(id => $(id).addEventListener("input", refreshSend));
+  ["wWhen","wBody","wWhy","hWhat","hWhy"].forEach(id => $(id).addEventListener("input", () => {
+    refreshSend();
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(() => saveDraft(lastKey), 400);
+  }));
   ["wWhen","wBody","wWhy"].forEach(id => $(id).addEventListener("input", renderPreview));
 
   /* The one blank people answer with a category — "ไม่มีเวลา", "คนไม่พอ" —
@@ -480,6 +486,44 @@
     }
   }
 
+  /* ---- a half-typed answer survives the tab being thrown away -------------
+     Sent notes are in the database the moment Send is pressed, and a note sent
+     with no signal waits in the outbox, which is also on disk. What was only
+     ever in a textarea was not: a phone that runs low on memory reloads the
+     page by itself and the sentence was gone. Drafts are now written to this
+     phone's own storage as they are typed, and read back when the same round
+     is still on screen. They never leave the phone and they are cleared the
+     moment the note is sent or the room moves to another round. */
+  const DRAFT_KEY = "missingpiece.draft." + cfg.roomCode;
+  let draftTimer = null;
+
+  function saveDraft(key) {
+    if (!key) return;
+    const d = { key, site, stance, actor,
+                wWhen: $("wWhen").value, wBody: $("wBody").value, wWhy: $("wWhy").value,
+                hWhat: $("hWhat").value, hWhy: $("hWhy").value };
+    const empty = !d.wWhen && !d.wBody && !d.wWhy && !d.hWhat && !d.hWhy && !d.site && !d.stance;
+    try { empty ? localStorage.removeItem(DRAFT_KEY) : localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); }
+    catch (e) {}
+  }
+  function readDraft(key) {
+    try {
+      const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+      return d && d.key === key ? d : null;
+    } catch (e) { return null; }
+  }
+  function clearDraft() { try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
+
+  function restoreDraft(key) {
+    const d = readDraft(key);
+    if (!d) return;
+    ["wWhen","wBody","wWhy","hWhat","hWhy"].forEach(id => { if (d[id]) $(id).value = d[id]; });
+    actor = d.actor || null;
+    if (d.site) setSite(d.site);
+    if (d.stance) setStance(d.stance);
+    renderPreview(); refreshSend();
+  }
+
   /* ---- follow the facilitator ---- */
   let lastKey = null;
   function applyRoom(r) {
@@ -496,13 +540,18 @@
     const key = (room.phase === "why" || room.phase === "why_reveal") ? "why:" + room.spotlight_group
               : (room.phase === "how" || room.phase === "how_reveal") ? "how:" + room.spotlight_group
               : room.phase;
+    const firstSight = lastKey === null;
     if (key !== lastKey) {
+      const movedOn = !firstSight;
       lastKey = key;
+      if (movedOn) clearDraft();          // a different round: the old draft is done with
       ["wWhen","wBody","wWhy","hWhat","hWhy"].forEach(id => $(id).value = "");
       stance = null; site = null; actor = null;
       [...$("stanceRow").children].forEach(b => b.setAttribute("aria-pressed", "false"));
       $("stHas").setAttribute("aria-pressed", "false"); $("stHasnot").setAttribute("aria-pressed", "false");
       $("howFields").classList.add("hidden"); $("whyFields").classList.add("hidden");
+      // reloaded into the middle of the round it was already in
+      if (firstSight) restoreDraft(key);
     }
 
     $("whyCard").classList.toggle("hidden", m !== "why");
@@ -583,6 +632,7 @@
         mine.push(entry);
         if (m === "why") { $("wWhen").value = ""; $("wBody").value = ""; $("wWhy").value = ""; renderPreview(); }
         if (m === "how") { $("hWhat").value = ""; $("hWhy").value = ""; }
+        clearDraft();
         lastSentAt = Date.now();
         status(res.queued ? "warn" : "ok", res.queued ? t("sent_queued") : t("sent_ok"));
         setTimeout(() => status(null, null, true), res.queued ? 6000 : 2600);
