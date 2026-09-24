@@ -74,6 +74,11 @@ have been shaped by what people saw. Everywhere else it says **Next**.
 the session against 45 minutes. **Pause** stops both screens at once (the
 countdown on the wall freezes too), **Reset** puts the round back to 0:00.
 
+**The two pills are buttons.** Each shows the state and, beside it, what
+pressing it does: *Board open · press to close*, *Form mode off · press to
+switch*. Red on the board pill means the board is shut, not that anything is
+wrong.
+
 **Without the mouse:** <kbd>←</kbd> <kbd>→</kbd> move · <kbd>R</kbd> reveal or
 collect again · <kbd>B</kbd> open or close the board · <kbd>P</kbd> pause.
 
